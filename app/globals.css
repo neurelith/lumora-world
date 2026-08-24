@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* PRD §8.2 + Brand Kit §4 — neutral snapped (ponytail: parchment is alias of paper) */
+  --bg-parchment: #F4F2F6;
+  --bg-paper: #F4F2F6;
+  --bg-ivory: #fefefb;
+  --bg-white: #ffffff;
+  --bg-sand: #f0ede5;
+  --bg-charcoal: #3a3835;
+  --bg-deep: #1e1d1b;
+  --text-primary: #2B2A33;
+  --text-secondary: #6b6863;
+  --text-tertiary: #9e9a93;
+  --text-quaternary: #c4c0b8;
+  --text-on-dark: #f5f3ee;
+  --accent-terracotta: #c96442;
+  --accent-terracotta-hover: #b8583a;
+  --accent-terracotta-soft: rgba(201, 100, 66, 0.12);
+  --accent-terracotta-ring: rgba(201, 100, 66, 0.35);
+  --success-sage: #4a7c5e;
+  --success-sage-soft: rgba(74, 124, 94, 0.12);
+  --warning-amber: #E8A33D;
+  --warning-amber-soft: rgba(232, 163, 61, 0.14);
+  --danger-terracotta: #b53333;
+  --danger-terracotta-soft: rgba(181, 51, 51, 0.12);
+  --focus-blue: #3898ec;
+  --border-whisper: rgba(45, 43, 40, 0.08);
+  --border-soft: rgba(45, 43, 40, 0.12);
+  --border-on-dark: rgba(245, 243, 238, 0.1);
+  --shadow-ring: 0 0 0 1px var(--border-whisper);
+  --shadow-sm: 0 1px 2px rgba(45, 43, 40, 0.04);
+  --shadow-card: 0 4px 18px rgba(45, 43, 40, 0.04), 0 2px 8px rgba(45, 43, 40, 0.025), 0 1px 3px rgba(45, 43, 40, 0.02);
+  --shadow-float: 0 16px 32px rgba(45, 43, 40, 0.08), 0 8px 16px rgba(45, 43, 40, 0.05);
+  --shadow-deep: 0 24px 48px rgba(45, 43, 40, 0.1), 0 12px 24px rgba(45, 43, 40, 0.06), inset 0 1px 0 rgba(255,255,255,0.04);
+  --radius-chip: 4px;
+  --radius-button: 8px;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --radius-hero: 24px;
+  --radius-pill: 9999px;
+  --font-display: var(--font-display, 'Sora', 'Helvetica Neue', sans-serif);
+  --font-body: 'Spline Sans', var(--font-devanagari, 'Noto Sans Devanagari'), 'Helvetica Neue', sans-serif;
+  --font-mono: var(--font-mono, 'JetBrains Mono', 'Menlo', monospace);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-expo: cubic-bezier(0, 0, 0.2, 1);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 350ms;
+}
+
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+body { color: var(--text-primary); background: var(--bg-parchment); font-family: var(--font-body); font-size: 1.0625rem; line-height: 1.60; touch-action: manipulation; overflow-x: hidden; }
+h1, h2, h3, h4, h5, h6, .font-display { font-family: var(--font-display); font-weight: 600; }
+::selection { background: var(--accent-terracotta); color: #fff; }
+:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--focus-blue); border-radius: 4px; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+input, select, textarea { border-color: var(--border-whisper); border-radius: var(--radius-button); background: var(--bg-white); color: var(--text-primary); }
+input::placeholder, textarea::placeholder { color: var(--text-tertiary); }
+input:focus, select:focus, textarea:focus { border-color: var(--focus-blue); box-shadow: 0 0 0 4px rgba(56, 152, 236, 0.16); outline: none; }
+.sensory-calm { filter: saturate(0.58) brightness(0.99); }
+.sensory-calm *, .sensory-calm *::before, .sensory-calm *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: 0.01ms !important; } }
+canvas.tracing-canvas { touch-action: none !important; user-select: none !important; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg-parchment); }
+::-webkit-scrollbar-thumb { background: var(--text-tertiary); border: 3px solid var(--bg-parchment); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+/* — Disney wand: hide system cursor on desktop fine-pointer, keep it on touch/coarse — */
+@media (pointer: fine) {
+  html.using-wand, html.using-wand body, html.using-wand a, html.using-wand button, html.using-wand [role="button"] {
+    cursor: none !important;
+  }
+  html.using-wand canvas.tracing-canvas { cursor: none !important; }
+}
+
+@layer components {
+  .card {
+    background: var(--bg-ivory);
+    border: 1px solid var(--border-whisper);
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    transition: all var(--duration-base) var(--ease-out-expo);
+  }
+  .card:hover { box-shadow: var(--shadow-float); transform: translateY(-2px); }
+  .card-interactive:focus-visible { box-shadow: 0 0 0 3px #3898ec; }
+  .btn-base {
+    display: inline-flex; align-items: center; justify-content: center; white-space: nowrap;
+    font-family: var(--font-body); font-weight: 500; letter-spacing: -0.015em;
+    transition: background-color var(--duration-base) var(--ease-out-expo), color var(--duration-base) var(--ease-out-expo), border-color var(--duration-base) var(--ease-out-expo), transform var(--duration-base) var(--ease-out-expo), box-shadow var(--duration-base) var(--ease-out-expo);
+  }
+  .btn-base:active { transform: scale(0.97); }
+  .btn-base:disabled { pointer-events: none; opacity: 0.45; }
+  .progress-track { height: 6px; background: var(--border-whisper); border-radius: 9999px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 9999px; transition: width var(--duration-slow) var(--ease-spring); }
+}
+
+.animate-cascade-in { animation: cascadeIn 0.5s var(--ease-out-expo) forwards; opacity: 0; }
+.animate-spring-in { animation: springIn 0.6s var(--ease-spring) forwards; opacity: 0; }
+.animate-fade-in { animation: fadeIn 0.3s var(--ease-out-expo) forwards; opacity: 0; }
+.stagger-1 { animation-delay: 80ms; } .stagger-2 { animation-delay: 160ms; } .stagger-3 { animation-delay: 240ms; } .stagger-4 { animation-delay: 320ms; }
+.stagger-5 { animation-delay: 400ms; } .stagger-6 { animation-delay: 480ms; } .stagger-7 { animation-delay: 560ms; } .stagger-8 { animation-delay: 640ms; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
+@media print { .no-print { display: none !important; } .print-only { display: block !important; } body { background: white; } .card { box-shadow: none; border-color: #ddd; } .print-watermark { position: fixed; top: 38%; left: 50%; transform: translate(-50%, -50%) rotate(-14deg); font-size: 64px; font-weight: 800; letter-spacing: -0.04em; color: rgba(43,42,51,0.07); border: 4px dashed rgba(43,42,51,0.10); padding: 10px 22px; border-radius: 16px; pointer-events: none; z-index: 9999; } }
+.print-only { display: none; }
