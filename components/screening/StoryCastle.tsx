@@ -125,17 +125,19 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
       </div>
 
       {/* Main Stone Tablet Stage */}
-      <Card className="bg-gradient-to-b from-castle-light/10 via-white to-cream border-2 border-castle/30 p-6 md:p-12 shadow-soft-md">
+      <Card className="bg-gradient-to-b from-castle-light/10 via-white to-cream border-2 border-castle/30 p-6 md:p-12 pt-14 md:pt-16 shadow-soft-md">
         <div className="flex flex-col items-center text-center space-y-8">
-          <LanternMascot
-            mood={mascotMood}
-            size={90}
-            speechBubble={
-              language === 'hi'
-                ? 'इस जादुई शब्द को जोर से पढ़कर सुनाओ!'
-                : 'Read this magical tablet aloud!'
-            }
-          />
+          <div className="pt-2 pb-1 flex justify-center">
+            <LanternMascot
+              mood={mascotMood}
+              size={90}
+              speechBubble={
+                language === 'hi'
+                  ? 'इस जादुई शब्द को जोर से पढ़कर सुनाओ!'
+                  : 'Read this magical tablet aloud!'
+              }
+            />
+          </div>
 
           {/* Stone Tablet with Glowing Nonword */}
           <div className="w-full max-w-md bg-stone-100 border-4 border-stone-300 rounded-3xl p-8 shadow-inner relative overflow-hidden">

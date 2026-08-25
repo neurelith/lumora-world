@@ -159,22 +159,24 @@ export const SoundForest: React.FC<SoundForestProps> = ({
       {/* Main Stage — Asymmetric 70/30 Layout */}
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* LEFT: Task Area (70%) */}
-        <Card className="bg-gradient-to-b from-forest-soft/20 via-white to-ivory border border-forest/20 p-6 md:p-8 shadow-card relative overflow-hidden">
+        <Card className="bg-gradient-to-b from-forest-soft/20 via-white to-ivory border border-forest/20 p-6 md:p-8 pt-14 md:pt-16 shadow-card relative">
           <div className="flex flex-col items-center text-center space-y-8">
             {/* Mascot Guidance */}
-            <LanternMascot
-              mood={mascotMood}
-              size={90}
-              speechBubble={
-                isPlayingAudio
-                  ? language === 'hi' ? 'ध्यान से सुनो...' : 'Listen closely to each sound...'
-                  : showFeedback
-                  ? feedbackCorrect
-                    ? language === 'hi' ? 'बहुत बढ़िया! 🌟' : 'Excellent! 🌟'
-                    : language === 'hi' ? 'फिर से कोशिश करो!' : 'Try again!'
-                  : language === 'hi' ? 'अब मिला हुआ शब्द चुनो!' : 'Now blend the sounds and pick the word!'
-              }
-            />
+            <div className="pt-2 pb-1 flex justify-center">
+              <LanternMascot
+                mood={mascotMood}
+                size={90}
+                speechBubble={
+                  isPlayingAudio
+                    ? language === 'hi' ? 'ध्यान से सुनो...' : 'Listen closely to each sound...'
+                    : showFeedback
+                    ? feedbackCorrect
+                      ? language === 'hi' ? 'बहुत बढ़िया! 🌟' : 'Excellent! 🌟'
+                      : language === 'hi' ? 'फिर से कोशिश करो!' : 'Try again!'
+                    : language === 'hi' ? 'अब मिला हुआ शब्द चुनो!' : 'Now blend the sounds and pick the word!'
+                }
+              />
+            </div>
 
             {/* Pulsing Phoneme Circles */}
             <div className="space-y-3">

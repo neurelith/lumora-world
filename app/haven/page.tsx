@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { VisualSchedule } from '@/components/ui/VisualSchedule';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { PrintableReportCard } from '@/components/ui/PrintableReportCard';
+import { HarmonicFlowCanvas } from '@/components/ui/HarmonicFlowCanvas';
 import {
   ArrowLeft,
   Sparkles,
@@ -172,8 +173,10 @@ export default function HavenPage() {
         {/* State 0: Welcome Screen / Nickname Input */}
         {!hasStarted ? (
           <div className="max-w-md mx-auto w-full">
-            <Card className="p-6 sm:p-10 border-2 border-sage/40 shadow-soft-md text-center bg-gradient-to-b from-sage/10 via-white to-paper">
-              <LanternMascot mood="encouraging" size={100} speechBubble="Hello, friend! Ready for today's 3-minute adventure?" />
+            <Card className="p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-sage/40 shadow-soft-md text-center bg-gradient-to-b from-sage/10 via-white to-paper">
+              <div className="pt-2 pb-1 flex justify-center">
+                <LanternMascot mood="encouraging" size={100} speechBubble="Hello, friend! Ready for today's 3-minute adventure?" />
+              </div>
 
               <h1 className="text-2xl sm:text-3xl font-extrabold font-display text-ink mt-4">
                 {t('haven.welcome')}
@@ -206,16 +209,18 @@ export default function HavenPage() {
 
             {/* Quest 1: Sound Forest (Phoneme Blend) */}
             {currentStep === 0 && (
-              <Card className="bg-gradient-to-b from-forest-light/15 via-white to-paper p-6 sm:p-10 border-2 border-forest/30 text-center space-y-6 shadow-soft-md">
-                <LanternMascot
-                  mood={soundAnswered ? 'celebrating' : 'encouraging'}
-                  size={84}
-                  speechBubble={
-                    soundHintShown
-                      ? 'Hint: The sounds /s/ + /u/ + /n/ make...'
-                      : 'Listen to the forest spark: /s/ + /u/ + /n/'
-                  }
-                />
+              <Card className="bg-gradient-to-b from-forest-light/15 via-white to-paper p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-forest/30 text-center space-y-6 shadow-soft-md">
+                <div className="pt-2 pb-1 flex justify-center">
+                  <LanternMascot
+                    mood={soundAnswered ? 'celebrating' : 'encouraging'}
+                    size={84}
+                    speechBubble={
+                      soundHintShown
+                        ? 'Hint: The sounds /s/ + /u/ + /n/ make...'
+                        : 'Listen to the forest spark: /s/ + /u/ + /n/'
+                    }
+                  />
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-xs font-display font-extrabold uppercase tracking-widest text-forest">
@@ -256,8 +261,18 @@ export default function HavenPage() {
 
             {/* Quest 2: Rune Realm (Letter Trace) */}
             {currentStep === 1 && (
-              <Card className="bg-gradient-to-b from-realm-light/15 via-white to-paper p-6 sm:p-10 border-2 border-realm/30 text-center space-y-6 shadow-soft-md">
-                <LanternMascot mood="encouraging" size={84} speechBubble="Trace the gentle mountain curve!" />
+              <Card className="bg-gradient-to-b from-realm-light/15 via-white to-paper p-6 sm:p-8 pt-12 sm:pt-14 border-2 border-realm/30 text-center space-y-5 shadow-soft-md">
+                <div className="pt-2 pb-1">
+                  <LanternMascot
+                    mood={tracingDone ? 'celebrating' : 'encouraging'}
+                    size={80}
+                    speechBubble={
+                      tracingDone
+                        ? 'Magical trace complete!'
+                        : 'Trace the gentle mountain letter "m"!'
+                    }
+                  />
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-xs font-display font-extrabold uppercase tracking-widest text-realm">
@@ -268,15 +283,18 @@ export default function HavenPage() {
                   </h3>
                 </div>
 
-                <div className="w-56 h-56 mx-auto bg-white border-4 border-realm/40 rounded-3xl flex items-center justify-center relative shadow-inner select-none">
-                  <span className="font-display font-extrabold text-8xl text-realm opacity-25">
-                    m
-                  </span>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-xs font-display font-bold text-ink bg-white/90 border border-hairline px-3 py-1.5 rounded-full shadow-soft-xs animate-bounce-gentle">
-                      ✍️ Wave finger or touch to trace
-                    </span>
-                  </div>
+                <div className="relative w-full flex justify-center">
+                  <HarmonicFlowCanvas
+                    width={360}
+                    height={360}
+                    targetLetter="m"
+                    enableCameraAirControl={true}
+                    onStrokeFinish={() => {
+                      setTracingDone(true);
+                      announceStepComplete('Rune Realm', 2, 5);
+                      setTimeout(() => advanceQuest(2), 1000);
+                    }}
+                  />
                 </div>
 
                 <Button
@@ -288,7 +306,7 @@ export default function HavenPage() {
                     advanceQuest(2);
                   }}
                   rightIcon={<Check className="w-5 h-5" />}
-                  className="min-h-[56px] font-bold"
+                  className="min-h-[56px] font-bold max-w-xs mx-auto"
                 >
                   I Traced It! ✨
                 </Button>
@@ -297,8 +315,10 @@ export default function HavenPage() {
 
             {/* Quest 3: Vision Valley (Star Glide) */}
             {currentStep === 2 && (
-              <Card className="bg-gradient-to-b from-valley-light/15 via-white to-paper p-6 sm:p-10 border-2 border-valley/30 text-center space-y-6 shadow-soft-md">
-                <LanternMascot mood="encouraging" size={84} speechBubble="Which constellation has MORE glowing stars?" />
+              <Card className="bg-gradient-to-b from-valley-light/15 via-white to-paper p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-valley/30 text-center space-y-6 shadow-soft-md">
+                <div className="pt-2 pb-1 flex justify-center">
+                  <LanternMascot mood="encouraging" size={84} speechBubble="Which constellation has MORE glowing stars?" />
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-xs font-display font-extrabold uppercase tracking-widest text-valley">
@@ -339,8 +359,10 @@ export default function HavenPage() {
 
             {/* Quest 4: Story Castle (Word Magic) */}
             {currentStep === 3 && (
-              <Card className="bg-gradient-to-b from-castle-light/15 via-white to-paper p-6 sm:p-10 border-2 border-castle/30 text-center space-y-6 shadow-soft-md">
-                <LanternMascot mood="encouraging" size={84} speechBubble="Read this magical creature word aloud!" />
+              <Card className="bg-gradient-to-b from-castle-light/15 via-white to-paper p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-castle/30 text-center space-y-6 shadow-soft-md">
+                <div className="pt-2 pb-1 flex justify-center">
+                  <LanternMascot mood="encouraging" size={84} speechBubble="Read this magical creature word aloud!" />
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-xs font-display font-extrabold uppercase tracking-widest text-castle">
@@ -376,8 +398,10 @@ export default function HavenPage() {
 
             {/* Quest 5: Memory Mountains (Gem Recall) */}
             {currentStep === 4 && (
-              <Card className="bg-gradient-to-b from-mountains-light/15 via-white to-paper p-6 sm:p-10 border-2 border-mountains/30 text-center space-y-6 shadow-soft-md">
-                <LanternMascot mood="encouraging" size={84} speechBubble="Find the glowing Purple Gem from memory!" />
+              <Card className="bg-gradient-to-b from-mountains-light/15 via-white to-paper p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-mountains/30 text-center space-y-6 shadow-soft-md">
+                <div className="pt-2 pb-1 flex justify-center">
+                  <LanternMascot mood="encouraging" size={84} speechBubble="Find the glowing Purple Gem from memory!" />
+                </div>
 
                 <div className="space-y-1">
                   <span className="text-xs font-display font-extrabold uppercase tracking-widest text-mountains">

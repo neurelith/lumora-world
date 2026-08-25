@@ -272,11 +272,13 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
       </div>
 
       {/* Main Vision Stage */}
-      <Card className="bg-gradient-to-b from-valley-light/10 via-white to-cream border-2 border-valley/30 p-6 md:p-10 shadow-soft-md min-h-[420px] flex flex-col justify-center">
+      <Card className="bg-gradient-to-b from-valley-light/10 via-white to-cream border-2 border-valley/30 p-6 md:p-10 pt-12 md:pt-14 shadow-soft-md min-h-[420px] flex flex-col justify-center">
         {/* Step 1: Camera Permission Screen */}
         {step === 'permission' && (
           <div className="flex flex-col items-center text-center space-y-6 max-w-md mx-auto">
-            <LanternMascot mood="neutral" size={80} speechBubble="Let's check our eye tracking light!" />
+            <div className="pt-2 pb-1 flex justify-center">
+              <LanternMascot mood="neutral" size={80} speechBubble="Let's check our eye tracking light!" />
+            </div>
 
             <div className="p-4 bg-white border-2 border-hairline rounded-2xl text-sm font-body text-muted leading-relaxed">
               <strong className="text-ink">100% In-Memory Privacy:</strong> Camera frames are analyzed in real time on this tablet to detect gaze fixations and line reading smoothness using MediaPipe Face Mesh. No video is ever recorded or uploaded.

@@ -438,6 +438,8 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     };
   }, []);
 
+  const airFinishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const startCameraAirTracking = async () => {
     setCameraError(null);
     oneEuroRef.current.reset();
@@ -450,7 +452,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         setCameraActive(true);
         setInputMode('camera');
         setCalibrating(true);
-        setTimeout(() => setCalibrating(false), 1500);
+        setTimeout(() => setCalibrating(false), 1200);
         void initHandTracking();
       }
     } catch (err: any) {
@@ -464,14 +466,16 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     try {
       const { Hands } = await import('@mediapipe/hands');
       const { Camera } = await import('@mediapipe/camera_utils');
+      
       const hands = new Hands({
-        locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`,
+        locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`,
       });
+
       hands.setOptions({
         maxNumHands: 1,
-        modelComplexity: 1,
-        minDetectionConfidence: 0.55,
-        minTrackingConfidence: 0.55,
+        modelComplexity: 0, // Lite model for ultra-low latency & 60fps
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5,
       });
       handsRef.current = hands;
 
@@ -496,7 +500,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
             });
             pipCtx.stroke();
 
-            // Glowing index fingertip
+            // Glowing index fingertip Hotpoint
             const tip = lm[8];
             pipCtx.fillStyle = '#E8A33D';
             pipCtx.shadowColor = '#E8A33D';
@@ -508,6 +512,12 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         }
 
         if (!results.multiHandLandmarks?.[0]) {
+          if (handPosRef.current.present && strokeHistoryRef.current.length >= 8) {
+            // Hand left frame after drawing
+            const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
+            spawnStarBurst(last.x, last.y);
+            onStrokeFinish?.(strokeHistoryRef.current);
+          }
           setHandDetected(false);
           handPosRef.current.present = false;
           return;
@@ -535,13 +545,29 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         if (strokeHistoryRef.current.length % 2 === 0) spawnBurst(filtered.x, filtered.y, 38 + Math.random() * 16, 2);
         if (Math.random() < 0.2) playTone(filtered.y / canvas.height);
         onStrokeUpdate?.(strokeHistoryRef.current);
+
+        // Auto-finish air stroke debounce if child pauses
+        if (airFinishTimerRef.current) clearTimeout(airFinishTimerRef.current);
+        if (strokeHistoryRef.current.length >= 10) {
+          airFinishTimerRef.current = setTimeout(() => {
+            if (strokeHistoryRef.current.length >= 10) {
+              const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
+              spawnStarBurst(last.x, last.y);
+              onStrokeFinish?.(strokeHistoryRef.current);
+            }
+          }, 1100);
+        }
       });
 
       if (videoRef.current) {
         const cam = new Camera(videoRef.current, {
           onFrame: async () => {
-            if (videoRef.current && handsRef.current) {
-              await handsRef.current.send({ image: videoRef.current });
+            if (videoRef.current && handsRef.current && videoRef.current.readyState >= 2 && !videoRef.current.paused) {
+              try {
+                await handsRef.current.send({ image: videoRef.current });
+              } catch (frameErr) {
+                // Silently skip transient frames
+              }
             }
           },
           width: 480,

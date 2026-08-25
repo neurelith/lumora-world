@@ -25,17 +25,17 @@ const securityHeaders = [
     value: 'camera=(self), microphone=(self), geolocation=()',
   },
   {
-    // Camera + WASM (MediaPipe) + inline scripts (Next.js hydration) — ponytail: next/font inlines fonts, no external Google Fonts
+    // Camera + WASM (MediaPipe) + inline scripts (Next.js hydration)
     key: 'Content-Security-Policy',
     value: [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net",
       "style-src 'self' 'unsafe-inline'",
       "font-src 'self' data:",
-      "img-src 'self' data: blob:",
-      "media-src 'self' blob:",
-      "connect-src 'self' https://cdn.jsdelivr.net blob:",
-      "worker-src 'self' blob:",
+      "img-src 'self' data: blob: https://cdn.jsdelivr.net",
+      "media-src 'self' blob: https://cdn.jsdelivr.net",
+      "connect-src 'self' https://cdn.jsdelivr.net blob: data:",
+      "worker-src 'self' blob: https://cdn.jsdelivr.net",
       "frame-ancestors 'self'",
     ].join('; '),
   },

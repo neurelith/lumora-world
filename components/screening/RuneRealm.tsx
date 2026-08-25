@@ -45,13 +45,13 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
     if (points.length > 5) setMascotMood('encouraging');
   };
 
-  const handleNextRune = () => {
-    if (currentPoints.length < 3) return;
-    const rawStrokePoints = currentPoints.map((p) => ({ x: p.x, y: p.y, t: p.t, pressure: p.pressure }));
+  const handleAutoStrokeFinish = (points: HarmonicPoint[]) => {
+    if (showAnalysis || points.length < 5) return;
+    const rawStrokePoints = points.map((p) => ({ x: p.x, y: p.y, t: p.t, pressure: p.pressure }));
     const trial = analyzeStroke(rawStrokePoints, currentLetter, language);
     setLastTrial(trial);
     setShowAnalysis(true);
-    setMascotMood(trial.score >= 60 ? 'celebrating' : 'encouraging');
+    setMascotMood('celebrating');
     const nextTrials = [...completedTrials, trial];
     setCompletedTrials(nextTrials);
 
@@ -74,7 +74,12 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
         });
       }
       setShowAnalysis(false);
-    }, 1100);
+    }, 1200);
+  };
+
+  const handleNextRune = () => {
+    if (currentPoints.length < 3) return;
+    handleAutoStrokeFinish(currentPoints);
   };
 
   const handleRetry = () => {
@@ -113,26 +118,28 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
 
       {/* Main Drawing Stage */}
       <div className="grid gap-6 md:grid-cols-[1fr_260px] items-start">
-        <Card className="bg-gradient-to-b from-realm-light/10 via-white to-cream border-2 border-realm/30 p-5 sm:p-8 shadow-soft-md relative overflow-hidden flex flex-col items-center">
+        <Card className="bg-gradient-to-b from-realm-light/10 via-white to-cream border-2 border-realm/30 p-5 sm:p-8 pt-12 sm:pt-14 shadow-soft-md relative flex flex-col items-center">
           <div className="flex flex-col items-center text-center space-y-4 w-full">
             {/* Friendly Mascot Companion */}
-            <LanternMascot
-              mood={mascotMood}
-              size={76}
-              speechBubble={
-                showAnalysis
-                  ? lastTrial && lastTrial.score >= 60
-                    ? language === 'hi'
-                      ? 'शानदार! अक्षर बहुत सुंदर बना!'
-                      : 'Sparkling! Letter formed beautifully!'
+            <div className="pt-2 pb-1">
+              <LanternMascot
+                mood={mascotMood}
+                size={76}
+                speechBubble={
+                  showAnalysis
+                    ? lastTrial && lastTrial.score >= 60
+                      ? language === 'hi'
+                        ? 'शानदार! अक्षर बहुत सुंदर बना!'
+                        : 'Sparkling! Letter formed beautifully!'
+                      : language === 'hi'
+                      ? 'अच्छी कोशिश! चलो आगे बढ़ते हैं!'
+                      : "Great effort! Let's continue the adventure!"
                     : language === 'hi'
-                    ? 'अच्छी कोशिश! चलो आगे बढ़ते हैं!'
-                    : "Great effort! Let's continue the adventure!"
-                  : language === 'hi'
-                  ? `अक्षर "${currentLetter}" को उंगली या हवा में बनाओ!`
-                  : `Draw the letter "${currentLetter}" with touch or in the air!`
-              }
-            />
+                    ? `अक्षर "${currentLetter}" को उंगली या हवा में बनाओ!`
+                    : `Draw the letter "${currentLetter}" with touch or in the air!`
+                }
+              />
+            </div>
 
             {/* Drawing Canvas */}
             <div className="relative w-full flex justify-center">
@@ -141,6 +148,7 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
                 height={420}
                 targetLetter={currentLetter}
                 onStrokeUpdate={handleStrokeUpdate}
+                onStrokeFinish={handleAutoStrokeFinish}
                 enableCameraAirControl={true}
               />
 

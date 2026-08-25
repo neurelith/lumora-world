@@ -80,14 +80,14 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.86, y: -6 }}
             transition={{ type: 'spring', stiffness: 420, damping: 26 }}
-            className="absolute z-10 left-1/2 -translate-x-1/2 pointer-events-none"
-            style={{ top: -6, width: 'max-content', maxWidth: 228 }}
+            className="absolute z-20 left-1/2 -translate-x-1/2 pointer-events-none"
+            style={{ bottom: 'calc(100% + 10px)', width: 'max-content', maxWidth: 260 }}
           >
-            <div className="relative bg-white/92 backdrop-blur-xl border border-whisper shadow-deep px-4 py-2.5 text-sm font-body leading-relaxed text-ink" style={{ borderRadius: 16 }}>
+            <div className="relative bg-white/95 backdrop-blur-xl border border-hairline shadow-soft-md px-4 py-2.5 text-xs sm:text-sm font-display font-bold leading-snug text-ink text-center rounded-2xl">
               {speechBubble}
-              <svg width="18" height="10" viewBox="0 0 18 10" className="absolute left-1/2 -translate-x-1/2 -bottom-[8px] drop-shadow-sm">
+              <svg width="18" height="10" viewBox="0 0 18 10" className="absolute left-1/2 -translate-x-1/2 -bottom-[8px] drop-shadow-xs">
                 <path d="M0 0 L9 10 L18 0 Z" fill="white" />
-                <path d="M0 0 L9 10 L18 0 Z" fill="none" stroke="rgba(45,43,40,0.08)" strokeWidth="1" />
+                <path d="M0 0 L9 10 L18 0 Z" fill="none" stroke="rgba(43,42,51,0.12)" strokeWidth="1" />
               </svg>
             </div>
           </motion.div>
