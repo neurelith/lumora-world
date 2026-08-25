@@ -89,162 +89,160 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-5 animate-spring-in">
-      {/* Header Bar */}
-      <div className="flex items-center justify-between gap-4 bg-white border-2 border-hairline rounded-3xl p-4 md:p-6 shadow-soft-sm">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-realm text-white rounded-2xl shadow-soft-xs">
-            <PenTool className="w-6 h-6" />
+    <div className="max-w-5xl mx-auto space-y-3.5 animate-spring-in">
+      {/* Compact Header Bar */}
+      <div className="flex items-center justify-between gap-3 bg-white border border-hairline rounded-2xl p-3 sm:p-4 shadow-soft-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 sm:p-2.5 bg-realm text-white rounded-xl shadow-soft-xs">
+            <PenTool className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-ink leading-tight">
               {t('worlds.runeRealm')}
             </h2>
-            <p className="text-xs font-body text-muted">
+            <p className="text-[11px] font-body text-muted hidden sm:block">
               {t('worlds.runeRealmSubtitle')} &middot; Trace letter in air or on screen
             </p>
           </div>
         </div>
-        <div className="w-32 sm:w-48">
+        <div className="w-32 sm:w-44">
           <ProgressBar
             progress={progress}
             color="realm"
-            size="md"
+            size="sm"
             showLabel
             label={`Rune ${currentIdx + 1}/${lettersList.length}`}
           />
         </div>
       </div>
 
-      {/* Main Drawing Stage */}
-      <div className="grid gap-6 md:grid-cols-[1fr_260px] items-start">
-        <Card className="bg-gradient-to-b from-realm-light/10 via-white to-cream border-2 border-realm/30 p-5 sm:p-8 pt-12 sm:pt-14 shadow-soft-md relative flex flex-col items-center">
-          <div className="flex flex-col items-center text-center space-y-4 w-full">
-            {/* Friendly Mascot Companion */}
-            <div className="pt-2 pb-1">
-              <LanternMascot
-                mood={mascotMood}
-                size={76}
-                speechBubble={
-                  showAnalysis
-                    ? lastTrial && lastTrial.score >= 60
-                      ? language === 'hi'
-                        ? 'शानदार! अक्षर बहुत सुंदर बना!'
-                        : 'Sparkling! Letter formed beautifully!'
-                      : language === 'hi'
-                      ? 'अच्छी कोशिश! चलो आगे बढ़ते हैं!'
-                      : "Great effort! Let's continue the adventure!"
-                    : language === 'hi'
-                    ? `अक्षर "${currentLetter}" को उंगली या हवा में बनाओ!`
-                    : `Draw the letter "${currentLetter}" with touch or in the air!`
-                }
-              />
-            </div>
+      {/* Main Arcade Cockpit Stage */}
+      <div className="grid gap-3.5 lg:grid-cols-[1fr_300px] items-stretch">
+        {/* Left Arena: Drawing Canvas */}
+        <Card className="bg-gradient-to-b from-realm-light/10 via-white to-cream border border-realm/30 p-4 sm:p-5 shadow-soft-sm relative flex flex-col items-center justify-between">
+          <div className="relative w-full flex justify-center py-1">
+            <HarmonicFlowCanvas
+              width={380}
+              height={380}
+              targetLetter={currentLetter}
+              onStrokeUpdate={handleStrokeUpdate}
+              onStrokeFinish={handleAutoStrokeFinish}
+              enableCameraAirControl={true}
+            />
 
-            {/* Drawing Canvas */}
-            <div className="relative w-full flex justify-center">
-              <HarmonicFlowCanvas
-                width={420}
-                height={420}
-                targetLetter={currentLetter}
-                onStrokeUpdate={handleStrokeUpdate}
-                onStrokeFinish={handleAutoStrokeFinish}
-                enableCameraAirControl={true}
-              />
-
-              {/* Instant Child-Friendly Celebration Feedback */}
-              <AnimatePresence mode="wait">
-                {showAnalysis && lastTrial && (
-                  <motion.div
-                    key="analysis"
-                    initial={{ opacity: 0, scale: 0.9, y: 15 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -15 }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    className="absolute inset-0 flex items-center justify-center z-30 bg-ink/20 backdrop-blur-xs rounded-3xl p-4"
-                  >
-                    <div className="bg-white rounded-3xl p-6 shadow-soft-lg border-2 border-amber/40 text-center max-w-xs w-full">
-                      <div className="w-16 h-16 rounded-full bg-amber/20 text-amber flex items-center justify-center mx-auto mb-3">
-                        <Sparkles className="w-8 h-8 fill-amber animate-spin-slow" />
-                      </div>
-                      <h3 className="font-display font-extrabold text-2xl text-ink">
-                        {language === 'hi' ? 'शाबाश!' : 'Wonderful!'}
-                      </h3>
-                      <p className="text-xs text-muted mt-1 mb-4 font-body">
-                        {language === 'hi' ? 'जादुई लकीर पूरी हुई!' : 'Magical stroke captured!'}
-                      </p>
-                      <Button
-                        variant="sage"
-                        size="md"
-                        fullWidth
-                        onClick={handleNextRune}
-                        rightIcon={<Check className="w-4 h-4" />}
-                      >
-                        {language === 'hi' ? 'अगला अक्षर' : 'Next Rune'}
-                      </Button>
+            {/* Instant Celebration Feedback Modal */}
+            <AnimatePresence mode="wait">
+              {showAnalysis && lastTrial && (
+                <motion.div
+                  key="analysis"
+                  initial={{ opacity: 0, scale: 0.92, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.92, y: -10 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                  className="absolute inset-0 flex items-center justify-center z-30 bg-ink/20 backdrop-blur-xs rounded-2xl p-4"
+                >
+                  <div className="bg-white rounded-2xl p-5 shadow-soft-lg border-2 border-amber/40 text-center max-w-xs w-full">
+                    <div className="w-12 h-12 rounded-full bg-amber/20 text-amber flex items-center justify-center mx-auto mb-2">
+                      <Sparkles className="w-6 h-6 fill-amber animate-spin-slow" />
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    <h3 className="font-display font-extrabold text-xl text-ink">
+                      {language === 'hi' ? 'शाबाश!' : 'Wonderful!'}
+                    </h3>
+                    <p className="text-xs text-muted mt-0.5 mb-3 font-body">
+                      {language === 'hi' ? 'जादुई लकीर पूरी हुई!' : 'Magical stroke captured!'}
+                    </p>
+                    <Button
+                      variant="sage"
+                      size="sm"
+                      fullWidth
+                      onClick={handleNextRune}
+                      rightIcon={<Check className="w-4 h-4" />}
+                    >
+                      {language === 'hi' ? 'अगला अक्षर' : 'Next Rune'}
+                    </Button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center justify-center gap-3 w-full max-w-[420px] pt-2">
-              <Button
-                variant="sage"
-                size="lg"
-                onClick={handleNextRune}
-                disabled={currentPoints.length < 3 || showAnalysis}
-                rightIcon={<Check className="w-5 h-5" />}
-                className="flex-1 min-h-[56px] text-base font-bold shadow-soft-sm"
-              >
-                {language === 'hi' ? '✨ मैंने बना लिया' : '✨ I Drew It!'}
-              </Button>
-              <Button
-                variant="secondary"
-                size="md"
-                onClick={handleRetry}
-                leftIcon={<RotateCcw className="w-4 h-4" />}
-                className="min-h-[56px] px-4"
-                title="Clear and try again"
-              >
-                {language === 'hi' ? 'मिटाओ' : 'Retry'}
-              </Button>
-            </div>
+          {/* Action Buttons Bar */}
+          <div className="flex items-center justify-center gap-3 w-full max-w-[380px] pt-2">
+            <Button
+              variant="sage"
+              size="md"
+              onClick={handleNextRune}
+              disabled={currentPoints.length < 3 || showAnalysis}
+              rightIcon={<Check className="w-4 h-4" />}
+              className="flex-1 min-h-[48px] text-sm font-bold shadow-soft-sm"
+            >
+              {language === 'hi' ? '✨ मैंने बना लिया' : '✨ I Drew It!'}
+            </Button>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={handleRetry}
+              leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+              className="min-h-[48px] px-3.5 text-xs"
+              title="Clear and try again"
+            >
+              {language === 'hi' ? 'मिटाओ' : 'Retry'}
+            </Button>
           </div>
         </Card>
 
-        {/* Side Panel: Target Letter & Stardust Jar */}
-        <div className="space-y-4 hidden md:block">
-          {/* Target Letter Card */}
-          <Card className="text-center p-6 bg-white border-2 border-realm/30 shadow-soft-sm">
-            <p className="text-xs font-display font-bold uppercase tracking-wider text-realm mb-1">
+        {/* Right Sidebar: Unified Companion, Target Rune & Stardust Sequence */}
+        <div className="flex flex-col justify-between gap-3">
+          {/* Companion Card */}
+          <Card className="p-4 pt-10 bg-white border border-realm/25 text-center shadow-soft-xs flex flex-col items-center justify-center flex-1 min-h-[180px]">
+            <LanternMascot
+              mood={mascotMood}
+              size={76}
+              speechBubble={
+                showAnalysis
+                  ? lastTrial && lastTrial.score >= 60
+                    ? language === 'hi'
+                      ? 'शानदार! बहुत सुंदर!'
+                      : 'Sparkling! Beautiful stroke!'
+                    : language === 'hi'
+                    ? 'चलो आगे बढ़ते हैं!'
+                    : "Great effort! Let's continue!"
+                  : language === 'hi'
+                  ? `अक्षर "${currentLetter}" बनाओ!`
+                  : `Draw rune "${currentLetter}"!`
+              }
+            />
+          </Card>
+
+          {/* Target Rune Box */}
+          <Card className="p-3.5 bg-white border border-realm/25 text-center shadow-soft-xs">
+            <p className="text-[10px] font-display font-bold uppercase tracking-wider text-realm">
               {language === 'hi' ? 'लक्ष्य अक्षर' : 'Target Rune'}
             </p>
-            <div className="text-7xl font-display font-extrabold text-realm py-1 select-none">
+            <div className="text-5xl font-display font-extrabold text-realm py-0.5 select-none">
               {currentLetter}
             </div>
-            <p className="text-xs font-body text-muted mt-1">
+            <p className="text-[11px] font-body text-muted">
               {language === 'hi' ? 'हवा में या स्क्रीन पर बनाएं' : 'Trace along the glowing curve'}
             </p>
           </Card>
 
-          {/* Stardust Progress Card */}
-          <Card className="p-5 bg-gradient-to-b from-amber-50 to-white border-2 border-amber/30 text-center shadow-soft-sm">
-            <div className="flex items-center justify-center gap-1.5 text-amber mb-2">
-              <Sparkles className="w-5 h-5 fill-amber" />
-              <span className="font-display font-bold text-sm text-ink">Stardust Runes</span>
+          {/* Stardust Runes Sequence */}
+          <Card className="p-3 bg-gradient-to-b from-amber-50/60 to-white border border-amber/30 text-center shadow-soft-xs">
+            <div className="flex items-center justify-center gap-1 text-amber mb-1.5">
+              <Sparkles className="w-3.5 h-3.5 fill-amber" />
+              <span className="font-display font-bold text-xs text-ink">Stardust Sequence</span>
             </div>
-            <div className="flex items-center justify-center gap-2 py-2">
+            <div className="flex items-center justify-center gap-1.5 py-1">
               {lettersList.map((letter, idx) => (
                 <div
                   key={idx}
-                  className={`w-8 h-8 rounded-xl flex items-center justify-center font-display font-bold text-xs transition-all ${
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center font-display font-bold text-xs transition-all ${
                     idx < currentIdx
                       ? 'bg-sage text-white shadow-soft-xs'
                       : idx === currentIdx
                       ? 'bg-amber text-ink border-2 border-amber-600 animate-pulse'
-                      : 'bg-paper text-muted/50 border border-hairline'
+                      : 'bg-sand/60 text-muted/50 border border-hairline'
                   }`}
                 >
                   {letter}

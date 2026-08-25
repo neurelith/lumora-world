@@ -5,7 +5,7 @@ import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { LanternMascot } from '@/components/ui/LanternMascot';
-import { Grid, Play, Square, CheckCircle2 } from 'lucide-react';
+import { Grid, Brain, Play, Square, CheckCircle2 } from 'lucide-react';
 import { MemoryMountainsResult, Language } from '@/lib/types';
 import { classifyMemoryMountains } from '@/lib/scoring';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -93,64 +93,66 @@ export const MemoryMountains: React.FC<MemoryMountainsProps> = ({ grade, languag
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-spring-in">
-      <div className="flex items-center justify-between gap-4 bg-white border border-whisper rounded-panel p-4 md:p-6 shadow-card">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-mountains-soft text-mountains rounded-xl"><Grid className="w-6 h-6" /></div>
+    <div className="max-w-5xl mx-auto space-y-3.5 animate-spring-in">
+      <div className="flex items-center justify-between gap-3 bg-white border border-whisper rounded-2xl p-3 sm:p-4 shadow-card">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 sm:p-2.5 bg-mountains-soft text-mountains rounded-xl">
+            <Brain className="w-5 h-5" />
+          </div>
           <div>
-            <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">{t('worlds.memoryMountains')}</h2>
-            <p className="text-xs font-body text-ink-tertiary">{t('worlds.memoryMountainsSubtitle')} &middot; Rapid Automatized Naming</p>
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-ink leading-tight">{t('worlds.memoryMountains')}</h2>
+            <p className="text-[11px] font-body text-ink-tertiary hidden sm:block">{t('worlds.memoryMountainsSubtitle')} &middot; Rapid Automatized Naming</p>
           </div>
         </div>
-        <div className="bg-sand border border-amber/40 px-5 py-2.5 rounded-2xl flex items-center gap-3 shadow-sm">
-          <span className="text-xs font-display font-bold uppercase tracking-wider text-ink-tertiary">Time:</span>
-          <span className="font-display font-extrabold text-2xl md:text-3xl text-ink font-mono">{elapsedSec.toFixed(1)}s</span>
+        <div className="bg-sand border border-amber/40 px-3.5 py-1.5 rounded-xl flex items-center gap-2 shadow-xs">
+          <span className="text-[10px] font-display font-bold uppercase tracking-wider text-ink-tertiary">Time:</span>
+          <span className="font-display font-extrabold text-xl sm:text-2xl text-ink font-mono">{elapsedSec.toFixed(1)}s</span>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        <Card className="bg-gradient-to-b from-mountains-soft/20 via-white to-ivory border border-mountains/20 p-6 md:p-10 shadow-card">
-          <div className="flex flex-col items-center text-center space-y-6">
-            <LanternMascot mood={isTimerRunning ? 'encouraging' : hasFinished ? 'celebrating' : 'neutral'} size={70} speechBubble={!hasStarted ? (language === 'hi' ? 'टीचर टाइमर शुरू करें!' : 'Teacher starts timer, child names left to right!') : isTimerRunning ? (language === 'hi' ? 'जल्दी-जल्दी नाम बोलो!' : 'Name them as fast and clearly as you can!') : 'Great naming speed!'} />
+      <div className="grid gap-3.5 lg:grid-cols-[1fr_300px] items-stretch">
+        <Card className="bg-gradient-to-b from-mountains-soft/20 via-white to-ivory border border-mountains/20 p-4 sm:p-5 pt-8 shadow-card flex flex-col items-center justify-between">
+          <div className="flex flex-col items-center text-center space-y-4 w-full">
+            <LanternMascot mood={isTimerRunning ? 'encouraging' : hasFinished ? 'celebrating' : 'neutral'} size={76} speechBubble={!hasStarted ? (language === 'hi' ? 'टीचर टाइमर शुरू करें!' : 'Teacher starts timer, child names left to right!') : isTimerRunning ? (language === 'hi' ? 'जल्दी-जल्दी नाम बोलो!' : 'Name them as fast and clearly as you can!') : 'Great naming speed!'} />
 
-            <div className="grid grid-cols-5 gap-2 md:gap-3 p-4 bg-white border border-whisper rounded-3xl shadow-sm max-w-lg mx-auto relative overflow-hidden w-full">
-              {isTimerRunning && <div className="absolute inset-0 bg-amber/5 rounded-3xl pointer-events-none overflow-hidden"><div className="h-full bg-amber/10 transition-all duration-200 ease-out" style={{ width: `${(itemsNamed / 25) * 100}%` }} /></div>}
+            <div className="grid grid-cols-5 gap-2 p-3 bg-white border border-whisper rounded-2xl shadow-xs max-w-md mx-auto relative overflow-hidden w-full">
+              {isTimerRunning && <div className="absolute inset-0 bg-amber/5 rounded-2xl pointer-events-none overflow-hidden"><div className="h-full bg-amber/10 transition-all duration-200 ease-out" style={{ width: `${(itemsNamed / 25) * 100}%` }} /></div>}
               {gridItems.map((item, idx) => (
                 <motion.button
                   key={item.id}
                   onClick={() => toggleFlag(item.id)}
-                  className={`relative w-14 h-14 md:w-16 md:h-16 rounded-2xl border-2 flex items-center justify-center transition-all duration-200 select-none ${item.isFlaggedError ? 'bg-terracotta-soft border-terracotta ring-2 ring-terracotta/40 scale-95' : 'bg-sand/60 border-whisper hover:border-amber/50 hover:bg-white hover:scale-105'}`}
+                  className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-xl border-2 flex items-center justify-center transition-all duration-200 select-none ${item.isFlaggedError ? 'bg-terracotta-soft border-terracotta ring-2 ring-terracotta/40 scale-95' : 'bg-sand/60 border-whisper hover:border-amber/50 hover:bg-white hover:scale-105'}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: idx * 0.025, type: 'spring', stiffness: 300, damping: 25 }}
+                  transition={{ delay: idx * 0.02, type: 'spring', stiffness: 300, damping: 25 }}
                   whileTap={{ scale: 0.95 }}
                 >
                   <ShapeIcon shape={item.shape} color={item.color} />
-                  {item.isFlaggedError && <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-terracotta rounded-full animate-pulse-gentle" />}
-                  {itemsNamed > idx && !item.isFlaggedError && <span className="absolute bottom-1 right-1 w-2 h-2 bg-sage rounded-full" />}
+                  {item.isFlaggedError && <span className="absolute top-1 right-1 w-2 h-2 bg-terracotta rounded-full animate-pulse-gentle" />}
+                  {itemsNamed > idx && !item.isFlaggedError && <span className="absolute bottom-1 right-1 w-1.5 h-1.5 bg-sage rounded-full" />}
                 </motion.button>
               ))}
             </div>
 
             <AnimatePresence>
               {hasStarted && !isTimerRunning && !hasFinished && (
-                <motion.div className="text-center p-4 bg-sand/50 rounded-panel" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
-                  <CheckCircle2 className="w-6 h-6 text-sage mx-auto mb-2" />
-                  <p className="text-sm font-medium text-ink">{language === 'hi' ? 'बहुत बढ़िया!' : 'Great job!'}</p>
-                  <p className="text-xs text-ink-tertiary mt-1">{Math.round((25 / elapsedSec) * 100) / 100} items/sec</p>
+                <motion.div className="text-center p-2.5 bg-sand/50 rounded-xl" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+                  <CheckCircle2 className="w-5 h-5 text-sage mx-auto mb-1" />
+                  <p className="text-xs font-medium text-ink">{language === 'hi' ? 'बहुत बढ़िया!' : 'Great job!'}</p>
+                  <p className="text-[11px] text-ink-tertiary">{Math.round((25 / elapsedSec) * 100) / 100} items/sec</p>
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <p className="text-xs text-ink-tertiary">💡 {language === 'hi' ? 'टीचर: गलत पर टैप करें' : 'Teacher: Tap any item if the child stumbles.'}</p>
+            <p className="text-[11px] text-ink-tertiary">💡 {language === 'hi' ? 'टीचर: गलत पर टैप करें' : 'Teacher: Tap any item if the child stumbles.'}</p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2">
+            <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
               {!hasStarted ? (
-                <Button variant="primary" size="lg" onClick={handleStart} leftIcon={<Play className="w-5 h-5 fill-white" />}>{language === 'hi' ? 'टाइमर शुरू करें' : 'Start Rapid Naming'}</Button>
+                <Button variant="primary" size="md" onClick={handleStart} leftIcon={<Play className="w-4 h-4 fill-white" />} className="min-h-[44px] text-xs font-bold">{language === 'hi' ? 'टाइमर शुरू करें' : 'Start Rapid Naming'}</Button>
               ) : isTimerRunning ? (
-                <Button variant="terracotta" size="lg" onClick={handleStop} leftIcon={<Square className="w-5 h-5 fill-white" />}>{language === 'hi' ? 'समाप्त' : 'Done / Stop Timer'}</Button>
+                <Button variant="terracotta" size="md" onClick={handleStop} leftIcon={<Square className="w-4 h-4 fill-white" />} className="min-h-[44px] text-xs font-bold">{language === 'hi' ? 'समाप्त' : 'Done / Stop Timer'}</Button>
               ) : (
-                <div className="flex items-center gap-2 text-sage font-display font-bold text-lg animate-pulse-gentle"><CheckCircle2 className="w-6 h-6" /><span>Recording Results...</span></div>
+                <div className="flex items-center gap-2 text-sage font-display font-bold text-base animate-pulse-gentle"><CheckCircle2 className="w-5 h-5" /><span>Recording Results...</span></div>
               )}
             </div>
           </div>

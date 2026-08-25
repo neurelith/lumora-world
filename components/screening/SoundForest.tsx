@@ -157,15 +157,15 @@ export const SoundForest: React.FC<SoundForestProps> = ({
       </div>
 
       {/* Main Stage — Asymmetric 70/30 Layout */}
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* LEFT: Task Area (70%) */}
-        <Card className="bg-gradient-to-b from-forest-soft/20 via-white to-ivory border border-forest/20 p-6 md:p-8 pt-14 md:pt-16 shadow-card relative">
-          <div className="flex flex-col items-center text-center space-y-8">
+      <div className="grid gap-4 lg:grid-cols-[1fr_300px] items-stretch">
+        {/* LEFT: Task Area */}
+        <Card className="bg-gradient-to-b from-forest-soft/20 via-white to-ivory border border-forest/20 p-4 sm:p-5 pt-8 shadow-card relative flex flex-col items-center justify-between">
+          <div className="flex flex-col items-center text-center space-y-4 w-full">
             {/* Mascot Guidance */}
-            <div className="pt-2 pb-1 flex justify-center">
+            <div className="pt-1 flex justify-center">
               <LanternMascot
                 mood={mascotMood}
-                size={90}
+                size={76}
                 speechBubble={
                   isPlayingAudio
                     ? language === 'hi' ? 'ध्यान से सुनो...' : 'Listen closely to each sound...'
@@ -179,26 +179,26 @@ export const SoundForest: React.FC<SoundForestProps> = ({
             </div>
 
             {/* Pulsing Phoneme Circles */}
-            <div className="space-y-3">
-              <p className="text-xs font-display font-bold uppercase tracking-wider text-forest">
+            <div className="space-y-2">
+              <p className="text-[11px] font-display font-bold uppercase tracking-wider text-forest">
                 {language === 'hi' ? 'ध्वनियां' : 'Phoneme Sounds'}
               </p>
 
-              <div className="flex flex-wrap items-center justify-center gap-3 md:gap-5">
+              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5">
                 {currentTrial.phonemes.map((phoneme, idx) => {
                   const isActive = activePhonemeIdx === idx;
                   return (
                     <motion.div
                       key={idx}
                       className={`
-                        w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center 
-                        font-display font-extrabold text-2xl md:text-3xl border-2 transition-all duration-300
+                        w-13 h-13 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center 
+                        font-display font-extrabold text-xl sm:text-2xl border-2 transition-all duration-300
                         ${isActive
-                          ? 'bg-forest text-white border-forest-light shadow-card scale-110'
-                          : 'bg-white text-ink border-whisper shadow-sm'
+                          ? 'bg-forest text-white border-forest-light shadow-card scale-105'
+                          : 'bg-white text-ink border-whisper shadow-xs'
                         }
                       `}
-                      animate={isActive ? { scale: [1, 1.1, 1] } : {}}
+                      animate={isActive ? { scale: [1, 1.08, 1] } : {}}
                       transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, ease: 'easeInOut' }}
                     >
                       {phoneme}
@@ -208,13 +208,14 @@ export const SoundForest: React.FC<SoundForestProps> = ({
               </div>
 
               {/* Replay Audio Button */}
-              <div className="pt-2">
+              <div className="pt-1 flex items-center justify-center gap-2">
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={handlePlayAudio}
                   disabled={isPlayingAudio}
-                  leftIcon={<Play className="w-4 h-4 text-forest" />}
+                  leftIcon={<Play className="w-3.5 h-3.5 text-forest" />}
+                  className="min-h-[38px] text-xs font-bold"
                 >
                   {language === 'hi' ? 'ध्वनि फिर से सुनें' : 'Listen Again'}
                 </Button>
@@ -223,8 +224,8 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                     variant="ghost"
                     size="sm"
                     onClick={handleReplay}
-                    leftIcon={<RotateCcw className="w-4 h-4" />}
-                    className="ml-2"
+                    leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
+                    className="min-h-[38px] text-xs"
                   >
                     {language === 'hi' ? 'फिर से कोशिश' : 'Try Again'}
                   </Button>
@@ -232,14 +233,14 @@ export const SoundForest: React.FC<SoundForestProps> = ({
               </div>
             </div>
 
-            {/* 4 Illustrated Answer Cards — Staggered reveal */}
+            {/* 4 Illustrated Answer Cards */}
             <AnimatePresence mode="wait">
-              <div className="w-full space-y-3" key={currentTrialIdx}>
-                <p className="text-xs font-display font-bold uppercase tracking-wider text-ink-tertiary">
+              <div className="w-full space-y-2 max-w-md mx-auto" key={currentTrialIdx}>
+                <p className="text-[11px] font-display font-bold uppercase tracking-wider text-ink-tertiary">
                   {language === 'hi' ? 'सही शब्द पर टैप करें' : 'Tap the blended word'}
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 max-w-lg mx-auto">
+                <div className="grid grid-cols-2 gap-2.5">
                   {shuffledOptions.map((option, idx) => {
                     const isSelected = selectedOption === option;
                     const isCorrect = option === currentTrial.targetWord;
@@ -247,7 +248,7 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                     let cardStyle = 'bg-white border-whisper text-ink hover:border-forest/60 hover:bg-forest-soft/50';
                     if (showFeedback) {
                       if (isSelected && isCorrect) {
-                        cardStyle = 'bg-sage-soft border-sage/30 text-sage shadow-[0_0_0_1px_rgba(74,124,94,0.35)] font-bold scale-[1.02]';
+                        cardStyle = 'bg-sage-soft border-sage/30 text-sage shadow-xs font-bold scale-[1.02]';
                       } else if (isSelected && !isCorrect) {
                         cardStyle = 'bg-amber-soft border-amber/30 text-ink font-bold';
                       } else if (isCorrect) {
@@ -263,23 +264,20 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                         onClick={() => handleSelectOption(option)}
                         disabled={selectedOption !== null || isPlayingAudio}
                         className={`
-                          min-h-[72px] p-4 rounded-xl border-2 flex items-center justify-center 
-                          font-display font-bold text-xl md:text-2xl transition-all duration-base ease-out-expo 
-                          select-none shadow-sm
+                          min-h-[54px] p-3 rounded-xl border-2 flex items-center justify-center 
+                          font-display font-bold text-lg sm:text-xl transition-all duration-base ease-out-expo 
+                          select-none shadow-xs
                           ${cardStyle}
                         `}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -20 }}
-                        transition={{ delay: idx * 0.08, type: 'spring', stiffness: 300, damping: 25 }}
+                        exit={{ opacity: 0, y: -14 }}
+                        transition={{ delay: idx * 0.06, type: 'spring', stiffness: 300, damping: 25 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         <span>{option}</span>
                         {showFeedback && isSelected && isCorrect && (
-                          <Sparkles className="ml-2 h-5 w-5 text-sage animate-pulse-gentle" />
-                        )}
-                        {showFeedback && isSelected && !isCorrect && (
-                          <span className="ml-2 text-amber">↻</span>
+                          <Sparkles className="ml-1.5 h-4 w-4 text-sage animate-pulse-gentle" />
                         )}
                       </motion.button>
                     );

@@ -240,47 +240,47 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto space-y-3.5 animate-spring-in">
       {/* Header Bar */}
-      <div className="flex items-center justify-between gap-4 bg-white border-2 border-hairline rounded-3xl p-4 md:p-6 shadow-soft-sm">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-valley text-white rounded-2xl">
-            <Eye className="w-6 h-6" />
+      <div className="flex items-center justify-between gap-3 bg-white border border-hairline rounded-2xl p-3 sm:p-4 shadow-soft-xs">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2 sm:p-2.5 bg-valley text-white rounded-xl">
+            <Eye className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">
+            <h2 className="font-display font-extrabold text-lg sm:text-xl text-ink leading-tight">
               {t('worlds.visionValley')}
             </h2>
-            <p className="text-xs font-body text-muted">
+            <p className="text-[11px] font-body text-muted hidden sm:block">
               {t('worlds.visionValleySubtitle')}
             </p>
           </div>
         </div>
 
         {step === 'reading' && (
-          <span className="px-3 py-1 bg-valley-light/20 text-valley border border-valley/30 rounded-xl text-xs font-display font-bold">
+          <span className="px-2.5 py-1 bg-valley-light/20 text-valley border border-valley/30 rounded-lg text-xs font-display font-bold">
             Passage {currentPassageIdx + 1}/{passages.length}
           </span>
         )}
 
         {(step === 'calibrating' || step === 'reading') && (
-          <div className="flex items-center gap-2 text-xs text-muted">
+          <div className="flex items-center gap-1.5 text-xs text-muted">
             <span className="w-2 h-2 rounded-full bg-valley animate-ping" />
-            <span>{showSimulatedFallback ? 'Simulated' : 'Real Gaze Active'}</span>
+            <span className="text-[11px]">{showSimulatedFallback ? 'Simulated' : 'Gaze Active'}</span>
           </div>
         )}
       </div>
 
       {/* Main Vision Stage */}
-      <Card className="bg-gradient-to-b from-valley-light/10 via-white to-cream border-2 border-valley/30 p-6 md:p-10 pt-12 md:pt-14 shadow-soft-md min-h-[420px] flex flex-col justify-center">
+      <Card className="bg-gradient-to-b from-valley-light/10 via-white to-cream border border-valley/30 p-4 sm:p-6 pt-8 shadow-soft-sm min-h-[380px] flex flex-col justify-center">
         {/* Step 1: Camera Permission Screen */}
         {step === 'permission' && (
-          <div className="flex flex-col items-center text-center space-y-6 max-w-md mx-auto">
-            <div className="pt-2 pb-1 flex justify-center">
-              <LanternMascot mood="neutral" size={80} speechBubble="Let's check our eye tracking light!" />
+          <div className="flex flex-col items-center text-center space-y-4 max-w-md mx-auto">
+            <div className="pt-1 flex justify-center">
+              <LanternMascot mood="neutral" size={76} speechBubble="Let's check our eye tracking light!" />
             </div>
 
-            <div className="p-4 bg-white border-2 border-hairline rounded-2xl text-sm font-body text-muted leading-relaxed">
+            <div className="p-3 bg-white border border-hairline rounded-xl text-xs font-body text-muted leading-relaxed">
               <strong className="text-ink">100% In-Memory Privacy:</strong> Camera frames are analyzed in real time on this tablet to detect gaze fixations and line reading smoothness using MediaPipe Face Mesh. No video is ever recorded or uploaded.
             </div>
 
