@@ -271,11 +271,21 @@ export class RealGazeTracker {
   }
 
   async stop() {
-    if (this.camera) {
-      await this.camera.stop();
+    try {
+      if (this.camera) {
+        await this.camera.stop();
+      }
+    } catch (err) {
+      console.warn('[RealGazeTracker] Error stopping MediaPipe camera:', err);
+    } finally {
+      this.faceMesh = null;
+      this.camera = null;
+      this.videoRef = null;
+      this.canvasOverlay = null;
+      this.gazeCallback = null;
+      this.smoothingBuffer = [];
+      this.lastGaze = null;
     }
-    this.faceMesh = null;
-    this.camera = null;
   }
 }
 

@@ -5,6 +5,7 @@ import { Sparkles, Wand2, MousePointer, RotateCcw, Volume2, VolumeX, Activity } 
 import { OneEuroFilter2D } from '@/lib/oneEuroFilter';
 import { calculateStrokeAccuracyScore } from '@/lib/dtw';
 import { CameraPermissionModal } from '@/components/ui/CameraPermissionModal';
+import { cameraService } from '@/lib/camera-service';
 
 export interface HarmonicPoint {
   x: number;
@@ -73,6 +74,8 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   const pipCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  const mediaPipeCamRef = useRef<any>(null);
+  const handsRef = useRef<any>(null);
   const particlesRef = useRef<Particle[]>([]);
   const strokeHistoryRef = useRef<HarmonicPoint[]>([]);
   const isInteractingRef = useRef(false);
@@ -330,23 +333,54 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   };
 
   const stopCamera = () => {
-    if (streamRef.current) { streamRef.current.getTracks().forEach(tr => tr.stop()); streamRef.current = null; }
-    setCameraActive(false); setHandDetected(false); setIsDrawing(false); handPosRef.current.present = false;
+    try {
+      if (mediaPipeCamRef.current) {
+        mediaPipeCamRef.current.stop();
+        mediaPipeCamRef.current = null;
+      }
+      if (handsRef.current) {
+        handsRef.current.close?.();
+        handsRef.current = null;
+      }
+    } catch (err) {
+      console.warn('[HarmonicFlowCanvas] Error stopping MediaPipe:', err);
+    } finally {
+      if (streamRef.current) {
+        cameraService.releaseStream();
+        streamRef.current = null;
+      }
+      setCameraActive(false);
+      setHandDetected(false);
+      setIsDrawing(false);
+      handPosRef.current.present = false;
+    }
   };
 
+  // Clean unmount lifecycle guarantee
+  useEffect(() => {
+    return () => {
+      stopCamera();
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, []);
+
   const startCameraAirTracking = async () => {
-    setCameraError(null); oneEuroRef.current.reset();
+    setCameraError(null);
+    oneEuroRef.current.reset();
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480, facingMode: 'user' }, audio: false });
+      const stream = await cameraService.acquireStream({ width: 480, height: 360, facingMode: 'user' });
       streamRef.current = stream;
+
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          void videoRef.current?.play();
-          setCameraActive(true); setInputMode('camera');
-          setCalibrating(true); setTimeout(() => setCalibrating(false), 1700);
-          void initHandTracking();
-        };
+        await cameraService.attachToVideo(videoRef.current, stream);
+        setCameraActive(true);
+        setInputMode('camera');
+        setCalibrating(true);
+        setTimeout(() => setCalibrating(false), 1700);
+        void initHandTracking();
       }
     } catch {
       setCameraError('Camera access needed for Magic Air Wand. Allow camera, or use Touch instead.');
@@ -358,32 +392,53 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     try {
       const { Hands } = await import('@mediapipe/hands');
       const { Camera } = await import('@mediapipe/camera_utils');
-      const hands = new Hands({ locateFile: f => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
+      const hands = new Hands({ locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}` });
       hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.58, minTrackingConfidence: 0.58 });
+      handsRef.current = hands;
 
-      hands.onResults(results => {
-        const pipCanvas = pipCanvasRef.current; const pipCtx = pipCanvas?.getContext('2d');
+      hands.onResults((results) => {
+        const pipCanvas = pipCanvasRef.current;
+        const pipCtx = pipCanvas?.getContext('2d');
         if (pipCanvas && pipCtx && videoRef.current) {
-          pipCtx.save(); pipCtx.clearRect(0, 0, pipCanvas.width, pipCanvas.height);
+          pipCtx.save();
+          pipCtx.clearRect(0, 0, pipCanvas.width, pipCanvas.height);
           pipCtx.drawImage(videoRef.current, 0, 0, pipCanvas.width, pipCanvas.height);
           if (results.multiHandLandmarks?.[0]) {
             const lm = results.multiHandLandmarks[0];
-            pipCtx.strokeStyle = '#3a8a82'; pipCtx.lineWidth = 1.8; pipCtx.beginPath();
-            const con: [number, number][] = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[17,18],[18,19],[19,20],[0,17]];
-            con.forEach(([a,b]) => { pipCtx.moveTo(lm[a].x * pipCanvas.width, lm[a].y * pipCanvas.height); pipCtx.lineTo(lm[b].x * pipCanvas.width, lm[b].y * pipCanvas.height); });
+            pipCtx.strokeStyle = '#3a8a82';
+            pipCtx.lineWidth = 1.8;
+            pipCtx.beginPath();
+            const con: [number, number][] = [
+              [0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8],
+              [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15],
+              [15, 16], [13, 17], [17, 18], [18, 19], [19, 20], [0, 17],
+            ];
+            con.forEach(([a, b]) => {
+              pipCtx.moveTo(lm[a].x * pipCanvas.width, lm[a].y * pipCanvas.height);
+              pipCtx.lineTo(lm[b].x * pipCanvas.width, lm[b].y * pipCanvas.height);
+            });
             pipCtx.stroke();
-            const tip = lm[8]; pipCtx.fillStyle = '#c96442'; pipCtx.beginPath(); pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 5.5, 0, Math.PI * 2); pipCtx.fill();
+            const tip = lm[8];
+            pipCtx.fillStyle = '#c96442';
+            pipCtx.beginPath();
+            pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 5.5, 0, Math.PI * 2);
+            pipCtx.fill();
           }
           pipCtx.restore();
         }
 
         if (!results.multiHandLandmarks?.[0]) {
-          setHandDetected(false); handPosRef.current.present = false; setIsDrawing(false); return;
+          setHandDetected(false);
+          handPosRef.current.present = false;
+          setIsDrawing(false);
+          return;
         }
-        setHandDetected(true); handPosRef.current.present = true;
+        setHandDetected(true);
+        handPosRef.current.present = true;
         const lm = results.multiHandLandmarks[0];
         const indexTip = lm[8], thumbTip = lm[4], wrist = lm[0], middleMcp = lm[9];
-        const canvas = canvasRef.current; if (!canvas) return;
+        const canvas = canvasRef.current;
+        if (!canvas) return;
 
         // palm size for normalized pinch
         const palmW = Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y);
@@ -394,33 +449,46 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         const isPinching = pinchNorm < 0.62;
 
         // FIXED mapping — NO drift
-        const rawX = 1 - indexTip.x; const rawY = indexTip.y;
+        const rawX = 1 - indexTip.x;
+        const rawY = indexTip.y;
         const tx = softMap(rawX, FIX_LO, FIX_HI, canvas.width);
         const ty = softMap(rawY, FIX_LO, FIX_HI, canvas.height);
 
         const filtered = oneEuroRef.current.filter(tx, ty, performance.now());
-        handPosRef.current.x = filtered.x; handPosRef.current.y = filtered.y;
+        handPosRef.current.x = filtered.x;
+        handPosRef.current.y = filtered.y;
 
         const shouldDraw = drawTriggerMode === 'continuous' || isPinching;
-        handPosRef.current.drawing = shouldDraw; setIsDrawing(shouldDraw);
+        handPosRef.current.drawing = shouldDraw;
+        setIsDrawing(shouldDraw);
         if (shouldDraw) {
           const t = performance.now();
           strokeHistoryRef.current.push({ x: filtered.x, y: filtered.y, t, pressure: 0.62, isAirDrawing: true });
           if (strokeHistoryRef.current.length % 2 === 0) spawnBurst(filtered.x, filtered.y, 38 + Math.random() * 16, 2);
           if (Math.random() < 0.18) playTone(filtered.y / canvas.height);
-          const score = calculateStrokeAccuracyScore(strokeHistoryRef.current.map(p => ({ x: p.x, y: p.y })), targetLetter);
-          setAccuracyScore(score); onStrokeUpdate?.(strokeHistoryRef.current);
+          const score = calculateStrokeAccuracyScore(strokeHistoryRef.current.map((p) => ({ x: p.x, y: p.y })), targetLetter);
+          setAccuracyScore(score);
+          onStrokeUpdate?.(strokeHistoryRef.current);
         }
       });
 
       if (videoRef.current) {
         const cam = new Camera(videoRef.current, {
-          onFrame: async () => { if (videoRef.current) await hands.send({ image: videoRef.current }); },
-          width: 640, height: 480,
+          onFrame: async () => {
+            if (videoRef.current && handsRef.current) {
+              await handsRef.current.send({ image: videoRef.current });
+            }
+          },
+          width: 480,
+          height: 360,
         });
+        mediaPipeCamRef.current = cam;
         await cam.start();
       }
-    } catch (e) { console.warn('MediaPipe error', e); setCameraError('Hand tracking failed to start. Use Touch instead.'); }
+    } catch (e) {
+      console.warn('[HarmonicFlowCanvas] MediaPipe error:', e);
+      setCameraError('Hand tracking failed to start. Use Touch instead.');
+    }
   };
 
   const handleClear = () => {
@@ -428,7 +496,11 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
       spawnStarBurst(last.x, last.y);
     }
-    strokeHistoryRef.current = []; particlesRef.current = []; setAccuracyScore(0); oneEuroRef.current.reset(); onStrokeUpdate?.([]);
+    strokeHistoryRef.current = [];
+    particlesRef.current = [];
+    setAccuracyScore(0);
+    oneEuroRef.current.reset();
+    onStrokeUpdate?.([]);
   };
 
   return (

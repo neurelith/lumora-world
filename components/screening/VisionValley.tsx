@@ -9,6 +9,7 @@ import { Eye, Camera, Check, Sparkles, Play, VideoOff, RefreshCw } from 'lucide-
 import { VisionValleyResult, Language } from '@/lib/types';
 import { RealGazeTracker, GazeAnalyzer, GazeSample } from '@/lib/gaze-real';
 import { classifyVisionValley } from '@/lib/scoring';
+import { cameraService } from '@/lib/camera-service';
 
 const READING_PASSAGES_EN = [
   'The little yellow bird sang a sweet song in the green tree.',
@@ -48,6 +49,7 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
   const gazeTrackerRef = useRef<RealGazeTracker | null>(null);
   const gazeAnalyzerRef = useRef<GazeAnalyzer>(new GazeAnalyzer());
   const streamRef = useRef<MediaStream | null>(null);
+  const simGazeRafRef = useRef<number | null>(null);
 
   const calibrationTargets: CalibrationTarget[] = [
     { x: 15, y: 20 }, // Top-Left
@@ -61,11 +63,18 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
   useEffect(() => {
     if (step !== 'calibrating' || showSimulatedFallback) return;
 
+    let isMounted = true;
     const initTracker = async () => {
       if (!videoRef.current || !overlayCanvasRef.current) return;
 
-      gazeTrackerRef.current = new RealGazeTracker();
-      const success = await gazeTrackerRef.current.initialize(videoRef.current, overlayCanvasRef.current);
+      const tracker = new RealGazeTracker();
+      gazeTrackerRef.current = tracker;
+      const success = await tracker.initialize(videoRef.current, overlayCanvasRef.current);
+
+      if (!isMounted) {
+        await tracker.stop();
+        return;
+      }
 
       if (!success) {
         setCameraError('Real gaze tracking unavailable. Using simulated demo mode.');
@@ -74,14 +83,15 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
       }
 
       // Receive real gaze samples
-      gazeTrackerRef.current.onGaze((gaze: GazeSample) => {
+      tracker.onGaze((gaze: GazeSample) => {
+        if (!isMounted) return;
         setLiveGaze({ x: gaze.x, y: gaze.y });
         gazeAnalyzerRef.current.addSample(gaze.x, gaze.y, gaze.t);
       });
 
       // Update calibration progress
       const progressInterval = setInterval(() => {
-        if (gazeTrackerRef.current) {
+        if (gazeTrackerRef.current && isMounted) {
           setCalibrationProgress(gazeTrackerRef.current.getCalibrationProgress());
         }
       }, 200);
@@ -91,6 +101,7 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
     initTracker();
 
     return () => {
+      isMounted = false;
       if (gazeTrackerRef.current) {
         gazeTrackerRef.current.stop();
         gazeTrackerRef.current = null;
@@ -98,25 +109,23 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
     };
   }, [step, showSimulatedFallback]);
 
-  // Initialize webcam
+  // Initialize webcam with CameraService
   const startCamera = async () => {
     try {
       setCameraError(null);
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: 'user' },
-        audio: false,
+      const stream = await cameraService.acquireStream({
+        width: 480,
+        height: 360,
+        facingMode: 'user',
       });
 
       streamRef.current = stream;
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current?.play();
-          setStep('calibrating');
-        };
+        await cameraService.attachToVideo(videoRef.current, stream);
+        setStep('calibrating');
       }
     } catch (err: any) {
-      console.warn('Camera access error:', err);
+      console.warn('[VisionValley] Camera access error:', err);
       setCameraError('Camera not available. Using simulated demo mode.');
       setShowSimulatedFallback(true);
     }
@@ -146,34 +155,28 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
       } else {
         setStep('reading');
         gazeAnalyzerRef.current.reset();
-        // Start real gaze tracking loop (already running via onGaze callback)
       }
     }
   };
 
-  // Simulated gaze loop for fallback
+  // Simulated gaze loop for fallback with rAF cancel ref
   const startSimulatedGazeLoop = () => {
-    let lastTime = performance.now();
-
-    const loop = () => {
-      const now = performance.now();
-      lastTime = now;
-
+    const loop = (now: number) => {
       // Realistic reading scanpath simulation
       const screenW = typeof window !== 'undefined' ? window.innerWidth : 800;
       const screenH = typeof window !== 'undefined' ? window.innerHeight : 600;
 
       const cycleTime = (now % 3000) / 3000;
-      const rawX = (screenW * 0.25) + cycleTime * (screenW * 0.5) + (Math.random() - 0.5) * 20;
-      const rawY = (screenH * 0.45) + Math.sin(now / 800) * 15;
+      const rawX = screenW * 0.25 + cycleTime * (screenW * 0.5) + (Math.random() - 0.5) * 20;
+      const rawY = screenH * 0.45 + Math.sin(now / 800) * 15;
 
       setLiveGaze({ x: rawX, y: rawY });
       gazeAnalyzerRef.current.addSample(rawX, rawY, now);
 
-      requestAnimationFrame(loop);
+      simGazeRafRef.current = requestAnimationFrame(loop);
     };
 
-    requestAnimationFrame(loop);
+    simGazeRafRef.current = requestAnimationFrame(loop);
   };
 
   // Finish Reading Passage
@@ -181,8 +184,13 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
     if (currentPassageIdx < passages.length - 1) {
       setCurrentPassageIdx((prev) => prev + 1);
     } else {
+      if (simGazeRafRef.current) {
+        cancelAnimationFrame(simGazeRafRef.current);
+        simGazeRafRef.current = null;
+      }
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
+        cameraService.releaseStream();
+        streamRef.current = null;
       }
       if (gazeTrackerRef.current) {
         gazeTrackerRef.current.stop();
@@ -215,11 +223,17 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
   // Cleanup on unmount
   useEffect(() => {
     return () => {
+      if (simGazeRafRef.current) {
+        cancelAnimationFrame(simGazeRafRef.current);
+        simGazeRafRef.current = null;
+      }
       if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
+        cameraService.releaseStream();
+        streamRef.current = null;
       }
       if (gazeTrackerRef.current) {
         gazeTrackerRef.current.stop();
+        gazeTrackerRef.current = null;
       }
     };
   }, []);
