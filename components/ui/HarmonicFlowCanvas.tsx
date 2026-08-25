@@ -1,18 +1,16 @@
 'use client';
 
-import React, { useRef, useEffect, useState } from 'react';
-import { Sparkles, Wand2, MousePointer, RotateCcw, Volume2, VolumeX } from 'lucide-react';
-import { OneEuroFilter2D } from '@/lib/oneEuroFilter';
-import { calculateStrokeAccuracyScore } from '@/lib/dtw';
-import { CameraPermissionModal } from '@/components/ui/CameraPermissionModal';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { Camera, RefreshCw, Wand2, Sparkles, Check, Flame, Hand } from 'lucide-react';
 import { cameraService } from '@/lib/camera-service';
 
 export interface HarmonicPoint {
   x: number;
   y: number;
   t: number;
-  pressure: number;
-  isAirDrawing: boolean;
+  pressure?: number;
+  isAirDrawing?: boolean;
+  isNewStroke?: boolean;
 }
 
 interface Particle {
@@ -22,10 +20,20 @@ interface Particle {
   vy: number;
   size: number;
   color: string;
+  hue: number;
   alpha: number;
   life: number;
   maxLife: number;
-  hue: number;
+}
+
+interface CosmicMote {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  alpha: number;
+  baseHue: number;
 }
 
 interface HarmonicFlowCanvasProps {
@@ -34,264 +42,324 @@ interface HarmonicFlowCanvasProps {
   targetLetter?: string;
   onStrokeUpdate?: (points: HarmonicPoint[]) => void;
   onStrokeFinish?: (points: HarmonicPoint[]) => void;
-  enableCameraAirControl?: boolean;
-  className?: string;
+  worldAccent?: 'realm' | 'forest' | 'castle' | 'valley' | 'mountains';
   ambientMode?: 'subtle' | 'celebrate';
   fieldIntensity?: number;
-  worldAccent?: 'forest' | 'castle' | 'realm' | 'mountains' | 'valley';
+  enableCameraAirControl?: boolean;
+  className?: string;
 }
 
-const PENTATONIC = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
+// 1-Euro Adaptive Low-Pass Filter
+class OneEuroFilter {
+  private minCutoff: number;
+  private beta: number;
+  private dCutoff: number;
+  private xPrev: number | null = null;
+  private dxPrev: number | null = null;
+  private tPrev: number | null = null;
 
-function clamp01(v: number) {
-  return Math.max(0, Math.min(1, v));
+  constructor(minCutoff = 1.0, beta = 0.007, dCutoff = 1.0) {
+    this.minCutoff = minCutoff;
+    this.beta = beta;
+    this.dCutoff = dCutoff;
+  }
+
+  private smoothingFactor(tDiff: number, cutoff: number): number {
+    const r = 2 * Math.PI * cutoff * tDiff;
+    return r / (r + 1);
+  }
+
+  private exponentialSmoothing(alpha: number, x: number, xPrev: number): number {
+    return alpha * x + (1 - alpha) * xPrev;
+  }
+
+  filter(x: number, y: number, t: number): { x: number; y: number } {
+    if (this.xPrev === null || this.tPrev === null) {
+      this.xPrev = x;
+      this.dxPrev = 0;
+      this.tPrev = t;
+      return { x, y };
+    }
+    const tDiff = Math.max((t - this.tPrev) / 1000.0, 0.001);
+    const dx = (x - this.xPrev) / tDiff;
+    const aD = this.smoothingFactor(tDiff, this.dCutoff);
+    const dxHat = this.exponentialSmoothing(aD, dx, this.dxPrev ?? 0);
+    const cutoff = this.minCutoff + this.beta * Math.abs(dxHat);
+    const a = this.smoothingFactor(tDiff, cutoff);
+    const xHat = this.exponentialSmoothing(a, x, this.xPrev);
+
+    this.xPrev = xHat;
+    this.dxPrev = dxHat;
+    this.tPrev = t;
+    return { x: xHat, y };
+  }
+
+  reset() {
+    this.xPrev = null;
+    this.dxPrev = null;
+    this.tPrev = null;
+  }
 }
 
-function softMap(norm: number, lo: number, hi: number, size: number): number {
-  const t = clamp01((norm - lo) / Math.max(0.08, hi - lo));
-  const s = t * t * (3 - 2 * t);
-  return s * size;
+// Map camera frame to canvas coordinate
+function softMap(v: number, lo: number, hi: number, max: number): number {
+  const norm = (v - lo) / (hi - lo);
+  const clamped = Math.max(0, Math.min(1, norm));
+  return clamped * max;
 }
 
 export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   width = 440,
   height = 440,
-  targetLetter = 'b',
+  targetLetter,
   onStrokeUpdate,
   onStrokeFinish,
-  enableCameraAirControl = true,
+  worldAccent = 'realm',
   ambientMode,
   fieldIntensity,
-  worldAccent = 'realm',
+  enableCameraAirControl = true,
   className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const pipCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const pipCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const mediaPipeCamRef = useRef<any>(null);
   const handsRef = useRef<any>(null);
-  const particlesRef = useRef<Particle[]>([]);
-  const strokeHistoryRef = useRef<HarmonicPoint[]>([]);
-  const isInteractingRef = useRef(false);
+  const streamRef = useRef<MediaStream | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const rafRef = useRef<number | null>(null);
-
-  // Normalization boundaries
-  const FIX_LO = 0.12;
-  const FIX_HI = 0.88;
-
-  // 1-Euro tuned for responsive <8ms lag, smooth curve
-  const oneEuroRef = useRef(new OneEuroFilter2D(1.4, 0.025, 1.0));
-  const handPosRef = useRef({ x: width / 2, y: height / 2, present: false, drawing: false });
 
   const [inputMode, setInputMode] = useState<'touch' | 'camera'>('touch');
   const [cameraActive, setCameraActive] = useState(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
   const [handDetected, setHandDetected] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [isPinching, setIsPinching] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [calibrating, setCalibrating] = useState(false);
-  const permissionGrantedRef = useRef(false);
 
-  const playTone = (yNorm: number) => {
-    if (!soundEnabled || typeof window === 'undefined') return;
+  // References for live 60fps tracking & particles
+  const strokeHistoryRef = useRef<HarmonicPoint[]>([]);
+  const isInteractingRef = useRef(false);
+  const wasPinchingRef = useRef(false);
+  const handPosRef = useRef({ x: 220, y: 220, present: false, pinching: false });
+  const particlesRef = useRef<Particle[]>([]);
+  const cosmicMotesRef = useRef<CosmicMote[]>([]);
+  const oneEuroRef = useRef(new OneEuroFilter(1.2, 0.009, 1.0));
+  const rafRef = useRef<number | null>(null);
+  const bloomRef = useRef(0);
+
+  // Pentatonic Resonator (Audio Synthesis)
+  const playTone = useCallback((normY: number) => {
+    if (typeof window === 'undefined') return;
     try {
       if (!audioCtxRef.current) {
-        audioCtxRef.current = new (window.AudioContext ||
-          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+        const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioCtx) audioCtxRef.current = new AudioCtx();
       }
-      const ctx = audioCtxRef.current!;
-      if (ctx.state === 'suspended') void ctx.resume();
-      const idx = Math.max(0, Math.min(PENTATONIC.length - 1, Math.floor((1 - yNorm) * PENTATONIC.length)));
+      const ctx = audioCtxRef.current;
+      if (!ctx || ctx.state === 'suspended') {
+        ctx?.resume?.();
+      }
+      if (!ctx) return;
+
+      const pentatonic = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25]; // C4, D4, E4, G4, A4, C5
+      const noteIdx = Math.max(0, Math.min(pentatonic.length - 1, Math.floor((1 - normY) * pentatonic.length)));
+      const freq = pentatonic[noteIdx];
+
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(PENTATONIC[idx], ctx.currentTime);
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
       gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.12, ctx.currentTime + 0.04);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.25);
+      gain.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime + 0.04);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+
       osc.connect(gain);
       gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.28);
-    } catch {}
-  };
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 0.36);
+    } catch {
+      // Audio autoplay policy fallback
+    }
+  }, []);
 
-  const spawnBurst = (x: number, y: number, hue: number, n = 3) => {
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const s = Math.random() * 2.2 + 0.7;
+  // Initialize Cosmic Ambient Motes
+  useEffect(() => {
+    const motes: CosmicMote[] = [];
+    const count = 28;
+    for (let i = 0; i < count; i++) {
+      motes.push({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        size: Math.random() * 2.5 + 1.2,
+        alpha: Math.random() * 0.45 + 0.2,
+        baseHue: worldAccent === 'realm' ? 172 : worldAccent === 'forest' ? 142 : 38,
+      });
+    }
+    cosmicMotesRef.current = motes;
+  }, [width, height, worldAccent]);
+
+  // Particle Generators
+  const spawnBurst = (x: number, y: number, hue = 172, count = 3) => {
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 2.8 + 0.8;
       particlesRef.current.push({
         x,
         y,
-        vx: Math.cos(a) * s,
-        vy: Math.sin(a) * s,
-        size: Math.random() * 5 + 2.5,
-        color: `hsl(${hue}, 92%, 64%)`,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 3.5 + 1.8,
+        color: `hsl(${hue + (Math.random() - 0.5) * 20}, 95%, 65%)`,
         hue,
-        alpha: 0.96,
+        alpha: 1,
         life: 0,
-        maxLife: Math.random() * 20 + 12,
+        maxLife: Math.random() * 22 + 14,
       });
     }
   };
 
   const spawnStarBurst = (x: number, y: number) => {
-    for (let i = 0; i < 16; i++) {
-      const a = (Math.PI * 2 * i) / 16 + (Math.random() - 0.5) * 0.4;
-      const s = Math.random() * 3.8 + 1.6;
+    for (let i = 0; i < 22; i++) {
+      const angle = (Math.PI * 2 * i) / 22;
+      const speed = Math.random() * 4.5 + 1.5;
       particlesRef.current.push({
         x,
         y,
-        vx: Math.cos(a) * s,
-        vy: Math.sin(a) * s,
-        size: Math.random() * 4 + 2.2,
-        color: `hsl(${38 + Math.random() * 18}, 98%, 66%)`,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.random() * 4.5 + 2.5,
+        color: `hsl(${38 + Math.random() * 20}, 98%, 66%)`,
         hue: 38,
         alpha: 1,
         life: 0,
-        maxLife: Math.random() * 18 + 12,
+        maxLife: Math.random() * 28 + 18,
       });
     }
   };
 
-  const bloomRef = useRef(0);
-  const fieldOffsetRef = useRef(0);
-  const ambientCelebratedRef = useRef(false);
-
-  // Main 60 FPS Render Loop
+  // 60 FPS Render Loop (Harmonic Flow Engine)
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const isAmbient = !!ambientMode;
-    const intensity = fieldIntensity ?? (ambientMode === 'celebrate' ? 0.55 : ambientMode === 'subtle' ? 0.22 : 0);
-    const prefersCalm =
-      typeof window !== 'undefined' &&
-      (window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-        document.documentElement.classList.contains('sensory-calm'));
-    const effectiveIntensity = prefersCalm ? intensity * 0.5 : intensity;
-
-    if (ambientMode === 'celebrate' && !ambientCelebratedRef.current) {
-      ambientCelebratedRef.current = true;
-      spawnStarBurst(canvas.width / 2, canvas.height / 2);
-    }
+    let animTime = 0;
 
     const render = () => {
-      if (isAmbient || bloomRef.current > 0.02) fieldOffsetRef.current += 0.18;
-      else fieldOffsetRef.current *= 0.96;
+      animTime += 0.02;
 
-      // 1. Soft Warm Canvas Background
+      // 1. Soft Canvas Background Trail
       const bloom = bloomRef.current;
-      ctx.fillStyle = `rgba(250, 248, 243, ${0.25 + bloom * 0.05})`;
+      ctx.fillStyle = `rgba(252, 250, 246, ${0.28 + bloom * 0.04})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (bloom > 0.02 || isAmbient) {
-        const hueForBloom =
-          worldAccent === 'realm' ? 172 : worldAccent === 'forest' ? 152 : worldAccent === 'castle' ? 228 : 38;
-        const g = ctx.createRadialGradient(
-          canvas.width / 2,
-          canvas.height / 2,
-          80,
-          canvas.width / 2,
-          canvas.height / 2,
-          400
-        );
-        g.addColorStop(0, `hsla(${hueForBloom}, 90%, 65%, ${effectiveIntensity * 0.12 + bloom * 0.1})`);
-        g.addColorStop(1, `hsla(${hueForBloom}, 90%, 65%, 0)`);
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // 2. Cosmic Ambient Motes (Generative Harmonic Flow)
+      const motes = cosmicMotesRef.current;
+      for (const m of motes) {
+        m.x += m.vx + Math.sin(animTime + m.y * 0.01) * 0.2;
+        m.y += m.vy + Math.cos(animTime + m.x * 0.01) * 0.2;
+        if (m.x < 0) m.x = canvas.width;
+        if (m.x > canvas.width) m.x = 0;
+        if (m.y < 0) m.y = canvas.height;
+        if (m.y > canvas.height) m.y = 0;
+
+        ctx.fillStyle = `hsla(${m.baseHue}, 80%, 65%, ${m.alpha * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+        ctx.fill();
       }
 
-      // 2. Target Letter Guide (Clean, Dyslexia-Optimized)
+      // 3. Target Letter Silhouette
       if (targetLetter) {
         ctx.save();
-        ctx.font = 'bold 230px "Sora", "Baloo 2", sans-serif';
+        ctx.font = 'bold 230px "Baloo 2", "Lexend", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = 'rgba(201, 100, 66, 0.11)';
+        ctx.fillStyle = 'rgba(201, 100, 66, 0.12)';
         ctx.fillText(targetLetter, canvas.width / 2, canvas.height / 2 + 10);
-        ctx.strokeStyle = 'rgba(43, 42, 51, 0.14)';
-        ctx.lineWidth = 2.2;
+        ctx.strokeStyle = 'rgba(43, 42, 51, 0.15)';
+        ctx.lineWidth = 2.5;
         ctx.setLineDash([8, 12]);
         ctx.strokeText(targetLetter, canvas.width / 2, canvas.height / 2 + 10);
         ctx.restore();
       }
 
-      // 3. Fluid Ribbon Stroke with Glowing Splines
+      // 4. Multi-Segment Neon Spline Strokes
       const pts = strokeHistoryRef.current;
-      if (pts.length > 1 && !isAmbient) {
-        let speed = 0;
-        if (pts.length > 3) {
-          const a = pts[pts.length - 1],
-            b = pts[pts.length - 4];
-          speed = Math.hypot(a.x - b.x, a.y - b.y) / Math.max(1, a.t - b.t);
-        }
-        const hue = worldAccent === 'realm' ? 172 + Math.min(20, speed * 1800) : 24 + Math.min(36, speed * 3600);
-        const outer = `hsla(${hue}, 70%, 58%, 0.45)`;
-        const core = `hsl(${hue}, 85%, 58%)`;
-        bloomRef.current = Math.min(1, bloomRef.current * 0.92 + Math.min(0.5, speed * 900));
+      if (pts.length > 1) {
+        const segments: HarmonicPoint[][] = [];
+        let cur: HarmonicPoint[] = [];
 
-        const drawSpline = (color: string, w: number, blur: number) => {
+        for (const p of pts) {
+          if (p.isNewStroke && cur.length > 0) {
+            segments.push(cur);
+            cur = [];
+          }
+          cur.push(p);
+        }
+        if (cur.length > 0) segments.push(cur);
+
+        segments.forEach((seg) => {
+          if (seg.length < 2) return;
+
+          const hue = worldAccent === 'realm' ? 172 : 28;
+          const outerColor = `hsla(${hue}, 85%, 60%, 0.4)`;
+          const coreColor = `hsl(${hue}, 95%, 62%)`;
+
+          // Outer Glow
           ctx.save();
           ctx.beginPath();
-          ctx.moveTo(pts[0].x, pts[0].y);
-          for (let i = 1; i < pts.length; i++) {
-            const xc = (pts[i].x + pts[i - 1].x) / 2;
-            const yc = (pts[i].y + pts[i - 1].y) / 2;
-            ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, xc, yc);
+          ctx.moveTo(seg[0].x, seg[0].y);
+          for (let i = 1; i < seg.length; i++) {
+            const xc = (seg[i].x + seg[i - 1].x) / 2;
+            const yc = (seg[i].y + seg[i - 1].y) / 2;
+            ctx.quadraticCurveTo(seg[i - 1].x, seg[i - 1].y, xc, yc);
           }
-          ctx.strokeStyle = color;
-          ctx.lineWidth = w;
+          ctx.strokeStyle = outerColor;
+          ctx.lineWidth = 14;
           ctx.lineCap = 'round';
           ctx.lineJoin = 'round';
-          ctx.shadowColor = color;
-          ctx.shadowBlur = blur;
+          ctx.shadowColor = `hsl(${hue}, 90%, 60%)`;
+          ctx.shadowBlur = 18;
+          ctx.stroke();
+
+          // Inner Bright Core
+          ctx.strokeStyle = coreColor;
+          ctx.lineWidth = 5.5;
+          ctx.shadowBlur = 4;
+          ctx.stroke();
+
+          // White Hot Centerline
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 2;
+          ctx.shadowBlur = 0;
           ctx.stroke();
           ctx.restore();
-        };
-
-        drawSpline(outer, 24, 20);
-        drawSpline(core, 10, 8);
-
-        // Bright Center Highlight
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(pts[0].x, pts[0].y);
-        for (let i = 1; i < pts.length; i++) {
-          const xc = (pts[i].x + pts[i - 1].x) / 2;
-          const yc = (pts[i].y + pts[i - 1].y) / 2;
-          ctx.quadraticCurveTo(pts[i - 1].x, pts[i - 1].y, xc, yc);
-        }
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.lineWidth = 3.5;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-        ctx.restore();
-      } else {
-        bloomRef.current *= 0.96;
+        });
       }
 
-      // 4. Sparkling Particle Trail
-      for (let i = particlesRef.current.length - 1; i >= 0; i--) {
-        const p = particlesRef.current[i];
+      // 5. Active Particles (Stardust Fireworks)
+      const particles = particlesRef.current;
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.05;
-        p.vx *= 0.985;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
         p.life++;
-        p.alpha = 1 - p.life / p.maxLife;
-        if (p.life >= p.maxLife) {
-          particlesRef.current.splice(i, 1);
+        p.alpha = Math.max(0, 1 - p.life / p.maxLife);
+
+        if (p.alpha <= 0.01) {
+          particles.splice(i, 1);
           continue;
         }
+
         ctx.save();
-        ctx.globalAlpha = Math.max(0, p.alpha);
         ctx.fillStyle = p.color;
+        ctx.globalAlpha = p.alpha;
         ctx.shadowColor = p.color;
         ctx.shadowBlur = 8;
         ctx.beginPath();
@@ -300,40 +368,61 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         ctx.restore();
       }
 
-      // 5. Magic Wand Tip (Camera Air Mode)
+      // 6. Magic Wand Tip & Hover Reticle (Camera Air Mode)
       if (inputMode === 'camera' && handPosRef.current.present) {
         const hx = handPosRef.current.x;
         const hy = handPosRef.current.y;
-        ctx.save();
-        ctx.strokeStyle = '#c96442';
-        ctx.lineWidth = 2.5;
-        ctx.beginPath();
-        ctx.arc(hx, hy, 16, 0, Math.PI * 2);
-        ctx.stroke();
+        const pinching = handPosRef.current.pinching;
 
-        // Glowing Star Hotpoint
-        ctx.fillStyle = '#E8A33D';
-        ctx.shadowColor = '#E8A33D';
-        ctx.shadowBlur = 16;
-        ctx.beginPath();
-        const r = 8;
-        for (let k = 0; k < 5; k++) {
-          const a = -Math.PI / 2 + (Math.PI * 2 * k) / 5;
-          const a2 = a + Math.PI / 5;
-          const x1 = hx + Math.cos(a) * r;
-          const y1 = hy + Math.sin(a) * r;
-          const x2 = hx + Math.cos(a2) * (r * 0.45);
-          const y2 = hy + Math.sin(a2) * (r * 0.45);
-          if (k === 0) ctx.moveTo(x1, y1);
-          else ctx.lineTo(x1, y1);
-          ctx.lineTo(x2, y2);
+        ctx.save();
+        if (pinching) {
+          // PINCHING (DRAWING MODE) — Flaming Cosmic Wand Tip
+          ctx.strokeStyle = '#E8A33D';
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 18, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Pulsing Golden Star
+          ctx.fillStyle = '#FFD700';
+          ctx.shadowColor = '#FFD700';
+          ctx.shadowBlur = 22;
+          ctx.beginPath();
+          const r = 11;
+          for (let k = 0; k < 5; k++) {
+            const a = -Math.PI / 2 + (Math.PI * 2 * k) / 5;
+            const a2 = a + Math.PI / 5;
+            const x1 = hx + Math.cos(a) * r;
+            const y1 = hy + Math.sin(a) * r;
+            const x2 = hx + Math.cos(a2) * (r * 0.45);
+            const y2 = hy + Math.sin(a2) * (r * 0.45);
+            if (k === 0) ctx.moveTo(x1, y1);
+            else ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y2);
+          }
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(hx, hy, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // HOVERING MODE (PEN UP) — Targeting Reticle (0 ink drawn)
+          ctx.strokeStyle = 'rgba(201, 100, 66, 0.7)';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([4, 4]);
+          ctx.beginPath();
+          ctx.arc(hx, hy, 14, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = '#2FA8A0';
+          ctx.shadowColor = '#2FA8A0';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(hx, hy, 4.5, 0, Math.PI * 2);
+          ctx.fill();
         }
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.beginPath();
-        ctx.arc(hx, hy, 2.5, 0, Math.PI * 2);
-        ctx.fill();
         ctx.restore();
       }
 
@@ -344,7 +433,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, [targetLetter, inputMode, worldAccent, ambientMode, fieldIntensity]);
+  }, [targetLetter, inputMode, worldAccent]);
 
   // Touch Handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
@@ -356,10 +445,10 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
     const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
     const t = performance.now();
-    const pressure = typeof e.pressure === 'number' ? e.pressure : 0.5;
     isInteractingRef.current = true;
-    strokeHistoryRef.current = [{ x, y, t, pressure, isAirDrawing: false }];
-    spawnBurst(x, y, 38);
+
+    strokeHistoryRef.current.push({ x, y, t, pressure: 0.8, isAirDrawing: false, isNewStroke: true });
+    spawnBurst(x, y, 172, 5);
     playTone(y / canvas.height);
     onStrokeUpdate?.(strokeHistoryRef.current);
   };
@@ -372,38 +461,23 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     const x = ((e.clientX - rect.left) / rect.width) * canvas.width;
     const y = ((e.clientY - rect.top) / rect.height) * canvas.height;
     const t = performance.now();
-    const pressure = typeof e.pressure === 'number' ? e.pressure : 0.5;
-    strokeHistoryRef.current.push({ x, y, t, pressure, isAirDrawing: false });
-    if (strokeHistoryRef.current.length % 3 === 0) spawnBurst(x, y, 42 + Math.random() * 18, 2);
+
+    strokeHistoryRef.current.push({ x, y, t, pressure: 0.8, isAirDrawing: false });
+    if (strokeHistoryRef.current.length % 2 === 0) spawnBurst(x, y, 172, 2);
     if (Math.random() < 0.22) playTone(y / canvas.height);
     onStrokeUpdate?.(strokeHistoryRef.current);
   };
 
   const handlePointerUp = () => {
     if (inputMode === 'camera') return;
-    if (!isInteractingRef.current) return;
     isInteractingRef.current = false;
-    if (strokeHistoryRef.current.length > 4) {
+    if (strokeHistoryRef.current.length > 5) {
       const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
       spawnStarBurst(last.x, last.y);
-      const score = calculateStrokeAccuracyScore(
-        strokeHistoryRef.current.map((p) => ({ x: p.x, y: p.y })),
-        targetLetter
-      );
-      if (score > 80) {
-        for (let k = 0; k < 8; k++) {
-          spawnBurst(
-            last.x + (Math.random() - 0.5) * 60,
-            last.y + (Math.random() - 0.5) * 60,
-            38 + Math.random() * 24,
-            2
-          );
-        }
-      }
     }
-    onStrokeFinish?.(strokeHistoryRef.current);
   };
 
+  // Camera Teardown
   const stopCamera = () => {
     try {
       if (mediaPipeCamRef.current) {
@@ -415,7 +489,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         handsRef.current = null;
       }
     } catch (err) {
-      console.warn('[HarmonicFlowCanvas] Error stopping MediaPipe:', err);
+      console.warn('[HarmonicFlowCanvas] Teardown error:', err);
     } finally {
       if (streamRef.current) {
         cameraService.releaseStream();
@@ -423,22 +497,18 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       }
       setCameraActive(false);
       setHandDetected(false);
+      setIsPinching(false);
       handPosRef.current.present = false;
-      handPosRef.current.drawing = false;
+      handPosRef.current.pinching = false;
     }
   };
 
   useEffect(() => {
     return () => {
       stopCamera();
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, []);
-
-  const airFinishTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startCameraAirTracking = async () => {
     setCameraError(null);
@@ -461,19 +531,20 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     }
   };
 
+  // MediaPipe Hand Landmark & Pinch Tracking
   const initHandTracking = async () => {
     if (typeof window === 'undefined') return;
     try {
       const { Hands } = await import('@mediapipe/hands');
-      const { Camera } = await import('@mediapipe/camera_utils');
-      
+      const { Camera: MPCam } = await import('@mediapipe/camera_utils');
+
       const hands = new Hands({
         locateFile: (f) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4.1675469240/${f}`,
       });
 
       hands.setOptions({
         maxNumHands: 1,
-        modelComplexity: 0, // Lite model for ultra-low latency & 60fps
+        modelComplexity: 0, // Lite 60fps model
         minDetectionConfidence: 0.5,
         minTrackingConfidence: 0.5,
       });
@@ -500,26 +571,22 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
             });
             pipCtx.stroke();
 
-            // Glowing index fingertip Hotpoint
+            // Index tip & thumb tip highlights
             const tip = lm[8];
+            const thumb = lm[4];
             pipCtx.fillStyle = '#E8A33D';
-            pipCtx.shadowColor = '#E8A33D';
-            pipCtx.shadowBlur = 10;
             pipCtx.beginPath();
-            pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 6, 0, Math.PI * 2);
+            pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 5.5, 0, Math.PI * 2);
+            pipCtx.arc(thumb.x * pipCanvas.width, thumb.y * pipCanvas.height, 4.5, 0, Math.PI * 2);
             pipCtx.fill();
           }
         }
 
         if (!results.multiHandLandmarks?.[0]) {
-          if (handPosRef.current.present && strokeHistoryRef.current.length >= 8) {
-            // Hand left frame after drawing
-            const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
-            spawnStarBurst(last.x, last.y);
-            onStrokeFinish?.(strokeHistoryRef.current);
-          }
           setHandDetected(false);
+          setIsPinching(false);
           handPosRef.current.present = false;
+          handPosRef.current.pinching = false;
           return;
         }
 
@@ -527,46 +594,68 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         handPosRef.current.present = true;
         const lm = results.multiHandLandmarks[0];
         const indexTip = lm[8];
+        const thumbTip = lm[4];
+        const wrist = lm[0];
+        const middleMcp = lm[9];
         const canvas = canvasRef.current;
         if (!canvas) return;
+
+        // Pinch Detection: Euclidean distance normalized by palm scale
+        const dx = thumbTip.x - indexTip.x;
+        const dy = thumbTip.y - indexTip.y;
+        const dz = (thumbTip.z || 0) - (indexTip.z || 0);
+        const pinchDist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        const handScale = Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y);
+        const pinchRatio = pinchDist / Math.max(handScale, 0.08);
+
+        // Active pinch threshold
+        const pinching = pinchRatio < 0.38;
+        setIsPinching(pinching);
+        handPosRef.current.pinching = pinching;
 
         // Mirrored coordinate mapping
         const rawX = 1 - indexTip.x;
         const rawY = indexTip.y;
-        const tx = softMap(rawX, FIX_LO, FIX_HI, canvas.width);
-        const ty = softMap(rawY, FIX_LO, FIX_HI, canvas.height);
+        const tx = softMap(rawX, 0.15, 0.85, canvas.width);
+        const ty = softMap(rawY, 0.15, 0.85, canvas.height);
 
         const filtered = oneEuroRef.current.filter(tx, ty, performance.now());
         handPosRef.current.x = filtered.x;
         handPosRef.current.y = filtered.y;
 
         const t = performance.now();
-        strokeHistoryRef.current.push({ x: filtered.x, y: filtered.y, t, pressure: 0.7, isAirDrawing: true });
-        if (strokeHistoryRef.current.length % 2 === 0) spawnBurst(filtered.x, filtered.y, 38 + Math.random() * 16, 2);
-        if (Math.random() < 0.2) playTone(filtered.y / canvas.height);
-        onStrokeUpdate?.(strokeHistoryRef.current);
 
-        // Auto-finish air stroke debounce if child pauses
-        if (airFinishTimerRef.current) clearTimeout(airFinishTimerRef.current);
-        if (strokeHistoryRef.current.length >= 10) {
-          airFinishTimerRef.current = setTimeout(() => {
-            if (strokeHistoryRef.current.length >= 10) {
-              const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
-              spawnStarBurst(last.x, last.y);
-              onStrokeFinish?.(strokeHistoryRef.current);
-            }
-          }, 1100);
+        if (pinching) {
+          // PEN IS DOWN — DRAWING INK
+          const isNewStroke = !wasPinchingRef.current;
+          strokeHistoryRef.current.push({
+            x: filtered.x,
+            y: filtered.y,
+            t,
+            pressure: 0.85,
+            isAirDrawing: true,
+            isNewStroke,
+          });
+          spawnBurst(filtered.x, filtered.y, 172, 3);
+          if (Math.random() < 0.22) playTone(filtered.y / canvas.height);
+          onStrokeUpdate?.(strokeHistoryRef.current);
+        } else {
+          // PEN IS UP — HOVERING ONLY (Zero ink drawn!)
+          if (wasPinchingRef.current && strokeHistoryRef.current.length > 5) {
+            spawnBurst(filtered.x, filtered.y, 38, 6);
+          }
         }
+        wasPinchingRef.current = pinching;
       });
 
       if (videoRef.current) {
-        const cam = new Camera(videoRef.current, {
+        const cam = new MPCam(videoRef.current, {
           onFrame: async () => {
             if (videoRef.current && handsRef.current && videoRef.current.readyState >= 2 && !videoRef.current.paused) {
               try {
                 await handsRef.current.send({ image: videoRef.current });
-              } catch (frameErr) {
-                // Silently skip transient frames
+              } catch {
+                // Silently skip frame
               }
             }
           },
@@ -578,15 +667,11 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       }
     } catch (e) {
       console.warn('[HarmonicFlowCanvas] MediaPipe error:', e);
-      setCameraError('Magic Air Wand unavailable. Please use Touch/Stylus.');
+      setCameraError('Magic Air Wand unavailable. You can also draw with Touch/Stylus!');
     }
   };
 
   const handleClear = () => {
-    if (strokeHistoryRef.current.length > 3) {
-      const last = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
-      spawnStarBurst(last.x, last.y);
-    }
     strokeHistoryRef.current = [];
     particlesRef.current = [];
     oneEuroRef.current.reset();
@@ -594,138 +679,122 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center gap-4 w-full max-w-lg mx-auto select-none ${className}`}>
-      {/* Top Playful Mode Switcher */}
-      <div className="flex items-center justify-between gap-2 w-full bg-white border-2 border-hairline rounded-2xl p-2 shadow-soft-sm">
-        <div className="flex items-center gap-2">
+    <div className={`relative flex flex-col items-center select-none ${className}`}>
+      {/* Mode Selector & Controls Bar */}
+      <div className="flex items-center justify-between gap-3 w-full max-w-[440px] pb-3">
+        <div className="flex items-center gap-1.5 p-1 bg-sand/60 border border-hairline rounded-2xl shadow-soft-xs">
           <button
             type="button"
             onClick={() => {
               stopCamera();
               setInputMode('touch');
             }}
-            className={`min-h-[48px] px-4 py-2 rounded-xl font-display text-sm font-bold flex items-center gap-2 transition-all ${
+            className={`min-h-[42px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
               inputMode === 'touch'
-                ? 'bg-ink text-white shadow-soft-sm scale-[1.02]'
-                : 'bg-paper text-muted hover:text-ink hover:bg-hairline/60'
+                ? 'bg-ink text-white shadow-soft-sm'
+                : 'text-muted hover:text-ink'
             }`}
           >
-            <MousePointer className="w-4 h-4" /> Touch
+            <Hand className="w-4 h-4" />
+            <span>Touch</span>
           </button>
+
           {enableCameraAirControl && (
             <button
               type="button"
               onClick={() => {
-                if (permissionGrantedRef.current) void startCameraAirTracking();
-                else setShowPermissionModal(true);
+                if (inputMode !== 'camera') void startCameraAirTracking();
               }}
-              className={`min-h-[48px] px-4 py-2 rounded-xl font-display text-sm font-bold flex items-center gap-2 transition-all ${
+              className={`min-h-[42px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
                 inputMode === 'camera'
-                  ? 'bg-amber text-ink shadow-amber-glow scale-[1.02] animate-pulse font-extrabold'
-                  : 'bg-paper text-muted hover:text-ink hover:bg-hairline/60'
+                  ? 'bg-amber text-ink shadow-soft-sm'
+                  : 'text-muted hover:text-ink'
               }`}
             >
-              <Wand2 className="w-4 h-4 text-amber-800" /> Magic Air Wand
+              <Wand2 className="w-4 h-4" />
+              <span>Magic Air Wand</span>
             </button>
           )}
         </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setSoundEnabled((v) => !v)}
-            className="w-10 h-10 rounded-xl text-muted hover:text-ink hover:bg-paper flex items-center justify-center transition-colors"
-            title="Sound"
-            aria-label="Toggle audio effects"
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4 text-amber" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-          <button
-            type="button"
-            onClick={handleClear}
-            className="w-10 h-10 rounded-xl text-muted hover:text-ink hover:bg-paper flex items-center justify-center transition-colors"
-            title="Clear"
-            aria-label="Clear canvas"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-        </div>
+
+        <button
+          type="button"
+          onClick={handleClear}
+          title="Clear canvas"
+          className="p-2.5 text-muted hover:text-ink rounded-xl hover:bg-sand/60 border border-transparent hover:border-hairline transition-all"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* Main Canvas Arena */}
-      <div className="relative bg-white border-2 border-hairline rounded-3xl p-3 shadow-soft-md overflow-hidden flex items-center justify-center w-full aspect-square max-w-[440px]">
+      {/* Main Drawing Canvas Arena */}
+      <div
+        className="relative rounded-3xl overflow-hidden border-4 border-realm/30 bg-[#FCFAF6] shadow-soft-lg"
+        style={{ width, height }}
+      >
         <canvas
           ref={canvasRef}
           width={width}
           height={height}
-          role="img"
-          aria-label={`Trace the letter ${targetLetter}.`}
-          tabIndex={0}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-          className="tracing-canvas rounded-2xl block bg-ivory shadow-inner cursor-crosshair w-full h-full object-contain"
-          style={{ touchAction: 'none' }}
+          className="block w-full h-full cursor-crosshair touch-none"
         />
 
-        {/* Live Camera Video Feed inside PiP box with overlaid skeleton */}
-        <div
-          className={`absolute top-4 right-4 w-32 h-24 sm:w-36 sm:h-28 rounded-2xl border-2 border-white/90 shadow-soft-lg overflow-hidden bg-ink z-20 transition-all duration-300 ${
-            inputMode === 'camera' && cameraActive ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
-          }`}
-        >
-          <video
-            ref={videoRef}
-            playsInline
-            autoPlay
-            muted
-            className="w-full h-full object-cover -scale-x-100 absolute inset-0"
-          />
-          <canvas
-            ref={pipCanvasRef}
-            width={160}
-            height={140}
-            className="w-full h-full object-cover absolute inset-0 z-10 pointer-events-none -scale-x-100"
-          />
-          <div className="absolute bottom-1.5 left-1.5 right-1.5 bg-ink/80 backdrop-blur-sm text-[10px] text-white text-center font-display font-semibold rounded-full py-0.5 z-20 flex items-center justify-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${handDetected ? 'bg-sage animate-pulse' : 'bg-amber'}`} />
-            <span>{calibrating ? 'Calibrating…' : handDetected ? '✨ Wand Active' : 'Wave your hand'}</span>
-          </div>
-        </div>
+        {/* Live PiP Hardware Camera Preview (Top Right) */}
+        {inputMode === 'camera' && cameraActive && (
+          <div className="absolute top-3 right-3 w-28 h-20 rounded-2xl overflow-hidden border-2 border-white/90 shadow-soft-md bg-black/60 z-20">
+            <video
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              className="w-full h-full object-cover -scale-x-100"
+            />
+            <canvas
+              ref={pipCanvasRef}
+              width={112}
+              height={80}
+              className="absolute inset-0 w-full h-full pointer-events-none -scale-x-100"
+            />
 
-        {/* Error overlay if camera fails */}
-        {cameraError && (
-          <div className="absolute bottom-4 left-4 right-4 bg-white/95 border border-amber/40 p-3 rounded-2xl text-xs font-body text-ink text-center shadow-soft-sm z-30">
-            {cameraError}
+            {/* Hand Status Pill in PiP */}
+            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-xs flex items-center gap-1 text-[9px] font-display font-bold text-white whitespace-nowrap">
+              <span className={`w-1.5 h-1.5 rounded-full ${handDetected ? (isPinching ? 'bg-amber animate-ping' : 'bg-emerald-400') : 'bg-amber-400 animate-pulse'}`} />
+              <span>{handDetected ? (isPinching ? '✍️ Drawing' : '🪄 Hovering') : 'Show hand'}</span>
+            </div>
           </div>
         )}
 
-        {/* Dynamic Instructional Chip */}
-        <div className="absolute bottom-3.5 left-1/2 -translate-x-1/2 pointer-events-none z-10 w-max max-w-[90%]">
-          <span className="bg-white/90 backdrop-blur-md border border-hairline px-4 py-1.5 rounded-full text-xs font-display font-bold text-ink shadow-soft-xs inline-flex items-center gap-1.5">
-            <Sparkles className="w-3.5 h-3.5 text-amber" />
-            {inputMode === 'camera'
-              ? handDetected
-                ? '✨ Wave finger — the magic wand tip follows you!'
-                : 'Point index finger at camera to cast'
-              : 'Touch and trace with your finger'}
-          </span>
+        {/* Dynamic Instructional Banner at Canvas Bottom */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none z-10">
+          <div className="px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-hairline shadow-soft-xs flex items-center gap-2 text-xs font-display font-bold text-ink">
+            {inputMode === 'touch' ? (
+              <>
+                <Sparkles className="w-3.5 h-3.5 text-realm fill-realm" />
+                <span>Touch and trace with your finger</span>
+              </>
+            ) : isPinching ? (
+              <>
+                <Flame className="w-3.5 h-3.5 text-amber fill-amber animate-bounce-gentle" />
+                <span className="text-amber-800">✨ Drawing magic ink!</span>
+              </>
+            ) : (
+              <>
+                <Wand2 className="w-3.5 h-3.5 text-realm" />
+                <span>Pinch thumb & index to draw &middot; Release to hover</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
 
-      <CameraPermissionModal
-        open={showPermissionModal}
-        onAllow={() => {
-          permissionGrantedRef.current = true;
-          setShowPermissionModal(false);
-          void startCameraAirTracking();
-        }}
-        onUseTouch={() => {
-          setShowPermissionModal(false);
-          setInputMode('touch');
-        }}
-        onDismiss={() => setShowPermissionModal(false)}
-      />
+      {cameraError && (
+        <p className="text-xs font-body text-terracotta mt-2 text-center max-w-sm">
+          {cameraError}
+        </p>
+      )}
     </div>
   );
 };

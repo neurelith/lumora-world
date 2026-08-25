@@ -47,7 +47,7 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
 
   const handleAutoStrokeFinish = (points: HarmonicPoint[]) => {
     if (showAnalysis || points.length < 5) return;
-    const rawStrokePoints = points.map((p) => ({ x: p.x, y: p.y, t: p.t, pressure: p.pressure }));
+    const rawStrokePoints = points.map((p) => ({ x: p.x, y: p.y, t: p.t, pressure: p.pressure ?? 0.8 }));
     const trial = analyzeStroke(rawStrokePoints, currentLetter, language);
     setLastTrial(trial);
     setShowAnalysis(true);
