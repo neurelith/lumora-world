@@ -4,6 +4,7 @@ import "./globals.css";
 import { I18nProvider } from "@/lib/i18n";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { ServiceWorkerRegistrar } from "@/components/ui/ServiceWorkerRegistrar";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 const sora = Sora({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700"], variable: "--font-display", display: "swap" });
 const jetMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono", display: "swap" });
@@ -126,7 +127,9 @@ export default function RootLayout({
           Skip to main content
         </a>
         <CustomCursor />
-        <I18nProvider>{children}</I18nProvider>
+        <ErrorBoundary>
+          <I18nProvider>{children}</I18nProvider>
+        </ErrorBoundary>
         <ServiceWorkerRegistrar />
       </body>
     </html>
