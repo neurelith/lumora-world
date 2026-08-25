@@ -187,12 +187,12 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                   <motion.div
                     key={idx}
                     className={`
-                      w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-display font-extrabold text-lg sm:text-xl
-                      border-2 transition-all duration-200 select-none
+                      w-13 h-13 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center font-display font-extrabold text-xl sm:text-2xl
+                      border-2 border-b-4 transition-all duration-200 select-none
                       ${
                         isActive
-                          ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white border-amber-300 scale-110 shadow-candy-amber ring-4 ring-amber-200'
-                          : 'bg-white text-ink border-emerald-300 shadow-soft-xs'
+                          ? 'bg-gradient-to-b from-[#FBBF24] to-[#F59E0B] text-amber-950 border-amber-300 border-b-amber-500 scale-110 shadow-candy-amber ring-4 ring-amber-200'
+                          : 'bg-white text-ink border-emerald-200 border-b-emerald-400 shadow-soft-xs'
                       }
                     `}
                     animate={isActive ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
@@ -224,23 +224,23 @@ export const SoundForest: React.FC<SoundForestProps> = ({
             {/* Option Cards (4-Choice Selection Grid) */}
             <AnimatePresence mode="wait">
               <div className="w-full max-w-md space-y-2 pt-1">
-                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-emerald-900">
+                <p className="text-xs font-display font-extrabold uppercase tracking-wider text-emerald-950">
                   {language === 'hi' ? 'सही शब्द पर टैप करें' : 'Tap the blended word'}
                 </p>
 
-                <div className="grid grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-2 gap-3">
                   {shuffledOptions.map((option, idx) => {
                     const isSelected = selectedOption === option;
                     const isCorrect = option === currentTrial.targetWord;
 
-                    let cardStyle = 'bg-white/95 border-emerald-200 text-ink hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-candy-emerald';
+                    let cardStyle = 'bg-white text-ink border-emerald-200 border-b-emerald-400 hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-candy-emerald';
                     if (showFeedback) {
                       if (isSelected && isCorrect) {
-                        cardStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-400 text-white shadow-candy-emerald font-extrabold scale-[1.03]';
+                        cardStyle = 'bg-gradient-to-b from-[#22C55E] to-[#16A34A] border-emerald-400 border-b-[#15803D] text-white shadow-candy-emerald font-extrabold scale-[1.03]';
                       } else if (isSelected && !isCorrect) {
-                        cardStyle = 'bg-gradient-to-r from-orange-400 to-amber-500 border-orange-400 text-white font-extrabold';
+                        cardStyle = 'bg-gradient-to-b from-[#FB923C] to-[#EA580C] border-orange-400 border-b-[#C2410C] text-white font-extrabold';
                       } else if (isCorrect) {
-                        cardStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-400 text-white font-extrabold';
+                        cardStyle = 'bg-gradient-to-b from-[#22C55E] to-[#16A34A] border-emerald-400 border-b-[#15803D] text-white font-extrabold';
                       } else {
                         cardStyle = 'bg-white/40 text-ink/30 border-hairline opacity-50';
                       }
@@ -252,16 +252,16 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                         onClick={() => handleSelectOption(option)}
                         disabled={selectedOption !== null || isPlayingAudio}
                         className={`
-                          min-h-[56px] p-3.5 rounded-2xl border-2 flex items-center justify-center 
-                          font-display font-extrabold text-lg sm:text-xl transition-all duration-200 
-                          select-none shadow-soft-xs
+                          min-h-[58px] p-3.5 rounded-2xl border-2 border-b-4 flex items-center justify-center 
+                          font-display font-extrabold text-lg sm:text-xl transition-all duration-150 
+                          select-none shadow-soft-xs active:border-b-2 active:translate-y-0.5
                           ${cardStyle}
                         `}
                         initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -14 }}
                         transition={{ delay: idx * 0.06, type: 'spring', stiffness: 300, damping: 25 }}
-                        whileTap={{ scale: 0.96 }}
+                        whileTap={{ scale: 0.97 }}
                       >
                         <span>{option}</span>
                         {showFeedback && isSelected && isCorrect && (

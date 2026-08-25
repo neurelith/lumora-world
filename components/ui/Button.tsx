@@ -38,42 +38,42 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center whitespace-nowrap font-display font-bold tracking-[-0.015em] transition-all duration-200 ease-out active:scale-[0.96] focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber disabled:pointer-events-none disabled:opacity-45';
+    'inline-flex items-center justify-center whitespace-nowrap font-display font-extrabold tracking-wide transition-all duration-150 ease-out select-none active:translate-y-[3px] focus-visible:ring-4 focus-visible:ring-amber-300 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-40';
 
   const sizeStyles = {
-    sm: 'min-h-[40px] gap-1.5 px-3.5 py-2 text-sm rounded-xl',
-    md: 'min-h-[48px] gap-2 px-5 py-2.5 text-[15px] rounded-2xl',
-    lg: 'min-h-[54px] gap-2.5 px-6 py-3 text-[17px] rounded-2xl shadow-soft-sm',
-    hero: 'min-h-[62px] gap-3 px-8 py-4 text-[19px] rounded-3xl shadow-soft-md',
+    sm: 'min-h-[40px] gap-1.5 px-4 py-2 text-xs rounded-2xl',
+    md: 'min-h-[50px] gap-2 px-5 py-2.5 text-sm rounded-2xl',
+    lg: 'min-h-[56px] gap-2.5 px-6 py-3 text-base rounded-2xl',
+    hero: 'min-h-[64px] gap-3 px-8 py-4 text-lg rounded-3xl',
   };
 
   const variantStyles: Record<string, string> = {
     primary:
-      'bg-gradient-to-r from-[#E8A33D] to-[#D97706] text-ink border border-amber/40 shadow-candy-amber hover:brightness-105',
+      'bg-gradient-to-b from-[#FBBF24] to-[#F59E0B] text-amber-950 border-b-4 border-[#D97706] shadow-md shadow-amber-500/20 hover:brightness-105 active:border-b-0',
     secondary:
-      'bg-white text-ink border-2 border-hairline shadow-soft-xs hover:bg-sand/70 hover:border-ink/20',
+      'bg-white text-ink border-2 border-b-4 border-slate-200 shadow-xs hover:bg-slate-50 hover:border-slate-300 active:border-b-2',
     ghost:
-      'bg-transparent text-ink-secondary border-0 hover:bg-amber/10 hover:text-ink',
+      'bg-transparent text-ink-secondary border-0 hover:bg-amber-100 hover:text-ink active:translate-y-0',
     outline:
-      'bg-white/80 backdrop-blur-sm text-ink border-2 border-hairline hover:bg-sand hover:border-amber/40',
+      'bg-white/90 backdrop-blur-sm text-ink border-2 border-b-4 border-amber-300 hover:bg-amber-50 active:border-b-2',
     success:
-      'bg-gradient-to-r from-[#10B981] to-[#059669] text-white border border-emerald-400/40 shadow-candy-emerald hover:brightness-105',
+      'bg-gradient-to-b from-[#22C55E] to-[#16A34A] text-white border-b-4 border-[#15803D] shadow-md shadow-emerald-500/25 hover:brightness-105 active:border-b-0',
     sage:
-      'bg-gradient-to-r from-[#10B981] to-[#059669] text-white border border-emerald-400/40 shadow-candy-emerald hover:brightness-105',
+      'bg-gradient-to-b from-[#22C55E] to-[#16A34A] text-white border-b-4 border-[#15803D] shadow-md shadow-emerald-500/25 hover:brightness-105 active:border-b-0',
     terracotta:
-      'bg-gradient-to-r from-[#F97316] to-[#EA580C] text-white border border-orange-400/40 shadow-candy-coral hover:brightness-105',
+      'bg-gradient-to-b from-[#F43F5E] to-[#E11D48] text-white border-b-4 border-[#BE123C] shadow-md shadow-rose-500/25 hover:brightness-105 active:border-b-0',
     amber:
-      'bg-gradient-to-r from-[#F59E0B] to-[#D97706] text-ink font-extrabold border border-amber/40 shadow-candy-amber hover:brightness-105',
+      'bg-gradient-to-b from-[#FBBF24] to-[#F59E0B] text-amber-950 font-extrabold border-b-4 border-[#D97706] shadow-md shadow-amber-500/25 hover:brightness-105 active:border-b-0',
     forest:
-      'bg-gradient-to-r from-[#10B981] to-[#047857] text-white border border-emerald-400/40 shadow-candy-emerald hover:brightness-105',
+      'bg-gradient-to-b from-[#22C55E] to-[#15803D] text-white border-b-4 border-[#166534] shadow-md shadow-emerald-500/25 hover:brightness-105 active:border-b-0',
     realm:
-      'bg-gradient-to-r from-[#06B6D4] to-[#0891B2] text-white border border-cyan-400/40 shadow-candy-cyan hover:brightness-105',
+      'bg-gradient-to-b from-[#06B6D4] to-[#0891B2] text-white border-b-4 border-[#0E7490] shadow-md shadow-cyan-500/25 hover:brightness-105 active:border-b-0',
     castle:
-      'bg-gradient-to-r from-[#8B5CF6] to-[#6D28D9] text-white border border-purple-400/40 shadow-candy-purple hover:brightness-105',
+      'bg-gradient-to-b from-[#A855F7] to-[#7E22CE] text-white border-b-4 border-[#6B21A8] shadow-md shadow-purple-500/25 hover:brightness-105 active:border-b-0',
     mountains:
-      'bg-gradient-to-r from-[#F97316] to-[#C2410C] text-white border border-orange-400/40 shadow-candy-coral hover:brightness-105',
+      'bg-gradient-to-b from-[#FB923C] to-[#EA580C] text-white border-b-4 border-[#C2410C] shadow-md shadow-orange-500/25 hover:brightness-105 active:border-b-0',
     rainbow:
-      'bg-gradient-to-r from-[#F59E0B] via-[#10B981] to-[#06B6D4] text-white border border-white/40 shadow-candy-cyan hover:brightness-105 animate-pulse-gentle',
+      'bg-gradient-to-r from-[#F59E0B] via-[#10B981] to-[#06B6D4] text-white border-b-4 border-[#0891B2] shadow-md shadow-cyan-500/25 hover:brightness-105 active:border-b-0 animate-pulse-gentle',
   };
 
   return (

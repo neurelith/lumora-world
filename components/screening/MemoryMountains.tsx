@@ -135,10 +135,10 @@ export const MemoryMountains: React.FC<MemoryMountainsProps> = ({ grade, languag
                 <motion.button
                   key={item.id}
                   onClick={() => toggleFlag(item.id)}
-                  className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 flex items-center justify-center transition-all duration-200 select-none shadow-soft-xs ${
+                  className={`relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl border-2 border-b-4 flex items-center justify-center transition-all duration-150 select-none shadow-soft-xs active:border-b-2 active:translate-y-0.5 ${
                     item.isFlaggedError
-                      ? 'bg-rose-100 border-rose-400 ring-4 ring-rose-300 scale-95'
-                      : 'bg-white border-orange-100 hover:border-orange-400 hover:scale-105'
+                      ? 'bg-rose-100 border-rose-400 border-b-rose-600 ring-4 ring-rose-300 scale-95'
+                      : 'bg-white border-orange-200 border-b-orange-400 hover:border-orange-400 hover:bg-orange-50/50 hover:scale-105'
                   }`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}

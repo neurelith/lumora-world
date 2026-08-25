@@ -27,25 +27,25 @@ const paddingStyles = {
 
 const variantStyles = {
   default:
-    'bg-white/90 backdrop-blur-md border-2 border-hairline rounded-3xl shadow-soft-sm',
+    'bg-white/95 backdrop-blur-md border-2 border-b-4 border-slate-200 rounded-3xl shadow-soft-sm',
   elevated:
-    'bg-white border-2 border-hairline rounded-3xl shadow-soft-lg',
+    'bg-white border-2 border-b-4 border-slate-200 rounded-3xl shadow-soft-md',
   interactive:
-    'bg-white/95 backdrop-blur-md border-2 border-hairline rounded-3xl shadow-soft-sm transition-all duration-200 ease-out hover:shadow-soft-lg hover:-translate-y-1 hover:border-amber/40 focus-visible:ring-2 focus-visible:ring-amber cursor-pointer',
+    'bg-white/95 backdrop-blur-md border-2 border-b-4 border-slate-200 rounded-3xl shadow-soft-sm transition-all duration-200 ease-out hover:shadow-soft-lg hover:-translate-y-1 hover:border-amber-400 focus-visible:ring-4 focus-visible:ring-amber-300 cursor-pointer',
   outlined:
-    'bg-white/40 backdrop-blur-sm border-2 border-hairline rounded-3xl',
+    'bg-white/60 backdrop-blur-sm border-2 border-dashed border-amber-300 rounded-3xl',
   forest:
-    'bg-gradient-to-br from-[#F0FDF4] via-[#DCFCE7] to-[#F4F2F6] border-2 border-emerald-300 rounded-3xl shadow-candy-emerald',
+    'bg-gradient-to-br from-[#F0FDF4] via-[#DCFCE7] to-white border-2 border-b-4 border-emerald-400 rounded-3xl shadow-candy-emerald',
   realm:
-    'bg-gradient-to-br from-[#F0FDFA] via-[#CCFBF1] to-[#F4F2F6] border-2 border-teal-300 rounded-3xl shadow-candy-cyan',
+    'bg-gradient-to-br from-[#F0FDFA] via-[#CCFBF1] to-white border-2 border-b-4 border-teal-400 rounded-3xl shadow-candy-cyan',
   castle:
-    'bg-gradient-to-br from-[#FAF5FF] via-[#EDE9FE] to-[#F4F2F6] border-2 border-purple-300 rounded-3xl shadow-candy-purple',
+    'bg-gradient-to-br from-[#FAF5FF] via-[#EDE9FE] to-white border-2 border-b-4 border-purple-400 rounded-3xl shadow-candy-purple',
   valley:
-    'bg-gradient-to-br from-[#EFF6FF] via-[#DBEAFE] to-[#F4F2F6] border-2 border-blue-300 rounded-3xl shadow-soft-md',
+    'bg-gradient-to-br from-[#EFF6FF] via-[#DBEAFE] to-white border-2 border-b-4 border-blue-400 rounded-3xl shadow-soft-md',
   mountains:
-    'bg-gradient-to-br from-[#FFF7ED] via-[#FFEDD5] to-[#F4F2F6] border-2 border-orange-300 rounded-3xl shadow-candy-coral',
+    'bg-gradient-to-br from-[#FFF7ED] via-[#FFEDD5] to-white border-2 border-b-4 border-orange-400 rounded-3xl shadow-candy-coral',
   gold:
-    'bg-gradient-to-br from-[#FFFBEB] via-[#FEF3C7] to-[#FDE68A] border-2 border-amber-300 rounded-3xl shadow-candy-amber',
+    'bg-gradient-to-br from-[#FFFBEB] via-[#FEF3C7] to-white border-2 border-b-4 border-amber-400 rounded-3xl shadow-candy-amber',
 };
 
 /** A colorful, tactile container with rich world gradients and bouncy elevation. */

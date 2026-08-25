@@ -181,26 +181,26 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
             </div>
 
             {/* Teacher Fast Score Buttons */}
-            <div className="bg-white border border-hairline rounded-xl p-3 shadow-soft-xs">
-              <p className="text-[10px] font-display font-bold text-muted uppercase tracking-wider mb-2">
+            <div className="bg-white/95 border-2 border-purple-200 rounded-2xl p-4 shadow-soft-xs">
+              <p className="text-[11px] font-display font-extrabold text-purple-900 uppercase tracking-wider mb-2.5">
                 Teacher Fast Score (Guarantees 100% classroom uptime)
               </p>
               <div className="grid grid-cols-2 gap-3">
                 <Button
                   variant="sage"
-                  size="sm"
+                  size="md"
                   onClick={() => handleScore(true)}
-                  leftIcon={<ThumbsUp className="w-4 h-4" />}
-                  className="min-h-[44px] text-xs font-bold"
+                  leftIcon={<ThumbsUp className="w-5 h-5" />}
+                  className="min-h-[48px] text-xs font-extrabold uppercase tracking-wider"
                 >
                   {language === 'hi' ? 'सही पढ़ा (Fluent)' : 'Read Correctly'}
                 </Button>
                 <Button
                   variant="terracotta"
-                  size="sm"
+                  size="md"
                   onClick={() => handleScore(false)}
-                  leftIcon={<ThumbsDown className="w-4 h-4" />}
-                  className="min-h-[44px] text-xs font-bold"
+                  leftIcon={<ThumbsDown className="w-5 h-5" />}
+                  className="min-h-[48px] text-xs font-extrabold uppercase tracking-wider"
                 >
                   {language === 'hi' ? 'हिचकिचाहट / त्रुटि' : 'Hesitated / Error'}
                 </Button>
