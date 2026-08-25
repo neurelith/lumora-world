@@ -15,22 +15,7 @@ const STORES = {
   SYNC_QUEUE: 'syncQueue',
 } as const;
 
-type StoreName = typeof STORES[keyof typeof STORES];
-
-interface DBSchema {
-  screeningSessions: ScreeningSession & { id: string };
-  havenSessions: HavenDaySession & { id: string };
-  iasqResults: IASQResult & { id: string };
-  cohortCache: StudentCohortRecord & { id: string };
-  settings: { key: string; value: any };
-  syncQueue: {
-    id: string;
-    type: 'screening' | 'haven' | 'iasq' | 'cohort';
-    payload: any;
-    timestamp: number;
-    retries: number;
-  };
-}
+type StoreName = (typeof STORES)[keyof typeof STORES];
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -38,7 +23,7 @@ function getDB(): Promise<IDBDatabase> {
   if (!dbPromise) {
     dbPromise = new Promise((resolve, reject) => {
       if (typeof window === 'undefined' || !window.indexedDB) {
-        reject(new Error('IndexedDB not available'));
+        reject(new Error('IndexedDB not available in SSR'));
         return;
       }
 
@@ -47,7 +32,7 @@ function getDB(): Promise<IDBDatabase> {
       request.onerror = () => reject(request.error);
       request.onsuccess = () => resolve(request.result);
 
-      request.onupgradeneeded = (event) => {
+      request.onupgradeneeded = () => {
         const db = request.result;
 
         // Screening Sessions
@@ -97,17 +82,31 @@ function getDB(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-async function runTransaction<T>(
+async function runTransaction<T = void>(
   storeName: StoreName,
   mode: IDBTransactionMode,
-  callback: (store: IDBObjectStore) => Promise<T>
+  operation: (store: IDBObjectStore) => Promise<T> | IDBRequest | T
 ): Promise<T> {
   const db = await getDB();
-  return new Promise((resolve, reject) => {
+  return new Promise<T>((resolve, reject) => {
     const transaction = db.transaction(storeName, mode);
     const store = transaction.objectStore(storeName);
+    let opResult: any;
 
-    transaction.oncomplete = () => resolve(callback(store) as any);
+    try {
+      opResult = operation(store);
+    } catch (err) {
+      reject(err);
+      return;
+    }
+
+    transaction.oncomplete = () => {
+      if (opResult && typeof opResult.result !== 'undefined') {
+        resolve(opResult.result);
+      } else {
+        resolve(opResult);
+      }
+    };
     transaction.onerror = () => reject(transaction.error);
     transaction.onabort = () => reject(transaction.error);
   });
@@ -118,25 +117,24 @@ async function runTransaction<T>(
 // ============================================================================
 
 export async function saveScreeningSessionIDB(session: ScreeningSession): Promise<void> {
-  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', async (store) => {
-    await store.put(session);
-    // Queue for background sync
-    await queueSync('screening', session);
+  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', (store) => {
+    return store.put(session);
   });
+  await queueSync('screening', session);
 }
 
 export async function getScreeningSessionsIDB(): Promise<ScreeningSession[]> {
-  return runTransaction(STORES.SCREENING_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<ScreeningSession[]>(STORES.SCREENING_SESSIONS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
 }
 
 export async function getScreeningSessionByIdIDB(id: string): Promise<ScreeningSession | undefined> {
-  return runTransaction(STORES.SCREENING_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<ScreeningSession | undefined>(STORES.SCREENING_SESSIONS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.get(id);
       request.onsuccess = () => resolve(request.result);
@@ -146,30 +144,30 @@ export async function getScreeningSessionByIdIDB(id: string): Promise<ScreeningS
 }
 
 export async function getScreeningSessionsByChildIDB(childInitials: string): Promise<ScreeningSession[]> {
-  return runTransaction(STORES.SCREENING_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<ScreeningSession[]>(STORES.SCREENING_SESSIONS, 'readonly', (store) => {
     const index = store.index('childInitials');
     return new Promise((resolve, reject) => {
       const request = index.getAll(childInitials);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
 }
 
 export async function getScreeningSessionsBySchoolIDB(schoolCode: string): Promise<ScreeningSession[]> {
-  return runTransaction(STORES.SCREENING_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<ScreeningSession[]>(STORES.SCREENING_SESSIONS, 'readonly', (store) => {
     const index = store.index('schoolCode');
     return new Promise((resolve, reject) => {
       const request = index.getAll(schoolCode);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
 }
 
 export async function deleteScreeningSessionIDB(id: string): Promise<void> {
-  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', async (store) => {
-    await store.delete(id);
+  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', (store) => {
+    return store.delete(id);
   });
 }
 
@@ -178,28 +176,28 @@ export async function deleteScreeningSessionIDB(id: string): Promise<void> {
 // ============================================================================
 
 export async function saveHavenSessionIDB(session: HavenDaySession): Promise<void> {
-  await runTransaction(STORES.HAVEN_SESSIONS, 'readwrite', async (store) => {
-    await store.put({ ...session, id: session.dayId });
-    await queueSync('haven', session);
+  await runTransaction(STORES.HAVEN_SESSIONS, 'readwrite', (store) => {
+    return store.put({ ...session, id: session.dayId });
   });
+  await queueSync('haven', session);
 }
 
 export async function getHavenSessionsIDB(): Promise<HavenDaySession[]> {
-  return runTransaction(STORES.HAVEN_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<HavenDaySession[]>(STORES.HAVEN_SESSIONS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
 }
 
 export async function getHavenSessionsByChildIDB(nickname: string): Promise<HavenDaySession[]> {
-  return runTransaction(STORES.HAVEN_SESSIONS, 'readonly', async (store) => {
+  return runTransaction<HavenDaySession[]>(STORES.HAVEN_SESSIONS, 'readonly', (store) => {
     const index = store.index('childNickname');
     return new Promise((resolve, reject) => {
       const request = index.getAll(nickname);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
@@ -211,17 +209,17 @@ export async function getHavenSessionsByChildIDB(nickname: string): Promise<Have
 
 export async function saveIASQResultIDB(record: IASQResult): Promise<void> {
   const id = `iasq-${record.childInitials}-${record.completedAt}`;
-  await runTransaction(STORES.IASQ_RESULTS, 'readwrite', async (store) => {
-    await store.put({ ...record, id });
-    await queueSync('iasq', record);
+  await runTransaction(STORES.IASQ_RESULTS, 'readwrite', (store) => {
+    return store.put({ ...record, id });
   });
+  await queueSync('iasq', record);
 }
 
 export async function getIASQResultsIDB(): Promise<IASQResult[]> {
-  return runTransaction(STORES.IASQ_RESULTS, 'readonly', async (store) => {
+  return runTransaction<IASQResult[]>(STORES.IASQ_RESULTS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
@@ -232,20 +230,19 @@ export async function getIASQResultsIDB(): Promise<IASQResult[]> {
 // ============================================================================
 
 export async function saveCohortCacheIDB(records: StudentCohortRecord[]): Promise<void> {
-  await runTransaction(STORES.COHORT_CACHE, 'readwrite', async (store) => {
-    // Clear and rebuild
-    await store.clear();
+  await runTransaction(STORES.COHORT_CACHE, 'readwrite', (store) => {
+    store.clear();
     for (const record of records) {
-      await store.put(record);
+      store.put(record);
     }
   });
 }
 
 export async function getCohortCacheIDB(): Promise<StudentCohortRecord[]> {
-  return runTransaction(STORES.COHORT_CACHE, 'readonly', async (store) => {
+  return runTransaction<StudentCohortRecord[]>(STORES.COHORT_CACHE, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
   });
@@ -256,7 +253,7 @@ export async function getCohortCacheIDB(): Promise<StudentCohortRecord[]> {
 // ============================================================================
 
 export async function getSetting<T>(key: string): Promise<T | undefined> {
-  return runTransaction(STORES.SETTINGS, 'readonly', async (store) => {
+  return runTransaction<T | undefined>(STORES.SETTINGS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.get(key);
       request.onsuccess = () => resolve(request.result?.value);
@@ -266,8 +263,8 @@ export async function getSetting<T>(key: string): Promise<T | undefined> {
 }
 
 export async function setSetting(key: string, value: any): Promise<void> {
-  await runTransaction(STORES.SETTINGS, 'readwrite', async (store) => {
-    await store.put({ key, value });
+  await runTransaction(STORES.SETTINGS, 'readwrite', (store) => {
+    return store.put({ key, value });
   });
 }
 
@@ -282,8 +279,8 @@ async function queueSync(type: 'screening' | 'haven' | 'iasq' | 'cohort', payloa
     timestamp: Date.now(),
     retries: 0,
   };
-  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', async (store) => {
-    await store.add(syncItem);
+  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', (store) => {
+    return store.add(syncItem);
   });
 }
 
@@ -294,25 +291,39 @@ export async function getSyncQueue(): Promise<Array<{
   timestamp: number;
   retries: number;
 }>> {
-  return runTransaction(STORES.SYNC_QUEUE, 'readonly', async (store) => {
+  const all = await runTransaction<Array<{
+    id: number;
+    type: string;
+    payload: any;
+    timestamp: number;
+    retries: number;
+  }>>(STORES.SYNC_QUEUE, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(request.result || []);
       request.onerror = () => reject(request.error);
     });
+  });
+
+  const now = Date.now();
+  // Filter by exponential backoff (1s, 2s, 4s, 8s, 16s... max 30s) and max 5 retries
+  return (all || []).filter((item) => {
+    if (item.retries >= 5) return false; // Dead-letter limit reached
+    const backoffDelay = Math.min(30000, 1000 * Math.pow(2, item.retries));
+    return item.timestamp + backoffDelay <= now;
   });
 }
 
 export async function clearSyncQueue(ids: number[]): Promise<void> {
-  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', async (store) => {
+  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', (store) => {
     for (const id of ids) {
-      await store.delete(id);
+      store.delete(id);
     }
   });
 }
 
 export async function incrementSyncRetry(id: number): Promise<void> {
-  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', async (store) => {
+  await runTransaction(STORES.SYNC_QUEUE, 'readwrite', (store) => {
     const request = store.get(id);
     request.onsuccess = () => {
       const item = request.result;
@@ -337,24 +348,28 @@ export async function exportAllData(): Promise<string> {
     getAllSettings(),
   ]);
 
-  return JSON.stringify({
-    version: DB_VERSION,
-    exportedAt: new Date().toISOString(),
-    screening,
-    haven,
-    iasq,
-    cohort,
-    settings,
-  }, null, 2);
+  return JSON.stringify(
+    {
+      version: DB_VERSION,
+      exportedAt: new Date().toISOString(),
+      screening,
+      haven,
+      iasq,
+      cohort,
+      settings,
+    },
+    null,
+    2
+  );
 }
 
 async function getAllSettings(): Promise<Record<string, any>> {
-  return runTransaction(STORES.SETTINGS, 'readonly', async (store) => {
+  return runTransaction<Record<string, any>>(STORES.SETTINGS, 'readonly', (store) => {
     return new Promise((resolve, reject) => {
       const request = store.getAll();
       request.onsuccess = () => {
         const settings: Record<string, any> = {};
-        for (const item of request.result) {
+        for (const item of request.result || []) {
           settings[item.key] = item.value;
         }
         resolve(settings);
@@ -367,111 +382,32 @@ async function getAllSettings(): Promise<Record<string, any>> {
 export async function importAllData(json: string): Promise<void> {
   const data = JSON.parse(json);
 
-  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', async (store) => {
-    await store.clear();
-    for (const item of data.screening || []) await store.put(item);
+  await runTransaction(STORES.SCREENING_SESSIONS, 'readwrite', (store) => {
+    store.clear();
+    for (const item of data.screening || []) store.put(item);
   });
 
-  await runTransaction(STORES.HAVEN_SESSIONS, 'readwrite', async (store) => {
-    await store.clear();
-    for (const item of data.haven || []) await store.put(item);
+  await runTransaction(STORES.HAVEN_SESSIONS, 'readwrite', (store) => {
+    store.clear();
+    for (const item of data.haven || []) store.put(item);
   });
 
-  await runTransaction(STORES.IASQ_RESULTS, 'readwrite', async (store) => {
-    await store.clear();
-    for (const item of data.iasq || []) await store.put(item);
+  await runTransaction(STORES.IASQ_RESULTS, 'readwrite', (store) => {
+    store.clear();
+    for (const item of data.iasq || []) store.put(item);
   });
 
-  await runTransaction(STORES.COHORT_CACHE, 'readwrite', async (store) => {
-    await store.clear();
-    for (const item of data.cohort || []) await store.put(item);
+  await runTransaction(STORES.COHORT_CACHE, 'readwrite', (store) => {
+    store.clear();
+    for (const item of data.cohort || []) store.put(item);
   });
 
-  await runTransaction(STORES.SETTINGS, 'readwrite', async (store) => {
-    await store.clear();
+  await runTransaction(STORES.SETTINGS, 'readwrite', (store) => {
+    store.clear();
     for (const [key, value] of Object.entries(data.settings || {})) {
-      await store.put({ key, value });
+      store.put({ key, value });
     }
   });
-}
-
-// ============================================================================
-// React Hook for Easy Access
-// ============================================================================
-
-import { useState, useEffect, useCallback } from 'react';
-
-export function useScreeningSessions() {
-  const [sessions, setSessions] = useState<ScreeningSession[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  const refresh = useCallback(async () => {
-    try {
-      setLoading(true);
-      const data = await getScreeningSessionsIDB();
-      setSessions(data);
-      setError(null);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load sessions');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const add = useCallback(async (session: ScreeningSession) => {
-    await saveScreeningSessionIDB(session);
-    await refresh();
-  }, [refresh]);
-
-  const remove = useCallback(async (id: string) => {
-    await deleteScreeningSessionIDB(id);
-    await refresh();
-  }, [refresh]);
-
-  return { sessions, loading, error, refresh, add, remove };
-}
-
-export function useHavenSessions() {
-  const [sessions, setSessions] = useState<HavenDaySession[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refresh = useCallback(async () => {
-    const data = await getHavenSessionsIDB();
-    setSessions(data);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const add = useCallback(async (session: HavenDaySession) => {
-    await saveHavenSessionIDB(session);
-    await refresh();
-  }, [refresh]);
-
-  return { sessions, loading, add, refresh };
-}
-
-export function useIASQResults() {
-  const [results, setResults] = useState<IASQResult[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const refresh = useCallback(async () => {
-    const data = await getIASQResultsIDB();
-    setResults(data);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const add = useCallback(async (record: IASQResult) => {
-    await saveIASQResultIDB(record);
-    await refresh();
-  }, [refresh]);
-
-  return { results, loading, add, refresh };
 }
 
 // Initialize DB on import (client-side only)

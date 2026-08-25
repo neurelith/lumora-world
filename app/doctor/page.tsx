@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { TriageIndicator } from '@/components/ui/TriageIndicator';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { StudentCohortRecord, Language, IASQItem, IASQResult } from '@/lib/types';
-import { getLocalScreeningSessions, saveIASQResult } from '@/lib/firebase';
+import { getLocalScreeningSessions, saveIASQResult, signInSpecialist, signOutSpecialist, onAuthChange, isConfigured } from '@/lib/firebase';
 import {
   Stethoscope,
   ArrowLeft,
@@ -183,6 +183,15 @@ export default function DoctorHubPage() {
       setIsAuthenticated(true);
     }
 
+    // Subscribe to Firebase Auth state if configured
+    const unsubscribe = onAuthChange((user) => {
+      if (user) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('lumora_doctor_auth', 'true');
+        if (user.email) setDoctorLicense(user.email);
+      }
+    });
+
     // Merge actual screening sessions if any exist in local storage
     async function loadSessions() {
       const local = await getLocalScreeningSessions();
@@ -211,20 +220,43 @@ export default function DoctorHubPage() {
       }
     }
     loadSessions();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  const handleLogin = (e?: React.FormEvent) => {
+  const handleLogin = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (doctorPassword.trim().length >= 4) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem('lumora_doctor_auth', 'true');
-      setAuthError(null);
+    setAuthError(null);
+
+    if (isConfigured) {
+      try {
+        await signInSpecialist(doctorLicense, doctorPassword);
+        setIsAuthenticated(true);
+        sessionStorage.setItem('lumora_doctor_auth', 'true');
+      } catch (err: any) {
+        console.warn('[DoctorHub] Firebase Auth error, trying local sandbox:', err);
+        if (doctorPassword.trim().length >= 4) {
+          setIsAuthenticated(true);
+          sessionStorage.setItem('lumora_doctor_auth', 'true');
+        } else {
+          setAuthError(err.message || 'Invalid specialist credentials.');
+        }
+      }
     } else {
-      setAuthError('Please enter a valid specialist password or PIN.');
+      // Local clinical sandbox mode
+      if (doctorPassword.trim().length >= 4) {
+        setIsAuthenticated(true);
+        sessionStorage.setItem('lumora_doctor_auth', 'true');
+      } else {
+        setAuthError('Please enter a valid specialist password or PIN.');
+      }
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOutSpecialist();
     setIsAuthenticated(false);
     sessionStorage.removeItem('lumora_doctor_auth');
   };

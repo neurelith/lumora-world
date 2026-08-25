@@ -1,6 +1,25 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import {
+  getAuth,
+  signInAnonymously,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  User,
+  Auth,
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  Firestore,
+} from 'firebase/firestore';
 import { ScreeningSession, StudentCohortRecord, HavenDaySession, IASQResult } from './types';
 import {
   saveScreeningSessionIDB,
@@ -15,39 +34,80 @@ import {
 } from './storage';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'demo-api-key',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'lumora-world.firebaseapp.com',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'lumora-world',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'lumora-world.appspot.com',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1234567890',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1234567890:web:abcdef123456',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '',
 };
 
-// Initialize Firebase only on client or if configured
-const isConfigured = Boolean(process.env.NEXT_PUBLIC_FIREBASE_API_KEY);
-let app: any;
-let auth: any;
-let db: any;
+export const isConfigured = Boolean(
+  process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
+  process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID
+);
 
-if (typeof window !== 'undefined') {
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+
+if (typeof window !== 'undefined' && isConfigured) {
   try {
     app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     auth = getAuth(app);
     db = getFirestore(app);
   } catch (err) {
-    console.warn('Firebase initialization note (using local fallback mode):', err);
+    console.warn('[Firebase] Initialization error (falling back to offline mode):', err);
   }
 }
 
 export { app, auth, db };
 
 // ============================================================================
+// Authentication Layer (Anonymous for students, Email/Password for specialists)
+// ============================================================================
+
+export async function signInSpecialist(email: string, pass: string): Promise<User | null> {
+  if (!auth) {
+    throw new Error('Firebase Auth is not configured. Running in offline/demo mode.');
+  }
+  const credential = await signInWithEmailAndPassword(auth, email, pass);
+  return credential.user;
+}
+
+export async function signInAnonymousChild(): Promise<User | null> {
+  if (!auth) return null;
+  try {
+    const credential = await signInAnonymously(auth);
+    return credential.user;
+  } catch (err) {
+    console.warn('[Firebase] Anonymous child sign-in note:', err);
+    return null;
+  }
+}
+
+export async function signOutSpecialist(): Promise<void> {
+  if (!auth) return;
+  await signOut(auth);
+}
+
+export function onAuthChange(callback: (user: User | null) => void): () => void {
+  if (!auth) {
+    callback(null);
+    return () => {};
+  }
+  return onAuthStateChanged(auth, callback);
+}
+
+// ============================================================================
 // Offline-First Data Layer: IndexedDB primary, Firebase sync secondary
 // ============================================================================
 
 export async function saveScreeningSession(session: ScreeningSession): Promise<void> {
-  // 1. Always save to IndexedDB immediately (offline-first)
-  await saveScreeningSessionIDB(session);
+  // 1. Save to IndexedDB on client (offline-first)
+  if (typeof window !== 'undefined') {
+    await saveScreeningSessionIDB(session);
+  }
 
   // 2. Sync to Firebase Firestore if online and configured
   if (db && isConfigured) {
@@ -55,37 +115,44 @@ export async function saveScreeningSession(session: ScreeningSession): Promise<v
       const docRef = doc(db, 'sessions', session.id);
       await setDoc(docRef, session, { merge: true });
     } catch (e) {
-      console.warn('Firestore sync failed, saved locally:', e);
+      console.warn('[Firebase] Firestore sync failed:', e);
     }
   }
 }
 
 export async function getLocalScreeningSessions(): Promise<ScreeningSession[]> {
-  return getScreeningSessionsIDB();
+  if (typeof window !== 'undefined') {
+    return getScreeningSessionsIDB();
+  }
+  return [];
 }
 
 export async function saveHavenSession(session: HavenDaySession): Promise<void> {
-  await saveHavenSessionIDB(session);
+  if (typeof window !== 'undefined') {
+    await saveHavenSessionIDB(session);
+  }
 
   if (db && isConfigured) {
     try {
       const docRef = doc(db, 'haven_sessions', session.dayId);
       await setDoc(docRef, session, { merge: true });
     } catch (e) {
-      console.warn('Haven Firestore sync failed:', e);
+      console.warn('[Firebase] Haven Firestore sync failed:', e);
     }
   }
 }
 
 export async function saveIASQResult(record: IASQResult): Promise<void> {
-  await saveIASQResultIDB(record);
+  if (typeof window !== 'undefined') {
+    await saveIASQResultIDB(record);
+  }
 
   if (db && isConfigured) {
     try {
       const docRef = doc(db, 'iasq_results', `iasq-${record.childInitials}-${record.completedAt}`);
       await setDoc(docRef, record, { merge: true });
     } catch (e) {
-      console.warn('IASQ Firestore sync failed:', e);
+      console.warn('[Firebase] IASQ Firestore sync failed:', e);
     }
   }
 }
@@ -127,7 +194,7 @@ export async function syncPendingToFirestore(): Promise<void> {
       await setDoc(doc(db, collectionName, docId), item.payload, { merge: true });
       successIds.push(item.id);
     } catch (err) {
-      console.warn(`Sync failed for ${item.type}:`, err);
+      console.warn(`[Firebase] Sync failed for ${item.type}:`, err);
       await incrementSyncRetry(item.id);
     }
   }
@@ -139,11 +206,9 @@ export async function syncPendingToFirestore(): Promise<void> {
 
 // Auto-sync when coming online
 if (typeof window !== 'undefined') {
-  const handleOnline = () => {
+  window.addEventListener('online', () => {
     syncPendingToFirestore().catch(console.error);
-  };
-
-  window.addEventListener('online', handleOnline);
+  });
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden) {
       syncPendingToFirestore().catch(console.error);
