@@ -240,39 +240,39 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
   }, []);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-3.5 animate-spring-in">
+    <div className="min-h-[calc(100vh-80px)] bg-world-valley p-3 sm:p-4 rounded-3xl max-w-5xl mx-auto space-y-4">
       {/* Header Bar */}
-      <div className="flex items-center justify-between gap-3 bg-white border border-hairline rounded-2xl p-3 sm:p-4 shadow-soft-xs">
-        <div className="flex items-center gap-2.5">
-          <div className="p-2 sm:p-2.5 bg-valley text-white rounded-xl">
-            <Eye className="w-5 h-5" />
+      <div className="flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md border-2 border-blue-200 rounded-3xl p-4 shadow-soft-md">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-2xl shadow-soft-xs">
+            <Eye className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-display font-extrabold text-lg sm:text-xl text-ink leading-tight">
+            <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">
               {t('worlds.visionValley')}
             </h2>
-            <p className="text-[11px] font-body text-muted hidden sm:block">
+            <p className="text-xs font-body text-blue-800 font-medium hidden sm:block">
               {t('worlds.visionValleySubtitle')}
             </p>
           </div>
         </div>
 
         {step === 'reading' && (
-          <span className="px-2.5 py-1 bg-valley-light/20 text-valley border border-valley/30 rounded-lg text-xs font-display font-bold">
+          <span className="px-3.5 py-1 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-full text-xs font-display font-extrabold shadow-soft-xs">
             Passage {currentPassageIdx + 1}/{passages.length}
           </span>
         )}
 
         {(step === 'calibrating' || step === 'reading') && (
-          <div className="flex items-center gap-1.5 text-xs text-muted">
-            <span className="w-2 h-2 rounded-full bg-valley animate-ping" />
+          <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-full text-xs text-blue-900 font-bold">
+            <span className="w-2 h-2 rounded-full bg-blue-500 animate-ping" />
             <span className="text-[11px]">{showSimulatedFallback ? 'Simulated' : 'Gaze Active'}</span>
           </div>
         )}
       </div>
 
       {/* Main Vision Stage */}
-      <Card className="bg-gradient-to-b from-valley-light/10 via-white to-cream border border-valley/30 p-4 sm:p-6 pt-8 shadow-soft-sm min-h-[380px] flex flex-col justify-center">
+      <Card variant="valley" className="p-4 sm:p-6 pt-8 min-h-[380px] flex flex-col justify-center">
         {/* Step 1: Camera Permission Screen */}
         {step === 'permission' && (
           <div className="flex flex-col items-center text-center space-y-4 max-w-md mx-auto">
@@ -280,12 +280,12 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
               <LanternMascot mood="neutral" size={76} speechBubble="Let's check our eye tracking light!" />
             </div>
 
-            <div className="p-3 bg-white border border-hairline rounded-xl text-xs font-body text-muted leading-relaxed">
-              <strong className="text-ink">100% In-Memory Privacy:</strong> Camera frames are analyzed in real time on this tablet to detect gaze fixations and line reading smoothness using MediaPipe Face Mesh. No video is ever recorded or uploaded.
+            <div className="p-4 bg-white/95 border-2 border-blue-200 rounded-2xl text-xs font-body text-ink/80 leading-relaxed shadow-soft-xs">
+              <strong className="text-blue-900">100% In-Memory Privacy:</strong> Camera frames are analyzed in real time on this tablet to detect gaze fixations and line reading smoothness using MediaPipe Face Mesh. No video is ever recorded or uploaded.
             </div>
 
             {cameraError && (
-              <div className="p-3 bg-sunshine-50 border border-sunshine rounded-xl text-xs text-ink">
+              <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-xs text-amber-900 font-bold">
                 {cameraError}
               </div>
             )}
@@ -296,6 +296,7 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
                 size="md"
                 onClick={startCamera}
                 leftIcon={<Camera className="w-5 h-5" />}
+                className="font-extrabold uppercase tracking-wider text-xs"
               >
                 Enable Camera & Calibrate
               </Button>
@@ -307,6 +308,7 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
                   setShowSimulatedFallback(true);
                   setStep('calibrating');
                 }}
+                className="font-bold text-xs"
               >
                 Simulated Demo Mode
               </Button>

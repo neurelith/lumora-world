@@ -39,10 +39,12 @@ export default function HomePage() {
       line: 'Camera air-tracing · kinematics & letter strokes',
       desc: t('worlds.runeRealmSubtitle'),
       icon: Wand2,
-      accent: 'bg-realm',
-      accentSoft: 'bg-realm-soft',
-      ring: 'ring-realm/25',
-      dot: 'bg-realm',
+      accent: 'bg-gradient-to-br from-teal-400 to-cyan-500',
+      accentSoft: 'bg-cyan-100',
+      ring: 'ring-cyan-400 border-cyan-300',
+      cardBg: 'bg-gradient-to-br from-cyan-50/90 via-white to-teal-50/50',
+      badgeBg: 'bg-cyan-100 text-cyan-800 border border-cyan-300',
+      btnBg: 'bg-gradient-to-r from-teal-500 to-cyan-600 shadow-candy-cyan',
       tag: 'Most magical — the wand',
     },
     {
@@ -52,10 +54,12 @@ export default function HomePage() {
       line: 'Phoneme blending · auditory sequencing',
       desc: t('worlds.soundForestSubtitle'),
       icon: Volume2,
-      accent: 'bg-forest',
-      accentSoft: 'bg-forest-soft',
-      ring: 'ring-forest/25',
-      dot: 'bg-forest',
+      accent: 'bg-gradient-to-br from-emerald-400 to-teal-500',
+      accentSoft: 'bg-emerald-100',
+      ring: 'ring-emerald-400 border-emerald-300',
+      cardBg: 'bg-gradient-to-br from-emerald-50/90 via-white to-teal-50/50',
+      badgeBg: 'bg-emerald-100 text-emerald-800 border border-emerald-300',
+      btnBg: 'bg-gradient-to-r from-emerald-500 to-teal-600 shadow-candy-emerald',
       tag: 'Listen closely',
     },
     {
@@ -65,10 +69,12 @@ export default function HomePage() {
       line: 'Rapid automatized naming · timed matrix',
       desc: t('worlds.memoryMountainsSubtitle'),
       icon: Brain,
-      accent: 'bg-mountains',
-      accentSoft: 'bg-mountains-soft',
-      ring: 'ring-mountains/25',
-      dot: 'bg-mountains',
+      accent: 'bg-gradient-to-br from-orange-500 to-amber-500',
+      accentSoft: 'bg-orange-100',
+      ring: 'ring-orange-400 border-orange-300',
+      cardBg: 'bg-gradient-to-br from-orange-50/90 via-white to-amber-50/50',
+      badgeBg: 'bg-orange-100 text-orange-800 border border-orange-300',
+      btnBg: 'bg-gradient-to-r from-orange-500 to-amber-600 shadow-candy-coral',
       tag: 'Quick as you can',
     },
     {
@@ -78,10 +84,12 @@ export default function HomePage() {
       line: 'Nonword decoding · fluency practice',
       desc: t('worlds.storyCastleSubtitle'),
       icon: BookOpen,
-      accent: 'bg-castle',
-      accentSoft: 'bg-castle-soft',
-      ring: 'ring-castle/25',
-      dot: 'bg-castle',
+      accent: 'bg-gradient-to-br from-purple-500 to-indigo-600',
+      accentSoft: 'bg-purple-100',
+      ring: 'ring-purple-400 border-purple-300',
+      cardBg: 'bg-gradient-to-br from-purple-50/90 via-white to-indigo-50/50',
+      badgeBg: 'bg-purple-100 text-purple-800 border border-purple-300',
+      btnBg: 'bg-gradient-to-r from-purple-500 to-indigo-600 shadow-candy-purple',
       tag: 'Read the stones',
     },
     {
@@ -91,10 +99,12 @@ export default function HomePage() {
       line: 'Visual flow & reading pacing',
       desc: t('worlds.visionValleySubtitle'),
       icon: Eye,
-      accent: 'bg-valley',
-      accentSoft: 'bg-valley-soft',
-      ring: 'ring-valley/25',
-      dot: 'bg-valley',
+      accent: 'bg-gradient-to-br from-blue-500 to-indigo-600',
+      accentSoft: 'bg-blue-100',
+      ring: 'ring-blue-400 border-blue-300',
+      cardBg: 'bg-gradient-to-br from-blue-50/90 via-white to-sky-50/50',
+      badgeBg: 'bg-blue-100 text-blue-800 border border-blue-300',
+      btnBg: 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-soft-md',
       tag: 'Supplementary',
     },
   ];
@@ -294,26 +304,26 @@ export default function HomePage() {
           </div>
 
           {/* Evidence strip */}
-          <div className="mt-10 sm:mt-14 grid grid-cols-1 gap-px overflow-hidden rounded-panel border border-whisper bg-whisper sm:grid-cols-3">
-            <div className="bg-white p-5 sm:p-6 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-button bg-terracotta-soft text-terracotta flex-shrink-0"><Users className="h-4 w-4" /></div>
+          <div className="mt-10 sm:mt-14 grid grid-cols-1 gap-3 overflow-hidden sm:grid-cols-3">
+            <div className="bg-gradient-to-br from-orange-50 to-white p-5 sm:p-6 flex items-center gap-3.5 rounded-3xl border-2 border-orange-200 shadow-candy-coral">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-soft-xs flex-shrink-0"><Users className="h-5 w-5" /></div>
               <div>
-                <p className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink">~8<span className="text-terracotta">%</span></p>
-                <p className="mt-0.5 text-xs sm:text-sm text-ink-tertiary">Pooled SLD prevalence in Indian schoolchildren</p>
+                <p className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-orange-600">~8<span className="text-orange-500">%</span></p>
+                <p className="mt-0.5 text-xs sm:text-sm text-ink/80 font-medium">Pooled SLD prevalence in Indian schoolchildren</p>
               </div>
             </div>
-            <div className="bg-white p-5 sm:p-6 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-button bg-sage-soft text-sage flex-shrink-0"><Stethoscope className="h-4 w-4" /></div>
+            <div className="bg-gradient-to-br from-emerald-50 to-white p-5 sm:p-6 flex items-center gap-3.5 rounded-3xl border-2 border-emerald-200 shadow-candy-emerald">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-soft-xs flex-shrink-0"><Stethoscope className="h-5 w-5" /></div>
               <div>
-                <p className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink">3,890</p>
-                <p className="mt-0.5 text-xs sm:text-sm text-ink-tertiary">Registered clinical psychologists in India (RCI, 2024)</p>
+                <p className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-emerald-600">3,890</p>
+                <p className="mt-0.5 text-xs sm:text-sm text-ink/80 font-medium">Registered clinical psychologists in India (RCI, 2024)</p>
               </div>
             </div>
-            <div className="bg-white p-5 sm:p-6 flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-button bg-amber-soft text-amber flex-shrink-0"><TrendingUp className="h-4 w-4" /></div>
+            <div className="bg-gradient-to-br from-amber-50 to-white p-5 sm:p-6 flex items-center gap-3.5 rounded-3xl border-2 border-amber-200 shadow-candy-amber">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-400 to-yellow-500 text-ink shadow-soft-xs flex-shrink-0"><TrendingUp className="h-5 w-5" /></div>
               <div>
-                <p className="font-display text-2xl sm:text-3xl font-semibold tracking-tight text-ink">5–8<span className="text-terracotta"> yrs</span></p>
-                <p className="mt-0.5 text-xs sm:text-sm text-ink-tertiary">Critical primary window for early classroom triage</p>
+                <p className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-amber-700">5–8<span className="text-amber-600"> yrs</span></p>
+                <p className="mt-0.5 text-xs sm:text-sm text-ink/80 font-medium">Critical primary window for early classroom triage</p>
               </div>
             </div>
           </div>
@@ -335,30 +345,30 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-12">
             {/* Tier 1 */}
-            <article className="lg:col-span-6 rounded-panel border border-whisper bg-white p-6 sm:p-8 shadow-sm">
-              <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-button bg-terracotta text-white">
-                <Sparkles className="h-5 w-5" />
+            <article className="lg:col-span-6 rounded-3xl border-2 border-orange-200 bg-gradient-to-br from-orange-50/60 to-white p-6 sm:p-8 shadow-candy-coral">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-soft-xs">
+                <Sparkles className="h-5 w-5 fill-white" />
               </div>
-              <p className="mt-4 sm:mt-5 text-xs sm:text-[13px] font-medium uppercase tracking-wide text-ink-tertiary">Tier 1 · Teacher facilitated</p>
-              <h3 className="mt-1.5 sm:mt-2 font-display text-xl sm:text-2xl font-semibold tracking-tight text-ink">{t('app.roleScreening')}</h3>
-              <p className="mt-2 sm:mt-3 leading-relaxed text-ink-secondary text-sm">{t('app.roleScreeningDesc')} A 15-minute battery across five game worlds capturing motor, phonemic and naming signals.</p>
-              <Link href="/screening" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-sm sm:text-[15px] font-medium text-terracotta hover:underline">
+              <p className="mt-4 sm:mt-5 text-xs sm:text-[13px] font-extrabold uppercase tracking-wide text-orange-800">Tier 1 &middot; Teacher facilitated</p>
+              <h3 className="mt-1.5 sm:mt-2 font-display text-xl sm:text-2xl font-extrabold tracking-tight text-ink">{t('app.roleScreening')}</h3>
+              <p className="mt-2 sm:mt-3 leading-relaxed text-ink/80 text-sm font-body">{t('app.roleScreeningDesc')} A 15-minute battery across five game worlds capturing motor, phonemic and naming signals.</p>
+              <Link href="/screening" className="mt-5 sm:mt-6 inline-flex items-center gap-1.5 text-sm sm:text-[15px] font-bold text-orange-600 hover:text-orange-700 hover:underline">
                 Begin a check-in <ArrowRight className="h-4 w-4" />
               </Link>
             </article>
 
             {[
-              { tier: 'Tier 2 · Child practice', title: t('app.roleHaven'), desc: t('app.roleHavenDesc'), to: '/haven', cta: t('app.enterHaven') },
-              { tier: 'Tier 3 · Specialist telemetry', title: t('app.roleDoctor'), desc: t('app.roleDoctorDesc'), to: '/doctor', cta: t('app.openDoctorHub') },
+              { tier: 'Tier 2 · Child practice', title: t('app.roleHaven'), desc: t('app.roleHavenDesc'), to: '/haven', cta: t('app.enterHaven'), color: 'emerald' },
+              { tier: 'Tier 3 · Specialist telemetry', title: t('app.roleDoctor'), desc: t('app.roleDoctorDesc'), to: '/doctor', cta: t('app.openDoctorHub'), color: 'blue' },
             ].map((c) => (
-              <article key={c.to} className="lg:col-span-3 rounded-panel border border-whisper bg-white p-6 sm:p-8 flex flex-col">
-                <div className="flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-button bg-paper border border-whisper text-ink">
-                  {c.to === '/haven' ? <Sparkles className="h-5 w-5" /> : <Stethoscope className="h-5 w-5" />}
+              <article key={c.to} className={`lg:col-span-3 rounded-3xl border-2 ${c.color === 'emerald' ? 'border-emerald-200 bg-gradient-to-br from-emerald-50/60 to-white shadow-candy-emerald' : 'border-blue-200 bg-gradient-to-br from-blue-50/60 to-white shadow-soft-md'} p-6 sm:p-8 flex flex-col`}>
+                <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${c.color === 'emerald' ? 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white' : 'bg-gradient-to-br from-blue-500 to-indigo-600 text-white'} shadow-soft-xs`}>
+                  {c.to === '/haven' ? <Sparkles className="h-5 w-5 fill-white" /> : <Stethoscope className="h-5 w-5" />}
                 </div>
-                <p className="mt-4 sm:mt-5 text-xs sm:text-[13px] font-medium uppercase tracking-wide text-ink-tertiary">{c.tier}</p>
-                <h3 className="mt-1.5 sm:mt-2 font-display text-lg sm:text-xl font-semibold tracking-tight text-ink">{c.title}</h3>
-                <p className="mt-2 sm:mt-3 mb-5 sm:mb-6 text-sm leading-relaxed text-ink-secondary">{c.desc}</p>
-                <Link href={c.to} className="mt-auto inline-flex items-center gap-1.5 text-sm sm:text-[15px] font-medium text-terracotta hover:underline">
+                <p className={`mt-4 sm:mt-5 text-xs sm:text-[13px] font-extrabold uppercase tracking-wide ${c.color === 'emerald' ? 'text-emerald-800' : 'text-blue-800'}`}>{c.tier}</p>
+                <h3 className="mt-1.5 sm:mt-2 font-display text-lg sm:text-xl font-extrabold tracking-tight text-ink">{c.title}</h3>
+                <p className="mt-2 sm:mt-3 mb-5 sm:mb-6 text-sm leading-relaxed text-ink/80 font-body">{c.desc}</p>
+                <Link href={c.to} className={`mt-auto inline-flex items-center gap-1.5 text-sm sm:text-[15px] font-bold ${c.color === 'emerald' ? 'text-emerald-600 hover:text-emerald-700' : 'text-blue-600 hover:text-blue-700'} hover:underline`}>
                   {c.cta} <ArrowRight className="h-4 w-4" />
                 </Link>
               </article>
@@ -402,35 +412,32 @@ export default function HomePage() {
                       type="button"
                       key={w.id}
                       onClick={() => setActiveWorld(i)}
-                      className={`group relative flex w-full items-center gap-3 sm:gap-4 rounded-panel border px-3 sm:px-4 py-3 sm:py-4 text-left transition-all ${isActive ? 'bg-paper border-terracotta/30 shadow-card' : 'bg-white border-whisper hover:bg-paper hover:border-hairline hover:shadow-sm'}`}
+                      className={`group relative flex w-full items-center gap-3 sm:gap-4 rounded-2xl border-2 px-3 sm:px-4 py-3 sm:py-4 text-left transition-all ${isActive ? `${w.cardBg} ${w.ring} shadow-soft-md scale-[1.01]` : 'bg-white border-hairline hover:bg-sand/40 hover:border-ink/20'}`}
                     >
                       {/* node */}
-                      <span className={`relative flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-button border-2 transition-all ${isActive ? `${w.accent} text-white border-transparent shadow-[0_4px_14px_rgba(0,0,0,0.12)] scale-[1.02]` : `bg-white text-ink-tertiary border-whisper group-hover:text-ink group-hover:border-hairline`}`}>
+                      <span className={`relative flex h-11 w-11 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl border-2 transition-all ${isActive ? `${w.accent} text-white border-transparent shadow-soft-xs scale-[1.05]` : `bg-sand/60 text-ink/60 border-hairline group-hover:text-ink`}`}>
                         <Icon className="h-5 w-5" />
                         {isActive && <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-white shadow-sm">✓</span>}
                       </span>
 
                       <span className="flex-1 min-w-0">
                         <span className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                          <span className={`font-mono text-xs font-bold tracking-wide ${isActive ? 'text-terracotta' : 'text-ink-quaternary'}`}>{w.no}</span>
+                          <span className={`font-mono text-xs font-bold tracking-wide ${isActive ? 'text-ink' : 'text-ink-quaternary'}`}>{w.no}</span>
                           <span className="hidden sm:inline h-1 w-1 rounded-full bg-hairline" aria-hidden="true" />
-                          <span className="font-display text-sm sm:text-[15px] font-semibold tracking-tight text-ink">{w.name}</span>
-                          {isSupp && <span className="rounded-pill bg-amber-soft border border-amber/20 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-amber uppercase">Supplementary</span>}
-                          {isActive && !isSupp && <span className="hidden sm:inline-flex items-center gap-1 rounded-pill bg-terracotta-soft border border-terracotta/20 px-2 py-0.5 text-[11px] font-semibold text-terracotta">Active</span>}
+                          <span className="font-display text-sm sm:text-[15px] font-extrabold tracking-tight text-ink">{w.name}</span>
+                          {isSupp && <span className="rounded-full bg-amber-100 border border-amber-300 px-2 py-0.5 text-[10px] font-extrabold tracking-wide text-amber-900 uppercase">Supplementary</span>}
+                          {isActive && !isSupp && <span className={`hidden sm:inline-flex items-center gap-1 rounded-full ${w.badgeBg} px-2.5 py-0.5 text-[11px] font-extrabold`}>Active</span>}
                         </span>
-                        <span className="block text-xs sm:text-[13px] leading-5 text-ink-tertiary truncate">{w.line}</span>
+                        <span className="block text-xs sm:text-[13px] leading-5 text-ink/70 font-medium truncate">{w.line}</span>
                         <span className="block text-xs text-ink-tertiary mt-0.5 sm:hidden">{w.tag}</span>
                       </span>
 
                       <span className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`hidden lg:inline text-xs text-ink-quaternary group-hover:text-ink-tertiary ${isActive ? '!text-ink-tertiary' : ''}`}>{w.tag}</span>
-                        <span className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border transition-colors ${isActive ? 'bg-white border-terracotta/20 text-terracotta' : 'bg-paper border-whisper text-ink-quaternary group-hover:text-ink-tertiary group-hover:border-hairline'}`}>
+                        <span className={`hidden lg:inline text-xs text-ink/50 font-medium ${isActive ? '!text-ink/80 font-bold' : ''}`}>{w.tag}</span>
+                        <span className={`flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full border transition-colors ${isActive ? 'bg-white border-amber-300 text-ink shadow-xs' : 'bg-sand/60 border-hairline text-ink-quaternary group-hover:text-ink'}`}>
                           <ArrowRight className={`h-3.5 w-3.5 sm:h-4 sm:w-4 transition-transform ${isActive ? 'translate-x-0' : 'group-hover:translate-x-0.5'}`} />
                         </span>
                       </span>
-
-                      {/* active rail */}
-                      {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 h-10 w-1 rounded-full bg-terracotta hidden lg:block" aria-hidden="true" />}
                     </button>
                   );
                 })}
@@ -438,10 +445,10 @@ export default function HomePage() {
 
               {/* footprints hint + mobile CTA */}
               <div className="mt-4 flex items-center justify-between">
-                <span className="inline-flex items-center gap-1.5 rounded-pill bg-paper border border-whisper px-3 py-1.5 text-xs font-medium text-ink-tertiary">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-sand/60 border border-hairline px-3 py-1.5 text-xs font-bold text-ink/60">
                   <span className="tracking-widest">· · ·</span> Follow the footsteps
                 </span>
-                <Link href="/screening" className="md:hidden inline-flex items-center gap-1.5 text-xs sm:text-sm font-medium text-terracotta hover:underline">
+                <Link href="/screening" className="md:hidden inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-terracotta hover:underline">
                   Full battery <ArrowRight className="h-3.5 w-3.5" />
                 </Link>
               </div>
@@ -449,26 +456,26 @@ export default function HomePage() {
 
             {/* Active world detail */}
             <div className="lg:col-span-5 lg:sticky lg:top-20 self-start">
-              <div className={`relative rounded-panel border bg-white p-5 sm:p-7 flex flex-col shadow-card overflow-hidden ${active.ring} ring-1`}>
+              <div className={`relative rounded-3xl border-2 ${active.cardBg} p-5 sm:p-7 flex flex-col shadow-soft-md overflow-hidden ${active.ring}`}>
                 <div className={`absolute -top-12 -right-12 h-40 w-40 rounded-full blur-2xl opacity-40 ${active.accentSoft}`} aria-hidden="true" />
                 <div className="relative">
                   <div className="flex items-start justify-between gap-4">
-                    <div className={`flex h-10 w-10 items-center justify-center rounded-button ${active.accent} text-white shadow-sm`}>
+                    <div className={`flex h-11 w-11 items-center justify-center rounded-2xl ${active.accent} text-white shadow-soft-xs`}>
                       <ActiveIcon className="h-5 w-5" />
                     </div>
-                    <span className="rounded-pill bg-paper border border-whisper px-2.5 py-1 text-xs font-semibold text-ink-secondary">World {active.no} of 05</span>
+                    <span className="rounded-full bg-white/90 border border-hairline px-3 py-1 text-xs font-extrabold text-ink shadow-xs">World {active.no} of 05</span>
                   </div>
 
-                  <p className="mt-3 sm:mt-4 font-mono text-xs font-bold tracking-[0.14em] text-terracotta uppercase">World {active.no} — {active.name}</p>
-                  <h3 className="mt-1 font-display text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-ink leading-tight">{active.name}</h3>
-                  <p className="mt-2 text-sm sm:text-[15px] leading-6 text-ink-secondary">{active.desc}</p>
-                  <p className="mt-1 text-xs font-medium text-ink-tertiary">{active.line}</p>
+                  <p className="mt-3 sm:mt-4 font-mono text-xs font-bold tracking-[0.14em] text-ink/60 uppercase">World {active.no} — {active.name}</p>
+                  <h3 className="mt-1 font-display text-xl sm:text-2xl md:text-3xl font-extrabold tracking-tight text-ink leading-tight">{active.name}</h3>
+                  <p className="mt-2 text-sm sm:text-[15px] leading-6 text-ink/80 font-body">{active.desc}</p>
+                  <p className="mt-1 text-xs font-bold text-ink/60">{active.line}</p>
 
-                  <div className="mt-4 sm:mt-5 rounded-panel border border-hairline bg-paper p-3.5 sm:p-4 flex gap-3 items-start">
+                  <div className="mt-4 sm:mt-5 rounded-2xl border border-hairline bg-white/80 backdrop-blur-xs p-3.5 sm:p-4 flex gap-3 items-start shadow-soft-xs">
                     <div className="hidden sm:block flex-shrink-0">
                       <LanternMascot mood={activeWorld === 0 ? 'celebrating' : activeWorld === 4 ? 'thinking' : 'encouraging'} size={48} />
                     </div>
-                    <p className="text-xs sm:text-sm leading-5 text-ink-secondary">
+                    <p className="text-xs sm:text-sm leading-5 text-ink/80 font-medium">
                       {activeWorld === 0 && 'Wave your finger — the wand draws with star dust. This is the one camera world.'}
                       {activeWorld === 1 && 'Listen, then blend. The forest rewards smooth listening, not speed.'}
                       {activeWorld === 2 && 'Name them fast — 25 little friends racing down the mountain.'}
@@ -480,28 +487,28 @@ export default function HomePage() {
                   <div className="mt-5 sm:mt-6 grid grid-cols-2 gap-2">
                     <Link
                       href={active.id}
-                      className="inline-flex items-center justify-center gap-2 rounded-pill bg-terracotta px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-semibold text-white shadow-[0_6px_18px_rgba(201,100,66,0.22)] transition-all hover:bg-terracotta-hover hover:shadow-[0_8px_24px_rgba(201,100,66,0.28)] active:scale-[0.97]"
+                      className={`inline-flex items-center justify-center gap-2 rounded-full ${active.btnBg} px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-extrabold text-white transition-all hover:brightness-105 active:scale-[0.97] uppercase tracking-wider`}
                     >
-                      <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4" /> Launch
+                      <Play className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-white" /> Launch
                     </Link>
                     <Link
                       href="/screening"
-                      className="inline-flex items-center justify-center gap-2 rounded-pill border border-whisper bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-ink transition-colors hover:border-ink/20"
+                      className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-hairline bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-ink transition-colors hover:bg-sand/60 shadow-soft-xs"
                     >
                       Full battery <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-ink-tertiary" />
                     </Link>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between text-xs text-ink-tertiary border-t border-hairline pt-3 sm:pt-4">
-                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-sage" /> DALI-aligned signals</span>
-                    <span className="inline-flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-amber" /> Personal badges</span>
+                  <div className="mt-4 flex items-center justify-between text-xs text-ink/70 font-medium border-t border-hairline pt-3 sm:pt-4">
+                    <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-emerald-600" /> DALI-aligned signals</span>
+                    <span className="inline-flex items-center gap-1.5"><Star className="h-4 w-4 text-amber-500 fill-amber-500" /> Personal badges</span>
                   </div>
                 </div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-pill bg-paper border border-whisper px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs text-ink-tertiary"><Wand2 className="h-3.5 w-3.5 text-realm" /> Rune Realm = camera wand</span>
-                <span className="inline-flex items-center gap-1.5 rounded-pill bg-paper border border-whisper px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs text-ink-tertiary"><Eye className="h-3.5 w-3.5 text-valley" /> Vision Valley = supplementary</span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-cyan-50 border border-cyan-200 px-3 py-1.5 text-xs text-cyan-900 font-bold"><Wand2 className="h-3.5 w-3.5 text-cyan-600" /> Rune Realm = camera wand</span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-3 py-1.5 text-xs text-blue-900 font-bold"><Eye className="h-3.5 w-3.5 text-blue-600" /> Vision Valley = supplementary</span>
               </div>
             </div>
           </div>
