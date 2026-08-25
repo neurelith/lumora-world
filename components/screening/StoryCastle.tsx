@@ -97,18 +97,18 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
   const progress = ((currentIdx + 1) / wordsList.length) * 100;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="min-h-[calc(100vh-80px)] bg-world-castle p-3 sm:p-4 rounded-3xl max-w-4xl mx-auto space-y-4">
       {/* Header Bar */}
-      <div className="flex items-center justify-between gap-4 bg-white border-2 border-hairline rounded-3xl p-4 md:p-6 shadow-soft-sm">
+      <div className="flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md border-2 border-purple-200 rounded-3xl p-4 shadow-candy-purple">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-castle text-white rounded-2xl">
+          <div className="p-3 bg-gradient-to-br from-purple-500 to-indigo-600 text-white rounded-2xl shadow-soft-xs">
             <BookOpen className="w-6 h-6" />
           </div>
           <div>
             <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">
               {t('worlds.storyCastle')}
             </h2>
-            <p className="text-xs font-body text-muted">
+            <p className="text-xs font-body text-purple-800 font-medium">
               {t('worlds.storyCastleSubtitle')}
             </p>
           </div>
@@ -118,7 +118,7 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
           <ProgressBar
             progress={progress}
             color="castle"
-            height="md"
+            size="md"
             showLabel
             label={`Word ${currentIdx + 1}/${wordsList.length}`}
           />
@@ -126,7 +126,7 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
       </div>
 
       {/* Main Stone Tablet Stage */}
-      <Card className="bg-gradient-to-b from-castle-light/10 via-white to-cream border-2 border-castle/30 p-4 sm:p-6 pt-8 shadow-soft-sm">
+      <Card variant="castle" className="p-4 sm:p-6 pt-8">
         <div className="flex flex-col items-center text-center space-y-4 max-w-lg mx-auto">
           <div className="pt-1 flex justify-center">
             <LanternMascot
@@ -141,20 +141,20 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
           </div>
 
           {/* Stone Tablet with Glowing Nonword */}
-          <div className="w-full bg-stone-100 border-2 border-stone-300 rounded-2xl p-5 shadow-inner relative overflow-hidden">
-            <div className="absolute top-2 left-4 text-[10px] font-display font-bold uppercase tracking-widest text-stone-400">
+          <div className="w-full bg-gradient-to-b from-purple-50 to-white border-2 border-purple-200 rounded-3xl p-6 shadow-candy-purple relative overflow-hidden">
+            <div className="absolute top-2 left-4 text-[10px] font-display font-extrabold uppercase tracking-widest text-purple-600">
               Stone Tablet #{currentIdx + 1}
             </div>
 
-            <div className="py-3 flex items-center justify-center">
-              <span className="font-display font-extrabold text-4xl sm:text-5xl text-castle tracking-wider select-none">
+            <div className="py-4 flex items-center justify-center">
+              <span className="font-display font-extrabold text-5xl sm:text-6xl text-purple-700 tracking-wider select-none drop-shadow-sm">
                 {currentWord}
               </span>
             </div>
 
             {transcript && (
-              <div className="mt-1 text-xs font-body text-muted bg-white/70 px-3 py-1 rounded-lg inline-block">
-                Voice heard: <strong className="text-ink">&quot;{transcript}&quot;</strong>
+              <div className="mt-1 text-xs font-body text-purple-900 bg-purple-100/80 border border-purple-300 px-3 py-1 rounded-full inline-block font-bold">
+                Voice heard: <strong className="text-purple-950">&quot;{transcript}&quot;</strong>
               </div>
             )}
           </div>

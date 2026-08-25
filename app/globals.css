@@ -94,8 +94,23 @@ canvas.tracing-canvas { touch-action: none !important; user-select: none !import
   }
   .btn-base:active { transform: scale(0.97); }
   .btn-base:disabled { pointer-events: none; opacity: 0.45; }
-  .progress-track { height: 6px; background: var(--border-whisper); border-radius: 9999px; overflow: hidden; }
-  .progress-fill { height: 100%; border-radius: 9999px; transition: width var(--duration-slow) var(--ease-spring); }
+  .progress-track { height: 8px; background: rgba(0, 0, 0, 0.06); border-radius: 9999px; overflow: hidden; box-shadow: inset 0 1px 2px rgba(0,0,0,0.06); }
+  .progress-fill { height: 100%; border-radius: 9999px; transition: width var(--duration-slow) var(--ease-spring); background: linear-gradient(90deg, #F59E0B 0%, #10B981 50%, #06B6D4 100%); }
+
+  /* Colorful World Mesh Ambiance */
+  .bg-world-forest { background: radial-gradient(circle at top left, #D1FAE5 0%, #ECFDF5 40%, #F4F2F6 100%); }
+  .bg-world-realm { background: radial-gradient(circle at top left, #CFFAFE 0%, #F0FDFA 40%, #F4F2F6 100%); }
+  .bg-world-castle { background: radial-gradient(circle at top left, #EDE9FE 0%, #FAF5FF 40%, #F4F2F6 100%); }
+  .bg-world-valley { background: radial-gradient(circle at top left, #DBEAFE 0%, #EFF6FF 40%, #F4F2F6 100%); }
+  .bg-world-mountains { background: radial-gradient(circle at top left, #FFEDD5 0%, #FFF7ED 40%, #F4F2F6 100%); }
+  .bg-world-haven { background: radial-gradient(circle at top, #FEF3C7 0%, #ECFDF5 50%, #F4F2F6 100%); }
+
+  /* Playful Candy Shadow Effects */
+  .shadow-candy-amber { box-shadow: 0 8px 24px -4px rgba(245, 158, 11, 0.25), 0 4px 10px rgba(245, 158, 11, 0.15); }
+  .shadow-candy-emerald { box-shadow: 0 8px 24px -4px rgba(16, 185, 129, 0.25), 0 4px 10px rgba(16, 185, 129, 0.15); }
+  .shadow-candy-cyan { box-shadow: 0 8px 24px -4px rgba(6, 182, 212, 0.25), 0 4px 10px rgba(6, 182, 212, 0.15); }
+  .shadow-candy-purple { box-shadow: 0 8px 24px -4px rgba(139, 92, 246, 0.25), 0 4px 10px rgba(139, 92, 246, 0.15); }
+  .shadow-candy-coral { box-shadow: 0 8px 24px -4px rgba(249, 115, 22, 0.25), 0 4px 10px rgba(249, 115, 22, 0.15); }
 }
 
 .animate-cascade-in { animation: cascadeIn 0.5s var(--ease-out-expo) forwards; opacity: 0; }

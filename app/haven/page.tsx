@@ -111,16 +111,12 @@ export default function HavenPage() {
   };
 
   return (
-    <div
-      className={`min-h-screen bg-paper flex flex-col justify-between p-4 sm:p-6 md:p-8 transition-colors duration-500 ${
-        sensoryCalm ? 'sensory-calm' : ''
-      }`}
-    >
-      {/* Context Top Navigation Bar */}
-      <header className="max-w-4xl mx-auto w-full flex items-center justify-between pb-5 border-b border-hairline">
+    <div className={`min-h-screen bg-world-haven flex flex-col p-4 sm:p-6 md:p-8 ${sensoryCalm ? 'sensory-calm' : ''}`}>
+      {/* Top Header Bar */}
+      <header className="max-w-4xl mx-auto w-full flex items-center justify-between pb-5 border-b-2 border-amber-200">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm font-display font-semibold text-muted hover:text-ink transition-colors"
+          className="flex items-center gap-2 text-sm font-display font-extrabold text-ink/70 hover:text-ink transition-colors bg-white/80 px-3 py-1.5 rounded-full border border-hairline shadow-soft-xs"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Home</span>
@@ -128,14 +124,14 @@ export default function HavenPage() {
 
         {/* Streak & Star Counter Bar */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber/30 rounded-full shadow-soft-xs">
-            <Flame className="w-4 h-4 text-terracotta fill-terracotta animate-bounce-gentle" />
-            <span className="font-display font-extrabold text-xs text-ink">{streakDays} Day Streak</span>
+          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-orange-400 to-amber-500 text-white rounded-full shadow-candy-coral">
+            <Flame className="w-4 h-4 text-white fill-white animate-bounce-gentle" />
+            <span className="font-display font-extrabold text-xs">{streakDays} Day Streak</span>
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-sunshine-50 border border-sunshine rounded-full shadow-soft-xs">
-            <Star className="w-4 h-4 text-amber fill-amber" />
-            <span className="font-display font-extrabold text-xs text-ink">{totalStars} Stars</span>
+          <div className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-400 to-yellow-400 text-ink rounded-full shadow-candy-amber">
+            <Star className="w-4 h-4 text-amber-900 fill-amber-900" />
+            <span className="font-display font-extrabold text-xs">{totalStars} Stars</span>
           </div>
         </div>
 
@@ -144,13 +140,13 @@ export default function HavenPage() {
           onClick={() => setSensoryCalm(!sensoryCalm)}
           aria-pressed={sensoryCalm}
           title="Toggle Sensory Calm Mode"
-          className={`min-h-[44px] px-3.5 rounded-2xl border-2 flex items-center gap-2 font-display text-xs font-bold transition-all ${
+          className={`min-h-[44px] px-3.5 rounded-2xl border-2 flex items-center gap-2 font-display text-xs font-extrabold transition-all ${
             sensoryCalm
               ? 'bg-ink text-white border-ink shadow-soft-sm'
-              : 'bg-white text-ink border-hairline hover:border-amber hover:shadow-soft-xs'
+              : 'bg-white text-ink border-amber-200 hover:border-amber-400 shadow-candy-amber'
           }`}
         >
-          {sensoryCalm ? <Moon className="w-4 h-4 text-amber-300 fill-amber-300" /> : <Sun className="w-4 h-4 text-amber fill-amber" />}
+          {sensoryCalm ? <Moon className="w-4 h-4 text-amber-300 fill-amber-300" /> : <Sun className="w-4 h-4 text-amber-500 fill-amber-500" />}
           <span className="hidden sm:inline">{sensoryCalm ? 'Calm Mode Active' : 'Calm Mode'}</span>
         </button>
       </header>
@@ -174,7 +170,7 @@ export default function HavenPage() {
         {/* State 0: Welcome Screen / Nickname Input */}
         {!hasStarted ? (
           <div className="max-w-md mx-auto w-full">
-            <Card className="p-6 sm:p-10 pt-14 sm:pt-16 border-2 border-sage/40 shadow-soft-md text-center bg-gradient-to-b from-sage/10 via-white to-paper">
+            <Card variant="gold" className="p-6 sm:p-10 pt-14 sm:pt-16 text-center">
               <div className="pt-2 pb-1 flex justify-center">
                 <LanternMascot mood="encouraging" size={100} speechBubble="Hello, friend! Ready for today's 3-minute adventure?" />
               </div>

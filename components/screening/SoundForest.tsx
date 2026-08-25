@@ -129,18 +129,18 @@ export const SoundForest: React.FC<SoundForestProps> = ({
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 animate-spring-in">
+    <div className="min-h-[calc(100vh-80px)] bg-world-forest p-3 sm:p-4 rounded-3xl max-w-5xl mx-auto space-y-4">
       {/* Top Game Bar */}
-      <div className="flex items-center justify-between gap-4 bg-white border border-whisper rounded-panel p-4 md:p-6 shadow-card">
+      <div className="flex items-center justify-between gap-4 bg-white/95 backdrop-blur-md border-2 border-emerald-200 rounded-3xl p-4 shadow-candy-emerald">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-forest-soft text-forest rounded-xl">
+          <div className="p-3 bg-gradient-to-br from-emerald-400 to-teal-500 text-white rounded-2xl shadow-soft-xs">
             <Volume2 className="w-6 h-6" />
           </div>
           <div>
             <h2 className="font-display font-extrabold text-xl md:text-2xl text-ink">
               {t('worlds.soundForest')}
             </h2>
-            <p className="text-xs font-body text-ink-tertiary">
+            <p className="text-xs font-body text-emerald-800 font-medium">
               {t('worlds.soundForestSubtitle')}
             </p>
           </div>
@@ -160,7 +160,7 @@ export const SoundForest: React.FC<SoundForestProps> = ({
       {/* Main Stage — Asymmetric 70/30 Layout */}
       <div className="grid gap-4 lg:grid-cols-[1fr_300px] items-stretch">
         {/* LEFT: Task Area */}
-        <Card className="bg-gradient-to-b from-forest-soft/20 via-white to-ivory border border-forest/20 p-4 sm:p-5 pt-8 shadow-card relative flex flex-col items-center justify-between">
+        <Card variant="forest" className="p-4 sm:p-5 pt-8 relative flex flex-col items-center justify-between">
           <div className="flex flex-col items-center text-center space-y-4 w-full">
             {/* Mascot Guidance */}
             <div className="pt-1 flex justify-center">
@@ -179,65 +179,52 @@ export const SoundForest: React.FC<SoundForestProps> = ({
               />
             </div>
 
-            {/* Pulsing Phoneme Circles */}
-            <div className="space-y-2">
-              <p className="text-[11px] font-display font-bold uppercase tracking-wider text-forest">
-                {language === 'hi' ? 'ध्वनियां' : 'Phoneme Sounds'}
-              </p>
-
-              <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5">
-                {currentTrial.phonemes.map((phoneme, idx) => {
-                  const isActive = activePhonemeIdx === idx;
-                  return (
-                    <motion.div
-                      key={idx}
-                      className={`
-                        w-13 h-13 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center 
-                        font-display font-extrabold text-xl sm:text-2xl border-2 transition-all duration-300
-                        ${isActive
-                          ? 'bg-forest text-white border-forest-light shadow-card scale-105'
-                          : 'bg-white text-ink border-whisper shadow-xs'
-                        }
-                      `}
-                      animate={isActive ? { scale: [1, 1.08, 1] } : {}}
-                      transition={{ duration: 0.5, repeat: isActive ? Infinity : 0, ease: 'easeInOut' }}
-                    >
-                      {phoneme}
-                    </motion.div>
-                  );
-                })}
-              </div>
-
-              {/* Replay Audio Button */}
-              <div className="pt-1 flex items-center justify-center gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handlePlayAudio}
-                  disabled={isPlayingAudio}
-                  leftIcon={<Play className="w-3.5 h-3.5 text-forest" />}
-                  className="min-h-[38px] text-xs font-bold"
-                >
-                  {language === 'hi' ? 'ध्वनि फिर से सुनें' : 'Listen Again'}
-                </Button>
-                {showFeedback && !feedbackCorrect && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleReplay}
-                    leftIcon={<RotateCcw className="w-3.5 h-3.5" />}
-                    className="min-h-[38px] text-xs"
+            {/* Visual Phoneme Tokens Sequence */}
+            <div className="flex items-center justify-center gap-2 sm:gap-3 py-1 flex-wrap">
+              {currentTrial.phonemes.map((phoneme, idx) => {
+                const isActive = activePhonemeIdx === idx;
+                return (
+                  <motion.div
+                    key={idx}
+                    className={`
+                      w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center font-display font-extrabold text-lg sm:text-xl
+                      border-2 transition-all duration-200 select-none
+                      ${
+                        isActive
+                          ? 'bg-gradient-to-br from-amber-400 to-orange-500 text-white border-amber-300 scale-110 shadow-candy-amber ring-4 ring-amber-200'
+                          : 'bg-white text-ink border-emerald-300 shadow-soft-xs'
+                      }
+                    `}
+                    animate={isActive ? { scale: [1, 1.15, 1.05] } : { scale: 1 }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 20 }}
                   >
-                    {language === 'hi' ? 'फिर से कोशिश' : 'Try Again'}
-                  </Button>
-                )}
-              </div>
+                    <span>{phoneme}</span>
+                  </motion.div>
+                );
+              })}
             </div>
 
-            {/* 4 Illustrated Answer Cards */}
+            {/* Audio Control Action Button */}
+            <div className="flex justify-center w-full max-w-xs">
+              <Button
+                variant="forest"
+                size="md"
+                fullWidth
+                onClick={handlePlayAudio}
+                disabled={isPlayingAudio}
+                leftIcon={isPlayingAudio ? <Volume2 className="w-5 h-5 animate-pulse" /> : <Play className="w-5 h-5 fill-white" />}
+                className="font-display font-extrabold uppercase tracking-wider text-xs"
+              >
+                {isPlayingAudio
+                  ? language === 'hi' ? 'ध्वनियां बजाई जा रही हैं...' : 'Playing Sounds...'
+                  : language === 'hi' ? 'ध्वनियां सुनो' : 'Listen to Sounds'}
+              </Button>
+            </div>
+
+            {/* Option Cards (4-Choice Selection Grid) */}
             <AnimatePresence mode="wait">
-              <div className="w-full space-y-2 max-w-md mx-auto" key={currentTrialIdx}>
-                <p className="text-[11px] font-display font-bold uppercase tracking-wider text-ink-tertiary">
+              <div className="w-full max-w-md space-y-2 pt-1">
+                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-emerald-900">
                   {language === 'hi' ? 'सही शब्द पर टैप करें' : 'Tap the blended word'}
                 </p>
 
@@ -246,16 +233,16 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                     const isSelected = selectedOption === option;
                     const isCorrect = option === currentTrial.targetWord;
 
-                    let cardStyle = 'bg-white border-whisper text-ink hover:border-forest/60 hover:bg-forest-soft/50';
+                    let cardStyle = 'bg-white/95 border-emerald-200 text-ink hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-candy-emerald';
                     if (showFeedback) {
                       if (isSelected && isCorrect) {
-                        cardStyle = 'bg-sage-soft border-sage/30 text-sage shadow-xs font-bold scale-[1.02]';
+                        cardStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-400 text-white shadow-candy-emerald font-extrabold scale-[1.03]';
                       } else if (isSelected && !isCorrect) {
-                        cardStyle = 'bg-amber-soft border-amber/30 text-ink font-bold';
+                        cardStyle = 'bg-gradient-to-r from-orange-400 to-amber-500 border-orange-400 text-white font-extrabold';
                       } else if (isCorrect) {
-                        cardStyle = 'bg-sage-soft border-sage/30 text-sage font-bold';
+                        cardStyle = 'bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-400 text-white font-extrabold';
                       } else {
-                        cardStyle = 'bg-sand text-ink-tertiary border-whisper opacity-60';
+                        cardStyle = 'bg-white/40 text-ink/30 border-hairline opacity-50';
                       }
                     }
 
@@ -265,20 +252,20 @@ export const SoundForest: React.FC<SoundForestProps> = ({
                         onClick={() => handleSelectOption(option)}
                         disabled={selectedOption !== null || isPlayingAudio}
                         className={`
-                          min-h-[54px] p-3 rounded-xl border-2 flex items-center justify-center 
-                          font-display font-bold text-lg sm:text-xl transition-all duration-base ease-out-expo 
-                          select-none shadow-xs
+                          min-h-[56px] p-3.5 rounded-2xl border-2 flex items-center justify-center 
+                          font-display font-extrabold text-lg sm:text-xl transition-all duration-200 
+                          select-none shadow-soft-xs
                           ${cardStyle}
                         `}
                         initial={{ opacity: 0, y: 14 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -14 }}
                         transition={{ delay: idx * 0.06, type: 'spring', stiffness: 300, damping: 25 }}
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.96 }}
                       >
                         <span>{option}</span>
                         {showFeedback && isSelected && isCorrect && (
-                          <Sparkles className="ml-1.5 h-4 w-4 text-sage animate-pulse-gentle" />
+                          <Sparkles className="ml-1.5 h-4 w-4 text-white fill-white animate-spin-slow" />
                         )}
                       </motion.button>
                     );
