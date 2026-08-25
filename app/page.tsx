@@ -275,10 +275,12 @@ export default function HomePage() {
 
             {/* Mascot island */}
             <div className="lg:col-span-5 flex justify-center lg:justify-end">
-              <div className="relative bg-white border border-whisper rounded-hero p-5 sm:p-6 shadow-card w-full max-w-[320px] sm:max-w-[360px]">
+              <div className="relative bg-white border border-whisper rounded-hero p-5 sm:p-6 pt-14 sm:pt-16 shadow-card w-full max-w-[320px] sm:max-w-[360px]">
                 <div className="absolute -top-6 -right-6 h-24 w-24 sm:h-28 sm:w-28 rounded-full bg-amber-soft blur-2xl opacity-60" aria-hidden="true" />
                 <div className="relative flex flex-col items-center text-center">
-                  <LanternMascot mood="encouraging" size={84} speechBubble="Wave your finger — I follow!" />
+                  <div className="pt-2 pb-1">
+                    <LanternMascot mood="encouraging" size={96} speechBubble="Wave your finger — I follow!" />
+                  </div>
                   <p className="mt-2.5 sm:mt-3 text-xs font-semibold tracking-widest text-ink-tertiary uppercase">Meet Lumi</p>
                   <p className="mt-1 text-xs sm:text-sm leading-5 text-ink-secondary">
                     Your guide through all five worlds. Hover the wand cursor — Lumi&apos;s eyes follow you.

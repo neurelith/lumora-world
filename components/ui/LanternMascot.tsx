@@ -15,7 +15,7 @@ interface LanternMascotProps {
 
 export const LanternMascot: React.FC<LanternMascotProps> = ({
   mood = 'neutral',
-  size = 92,
+  size = 96,
   speechBubble,
   showEyes = true,
   className = '',
@@ -24,14 +24,14 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
   const [eyeOffset, setEyeOffset] = useState({ x: 0, y: 0 });
   const wrapRef = useRef<HTMLDivElement | null>(null);
 
-  // Natural multi-frequency blinking loop
+  // Natural multi-frequency organic blinking loop
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
     const loop = () => {
-      const delay = 2600 + Math.random() * 2000;
+      const delay = 2400 + Math.random() * 2200;
       t = setTimeout(() => {
         setBlink(true);
-        setTimeout(() => setBlink(false), 130);
+        setTimeout(() => setBlink(false), 140);
         loop();
       }, delay);
     };
@@ -39,7 +39,7 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
     return () => clearTimeout(t);
   }, []);
 
-  // Eye-tracking global mouse (desktop)
+  // Eye tracking: pupils follow mouse/wand cursor smoothly
   useEffect(() => {
     if (typeof window === 'undefined' || window.matchMedia('(pointer: coarse)').matches) return;
     const onMove = (e: MouseEvent) => {
@@ -51,8 +51,8 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
       const dx = (e.clientX - cx) / (window.innerWidth / 2);
       const dy = (e.clientY - cy) / (window.innerHeight / 2);
       setEyeOffset({
-        x: Math.max(-2.5, Math.min(2.5, dx * 2.5)),
-        y: Math.max(-2, Math.min(2, dy * 2)),
+        x: Math.max(-3.5, Math.min(3.5, dx * 3.5)),
+        y: Math.max(-2.5, Math.min(2.5, dy * 2.5)),
       });
     };
     window.addEventListener('mousemove', onMove, { passive: true });
@@ -68,7 +68,7 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
     <div
       ref={wrapRef}
       className={`relative flex flex-col items-center select-none ${className}`}
-      style={{ width: size, height: size * 1.15 }}
+      style={{ width: size, height: size * 1.18 }}
     >
       {/* Speech Bubble floating safely ABOVE Lumi's ears */}
       <AnimatePresence mode="wait">
@@ -80,7 +80,7 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
             exit={{ opacity: 0, scale: 0.88, y: -6 }}
             transition={{ type: 'spring', stiffness: 420, damping: 28 }}
             className="absolute z-30 left-1/2 -translate-x-1/2 pointer-events-none"
-            style={{ bottom: 'calc(100% + 12px)', width: 'max-content', maxWidth: 280 }}
+            style={{ bottom: 'calc(100% + 14px)', width: 'max-content', maxWidth: 280 }}
           >
             <div className="relative bg-white/95 backdrop-blur-xl border border-hairline shadow-soft-md px-4 py-2 text-xs sm:text-sm font-display font-bold leading-snug text-ink text-center rounded-2xl">
               {speechBubble}
@@ -102,13 +102,13 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
       {/* Celebratory Stardust Confetti */}
       {isCelebrate && (
         <div className="absolute inset-0 pointer-events-none overflow-visible z-20" aria-hidden="true">
-          {[...Array(7)].map((_, i) => (
+          {[...Array(8)].map((_, i) => (
             <motion.span
               key={i}
               className="absolute text-xs"
-              style={{ left: `${12 + i * 14}%`, top: -4 }}
-              animate={{ y: [0, -22, 4], rotate: [0, 24, -18], opacity: [0, 1, 0] }}
-              transition={{ duration: 1.2, delay: i * 0.08, repeat: Infinity, repeatDelay: 1.1 }}
+              style={{ left: `${10 + i * 12}%`, top: -6 }}
+              animate={{ y: [0, -26, 4], rotate: [0, 28, -20], opacity: [0, 1, 0] }}
+              transition={{ duration: 1.2, delay: i * 0.07, repeat: Infinity, repeatDelay: 1.0 }}
             >
               {i % 3 === 0 ? '✨' : i % 3 === 1 ? '⭐' : '🌟'}
             </motion.span>
@@ -136,276 +136,330 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
         </div>
       )}
 
-      {/* Master Studio-Quality Lumi SVG Character */}
+      {/* Master Studio-Quality Hand-Crafted Lumi Character */}
       <motion.svg
-        viewBox="0 0 130 148"
+        viewBox="0 0 140 156"
         className="w-full h-full block overflow-visible"
         preserveAspectRatio="xMidYMid meet"
         role="img"
         aria-label={`Lumi the mascot, feeling ${mood}`}
         animate={
           isCelebrate
-            ? { y: [0, -6, 0], rotate: [0, -2, 2, 0] }
+            ? { y: [0, -8, 0], rotate: [0, -3, 3, 0] }
             : isSleepy
-            ? { y: [0, 2, 0], scaleY: [1, 0.98, 1] }
-            : { y: [0, -2, 0] }
+            ? { y: [0, 2, 0], scaleY: [1, 0.97, 1] }
+            : isThinking
+            ? { rotate: [-2, 2, -2], y: [0, -2, 0] }
+            : { y: [0, -3, 0] }
         }
         transition={{
-          duration: isCelebrate ? 0.6 : isSleepy ? 3.0 : 2.5,
+          duration: isCelebrate ? 0.55 : isSleepy ? 3.2 : 2.6,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
       >
         <defs>
-          {/* Fur Gradient - Head & Body */}
-          <radialGradient id="lumi-fur" cx="48%" cy="38%" r="68%">
-            <stop offset="0%" stopColor="#FFFDF9" />
-            <stop offset="55%" stopColor="#F9F1E6" />
-            <stop offset="100%" stopColor="#EAD8C4" />
-          </radialGradient>
-
-          {/* Belly & Chest Gradient */}
-          <radialGradient id="lumi-belly" cx="50%" cy="50%" r="60%">
+          {/* 3D Fur Shading: Soft Cream to Warm Butterscotch */}
+          <radialGradient id="lumi-head-grad" cx="48%" cy="36%" r="65%">
             <stop offset="0%" stopColor="#FFFFFF" />
-            <stop offset="100%" stopColor="#FFF5E8" />
+            <stop offset="45%" stopColor="#FFFDF7" />
+            <stop offset="78%" stopColor="#F7EADB" />
+            <stop offset="100%" stopColor="#E6CFB8" />
           </radialGradient>
 
-          {/* Inner Ear Peach Pink */}
-          <radialGradient id="lumi-ear-inner" cx="50%" cy="60%" r="70%">
-            <stop offset="0%" stopColor="#FF9FB2" />
-            <stop offset="100%" stopColor="#E66885" />
+          {/* Chubby Body Fur */}
+          <radialGradient id="lumi-body-grad" cx="50%" cy="42%" r="68%">
+            <stop offset="0%" stopColor="#FFFFFF" />
+            <stop offset="55%" stopColor="#F9EFE2" />
+            <stop offset="100%" stopColor="#E2C9AF" />
           </radialGradient>
 
-          {/* Outer Ear Golden Biscuit */}
-          <linearGradient id="lumi-ear-outer" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#F4E2D0" />
-            <stop offset="100%" stopColor="#D9BFAB" />
+          {/* Ear Outer Butterscotch */}
+          <linearGradient id="lumi-ear-grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#F5DEC8" />
+            <stop offset="60%" stopColor="#E2C4A8" />
+            <stop offset="100%" stopColor="#C9A689" />
           </linearGradient>
 
-          {/* Golden Lantern Pendant Glow */}
-          <radialGradient id="lantern-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#FFF3B0" />
-            <stop offset="45%" stopColor="#FFD152" />
-            <stop offset="100%" stopColor="#E8A33D" stopOpacity="0.1" />
+          {/* Ear Inner Soft Peach/Rose */}
+          <radialGradient id="lumi-ear-inner" cx="50%" cy="60%" r="65%">
+            <stop offset="0%" stopColor="#FFA6B8" />
+            <stop offset="65%" stopColor="#F07994" />
+            <stop offset="100%" stopColor="#D45070" />
           </radialGradient>
 
-          {/* Ambient Drop Shadow */}
-          <filter id="lumi-shadow" x="-25%" y="-20%" width="150%" height="150%">
-            <feDropShadow dx="0" dy="6" stdDeviation="6" floodColor="#2B2A33" floodOpacity="0.12" />
+          {/* Anime Eye Gradient (Obsidian to Warm Honey Amber) */}
+          <radialGradient id="lumi-iris" cx="50%" cy="40%" r="55%">
+            <stop offset="0%" stopColor="#362E2B" />
+            <stop offset="65%" stopColor="#251E1C" />
+            <stop offset="88%" stopColor="#D9822B" />
+            <stop offset="100%" stopColor="#8A4610" />
+          </radialGradient>
+
+          {/* Golden Lantern Pendant Radial Glow */}
+          <radialGradient id="lantern-aura" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#FFF4B8" stopOpacity="0.95" />
+            <stop offset="40%" stopColor="#FFD24D" stopOpacity="0.75" />
+            <stop offset="75%" stopColor="#E8A33D" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#C96442" stopOpacity="0" />
+          </radialGradient>
+
+          {/* Soft Ground / Body Drop Shadow */}
+          <filter id="lumi-shadow" x="-30%" y="-20%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="7" stdDeviation="6.5" floodColor="#2B2A33" floodOpacity="0.14" />
           </filter>
         </defs>
 
-        {/* 1. Fluffy Animated Tail */}
-        <g style={{ transformOrigin: '98px 105px' }}>
+        {/* 1. Fluffy S-Curve Tail with Butterscotch Tip */}
+        <motion.g
+          style={{ transformOrigin: '105px 115px' }}
+          animate={{ rotate: isCelebrate ? [-8, 14, -8] : [-4, 6, -4] }}
+          transition={{ duration: isCelebrate ? 0.7 : 2.2, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          {/* Main Tail */}
           <path
-            d="M 96 102 C 114 96 122 74 110 56 C 105 48 98 48 96 56 C 104 70 102 88 90 98 Z"
-            fill="#EAD8C4"
-            stroke="#D9BFAB"
+            d="M 98 112 C 118 108 132 86 122 64 C 117 53 108 53 106 62 C 114 78 112 96 95 106 Z"
+            fill="#E6CFB8"
+            stroke="#C9A689"
             strokeWidth="1.8"
             strokeLinejoin="round"
           />
+          {/* Fluffy Tail Tip Highlight */}
           <path
-            d="M 100 62 C 107 58 109 51 106 47"
-            stroke="#FFFDF9"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            opacity="0.9"
+            d="M 112 68 C 119 62 121 54 117 50 C 114 47 109 49 108 56"
+            fill="#FFFFFF"
+            opacity="0.8"
           />
-        </g>
+        </motion.g>
 
-        {/* 2. Chubby Pear-Shaped Body */}
-        <ellipse
-          cx="65"
-          cy="110"
-          rx="40"
-          ry="33"
-          fill="url(#lumi-fur)"
-          stroke="#D9BFAB"
+        {/* 2. Chubby Marshmallow Body */}
+        <path
+          d="M 38 102 C 28 116 32 136 50 142 C 64 146 76 146 90 142 C 108 136 112 116 102 102 C 92 88 48 88 38 102 Z"
+          fill="url(#lumi-body-grad)"
+          stroke="#D4BA9F"
           strokeWidth="1.8"
           filter="url(#lumi-shadow)"
         />
 
-        {/* Soft White Belly Patch */}
-        <ellipse cx="65" cy="116" rx="24" ry="20" fill="url(#lumi-belly)" opacity="0.85" />
+        {/* Soft White Chest Belly Patch */}
+        <ellipse cx="70" cy="120" rx="26" ry="20" fill="#FFFFFF" opacity="0.88" />
 
-        {/* Little Kitty Paws */}
-        <ellipse cx="42" cy="136" rx="12" ry="8" fill="#FFFDF9" stroke="#D9BFAB" strokeWidth="1.4" />
-        <ellipse cx="88" cy="136" rx="12" ry="8" fill="#FFFDF9" stroke="#D9BFAB" strokeWidth="1.4" />
-        <circle cx="39" cy="135" r="1.5" fill="#E66885" opacity="0.6" />
-        <circle cx="45" cy="135" r="1.5" fill="#E66885" opacity="0.6" />
-        <circle cx="85" cy="135" r="1.5" fill="#E66885" opacity="0.6" />
-        <circle cx="91" cy="135" r="1.5" fill="#E66885" opacity="0.6" />
-
-        {/* 3. Pointy Cat Ears */}
+        {/* 3. Cute Paws with Pink Toe Beans */}
+        {/* Left Paw */}
         <g>
-          {/* Left Ear */}
-          <path
-            d="M 22 38 L 30 12 L 48 28 Z"
-            fill="url(#lumi-ear-outer)"
-            stroke="#D0B59E"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-          />
-          <path d="M 28 32 L 33 19 L 42 28 Z" fill="url(#lumi-ear-inner)" />
-          {/* Fluffy Ear Tuft */}
-          <path d="M 29 33 Q 34 26 38 31" stroke="#FFFDF9" strokeWidth="1.6" fill="none" strokeLinecap="round" />
-
-          {/* Right Ear */}
-          <path
-            d="M 108 38 L 100 12 L 82 28 Z"
-            fill="url(#lumi-ear-outer)"
-            stroke="#D0B59E"
-            strokeWidth="1.8"
-            strokeLinejoin="round"
-          />
-          <path d="M 102 32 L 97 19 L 88 28 Z" fill="url(#lumi-ear-inner)" />
-          <path d="M 101 33 Q 96 26 92 31" stroke="#FFFDF9" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+          <ellipse cx="46" cy="140" rx="12" ry="8" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
+          <circle cx="43" cy="139" r="1.6" fill="#F07994" opacity="0.75" />
+          <circle cx="49" cy="139" r="1.6" fill="#F07994" opacity="0.75" />
+          <ellipse cx="46" cy="142" rx="2.4" ry="1.8" fill="#F07994" opacity="0.75" />
+        </g>
+        {/* Right Paw */}
+        <g>
+          <ellipse cx="94" cy="140" rx="12" ry="8" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
+          <circle cx="91" cy="139" r="1.6" fill="#F07994" opacity="0.75" />
+          <circle cx="97" cy="139" r="1.6" fill="#F07994" opacity="0.75" />
+          <ellipse cx="94" cy="142" rx="2.4" ry="1.8" fill="#F07994" opacity="0.75" />
         </g>
 
-        {/* 4. Cute Rounded Cat Head */}
-        <ellipse
-          cx="65"
-          cy="66"
-          rx="38"
-          ry="35"
-          fill="url(#lumi-fur)"
-          stroke="#D9BFAB"
+        {/* 4. Fluffy Pointed Anime Ears */}
+        {/* Left Ear */}
+        <g style={{ transformOrigin: '38px 42px' }}>
+          <path
+            d="M 24 46 C 18 34 26 12 36 8 C 44 20 48 30 52 40 Z"
+            fill="url(#lumi-ear-grad)"
+            stroke="#C9A689"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          {/* Inner Ear Soft Rose */}
+          <path
+            d="M 28 42 C 24 33 30 18 35 15 C 40 23 44 32 46 38 Z"
+            fill="url(#lumi-ear-inner)"
+          />
+          {/* Fluffy Ear Base Tuft */}
+          <path
+            d="M 32 44 Q 38 36 42 41"
+            stroke="#FFFFFF"
+            strokeWidth="2.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </g>
+
+        {/* Right Ear */}
+        <g style={{ transformOrigin: '102px 42px' }}>
+          <path
+            d="M 116 46 C 122 34 114 12 104 8 C 96 20 92 30 88 40 Z"
+            fill="url(#lumi-ear-grad)"
+            stroke="#C9A689"
+            strokeWidth="1.8"
+            strokeLinejoin="round"
+          />
+          {/* Inner Ear Soft Rose */}
+          <path
+            d="M 112 42 C 116 33 110 18 105 15 C 100 23 96 32 94 38 Z"
+            fill="url(#lumi-ear-inner)"
+          />
+          {/* Fluffy Ear Base Tuft */}
+          <path
+            d="M 108 44 Q 102 36 98 41"
+            stroke="#FFFFFF"
+            strokeWidth="2.2"
+            fill="none"
+            strokeLinecap="round"
+          />
+        </g>
+
+        {/* 5. Chibi Cat Head with Chubby Cheek Fur Wings */}
+        <path
+          d="M 36 48 C 48 34 92 34 104 48 C 116 60 126 72 120 86 C 116 96 104 102 88 105 C 78 106 62 106 52 105 C 36 102 24 96 20 86 C 14 72 24 60 36 48 Z"
+          fill="url(#lumi-head-grad)"
+          stroke="#D4BA9F"
           strokeWidth="1.8"
           filter="url(#lumi-shadow)"
         />
+
+        {/* Left Cheek Fur Tufts */}
+        <path d="M 22 78 C 14 80 16 86 22 88" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
+        <path d="M 23 85 C 16 88 18 93 24 94" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
+
+        {/* Right Cheek Fur Tufts */}
+        <path d="M 118 78 C 126 80 124 86 118 88" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
+        <path d="M 117 85 C 124 88 122 93 116 94" fill="#FFFDF7" stroke="#D4BA9F" strokeWidth="1.4" />
 
         {/* Rosy Peach Blush Cheeks */}
-        <ellipse cx="32" cy="78" rx="11" ry="7" fill="#FF8FA3" opacity="0.32" />
-        <ellipse cx="98" cy="78" rx="11" ry="7" fill="#FF8FA3" opacity="0.32" />
+        <ellipse cx="38" cy="84" rx="11" ry="6.5" fill="#FF8FA3" opacity="0.36" />
+        <ellipse cx="102" cy="84" rx="11" ry="6.5" fill="#FF8FA3" opacity="0.36" />
 
-        {/* 5. Big Expressive Anime / Pixar Eyes */}
+        {/* 6. Big Expressive Pixar Anime Eyes */}
         {showEyes && (
           <g>
             {isSleepy ? (
-              // Serene Sleepy Eyelashes
-              <g stroke="#2B2A33" strokeWidth="2.4" strokeLinecap="round" fill="none">
-                <path d="M 36 65 Q 46 72 56 65" />
-                <path d="M 74 65 Q 84 72 94 65" />
+              // Serene Sleepy Eyelash Curves
+              <g stroke="#2B2A33" strokeWidth="2.6" strokeLinecap="round" fill="none">
+                <path d="M 42 70 Q 52 78 62 70" />
+                <path d="M 78 70 Q 88 78 98 70" />
               </g>
             ) : isCelebrate ? (
-              // Joyful Crescent Arcs
-              <g stroke="#2B2A33" strokeWidth="2.8" strokeLinecap="round" fill="none">
-                <path d="M 36 67 Q 46 56 56 67" />
-                <path d="M 74 67 Q 84 56 94 67" />
+              // Joyful Crescent Happy Eyes (^ ^)
+              <g stroke="#2B2A33" strokeWidth="3.0" strokeLinecap="round" fill="none">
+                <path d="M 40 72 Q 52 60 64 72" />
+                <path d="M 76 72 Q 88 60 100 72" />
               </g>
             ) : (
-              // Open Anime Eyes with Dynamic Look & Blink
+              // Open Anime Eyes with Dual Star Catchlights & Pupil Tracking
               <g>
                 {/* Eye Whites */}
                 <ellipse
-                  cx="46"
-                  cy="62"
-                  rx="14"
-                  ry={blink ? 1.5 : 16}
+                  cx="52"
+                  cy="67"
+                  rx="15"
+                  ry={blink ? 1.8 : 17}
                   fill="#FFFFFF"
-                  stroke="#D9BFAB"
+                  stroke="#D4BA9F"
                   strokeWidth="1.2"
                 />
                 <ellipse
-                  cx="84"
-                  cy="62"
-                  rx="14"
-                  ry={blink ? 1.5 : 16}
+                  cx="88"
+                  cy="67"
+                  rx="15"
+                  ry={blink ? 1.8 : 17}
                   fill="#FFFFFF"
-                  stroke="#D9BFAB"
+                  stroke="#D4BA9F"
                   strokeWidth="1.2"
                 />
 
                 {!blink && (
                   <>
-                    {/* Deep Obsidian Irises */}
+                    {/* Deep Obsidian Iris with Honey Amber Base */}
                     <circle
-                      cx={46 + eyeOffset.x}
-                      cy={62 + eyeOffset.y + (isThinking ? -3 : 0)}
-                      r="8.2"
-                      fill="#2B2A33"
+                      cx={52 + eyeOffset.x}
+                      cy={67 + eyeOffset.y + (isThinking ? -3 : 0)}
+                      r="9.5"
+                      fill="url(#lumi-iris)"
+                    />
+                    <circle
+                      cx={88 + eyeOffset.x}
+                      cy={67 + eyeOffset.y + (isThinking ? -3 : 0)}
+                      r="9.5"
+                      fill="url(#lumi-iris)"
+                    />
+
+                    {/* Warm Honey Amber Crescent Glow in Iris Bottom */}
+                    <path
+                      d={`M ${45 + eyeOffset.x} ${70 + eyeOffset.y} Q ${52 + eyeOffset.x} ${76 + eyeOffset.y} ${59 + eyeOffset.x} ${70 + eyeOffset.y}`}
+                      stroke="#FFB03B"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      fill="none"
+                      opacity="0.85"
+                    />
+                    <path
+                      d={`M ${81 + eyeOffset.x} ${70 + eyeOffset.y} Q ${88 + eyeOffset.x} ${76 + eyeOffset.y} ${95 + eyeOffset.x} ${70 + eyeOffset.y}`}
+                      stroke="#FFB03B"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      fill="none"
+                      opacity="0.85"
+                    />
+
+                    {/* Primary Big Glossy Oval Catchlight */}
+                    <ellipse
+                      cx={55 + eyeOffset.x}
+                      cy={63 + eyeOffset.y}
+                      rx="3.8"
+                      ry="3.2"
+                      fill="#FFFFFF"
+                    />
+                    <ellipse
+                      cx={91 + eyeOffset.x}
+                      cy={63 + eyeOffset.y}
+                      rx="3.8"
+                      ry="3.2"
+                      fill="#FFFFFF"
+                    />
+
+                    {/* Secondary Mini Star Sparkle Catchlight */}
+                    <circle
+                      cx={48 + eyeOffset.x}
+                      cy={71 + eyeOffset.y}
+                      r="1.7"
+                      fill="#FFFFFF"
+                      opacity="0.9"
                     />
                     <circle
                       cx={84 + eyeOffset.x}
-                      cy={62 + eyeOffset.y + (isThinking ? -3 : 0)}
-                      r="8.2"
-                      fill="#2B2A33"
-                    />
-
-                    {/* Amber Iris Fringe Glow */}
-                    <circle
-                      cx={46 + eyeOffset.x}
-                      cy={64 + eyeOffset.y}
-                      r="4.2"
-                      fill="#E8A33D"
-                      opacity="0.4"
-                    />
-                    <circle
-                      cx={84 + eyeOffset.x}
-                      cy={64 + eyeOffset.y}
-                      r="4.2"
-                      fill="#E8A33D"
-                      opacity="0.4"
-                    />
-
-                    {/* Primary Star Sparkle Highlight */}
-                    <ellipse
-                      cx={48.5 + eyeOffset.x}
-                      cy={59 + eyeOffset.y}
-                      rx="3.2"
-                      ry="2.8"
+                      cy={71 + eyeOffset.y}
+                      r="1.7"
                       fill="#FFFFFF"
-                    />
-                    <ellipse
-                      cx={86.5 + eyeOffset.x}
-                      cy={59 + eyeOffset.y}
-                      rx="3.2"
-                      ry="2.8"
-                      fill="#FFFFFF"
-                    />
-
-                    {/* Secondary Mini Twinkle */}
-                    <circle
-                      cx={43 + eyeOffset.x}
-                      cy={65 + eyeOffset.y}
-                      r="1.4"
-                      fill="#FFFFFF"
-                      opacity="0.8"
-                    />
-                    <circle
-                      cx={81 + eyeOffset.x}
-                      cy={65 + eyeOffset.y}
-                      r="1.4"
-                      fill="#FFFFFF"
-                      opacity="0.8"
+                      opacity="0.9"
                     />
                   </>
                 )}
 
-                {/* Eyebrows */}
+                {/* Expressive Eyebrows */}
                 <path
                   d={
                     isThinking
-                      ? 'M 36 44 Q 46 38 56 46'
+                      ? 'M 42 47 Q 52 40 62 48'
                       : isEncouraging
-                      ? 'M 36 46 Q 46 42 56 46'
-                      : 'M 36 46 Q 46 44 56 47'
+                      ? 'M 42 49 Q 52 44 62 49'
+                      : 'M 42 49 Q 52 46 62 50'
                   }
-                  stroke="#9E8D7F"
-                  strokeWidth="1.8"
+                  stroke="#8C7665"
+                  strokeWidth="2.0"
                   strokeLinecap="round"
                   fill="none"
                 />
                 <path
                   d={
                     isThinking
-                      ? 'M 74 46 Q 84 40 94 43'
+                      ? 'M 78 49 Q 88 43 98 46'
                       : isEncouraging
-                      ? 'M 74 46 Q 84 42 94 46'
-                      : 'M 74 47 Q 84 44 94 46'
+                      ? 'M 78 49 Q 88 44 98 49'
+                      : 'M 78 50 Q 88 46 98 49'
                   }
-                  stroke="#9E8D7F"
-                  strokeWidth="1.8"
+                  stroke="#8C7665"
+                  strokeWidth="2.0"
                   strokeLinecap="round"
                   fill="none"
                 />
@@ -414,65 +468,73 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
           </g>
         )}
 
-        {/* 6. Cute Cat Nose & Sweet Mouth (:3) */}
-        <path d="M 62 72 L 68 72 L 65 76 Z" fill="#E66885" />
-        <ellipse cx="65" cy="72.5" rx="2" ry="1" fill="#FFFFFF" opacity="0.45" />
+        {/* 7. Cute Tiny Pink Heart Nose */}
+        <path d="M 66 76 L 74 76 L 70 80.5 Z" fill="#F07994" />
+        <ellipse cx="70" cy="76.5" rx="2.2" ry="1.1" fill="#FFFFFF" opacity="0.6" />
 
+        {/* 8. Feline Mouth (:3) */}
         {isCelebrate ? (
-          // Happy Open Smile with Pink Tongue
+          // Happy Open Laughing Smile with Pink Tongue
           <g>
             <path
-              d="M 57 77 Q 65 88 73 77 Z"
-              fill="#E66885"
+              d="M 61 81 Q 70 94 79 81 Z"
+              fill="#E6587A"
               stroke="#2B2A33"
-              strokeWidth="1.8"
+              strokeWidth="2.0"
               strokeLinejoin="round"
             />
-            <path d="M 61 82 Q 65 80 69 82" stroke="#FF9FB2" strokeWidth="1.5" fill="none" />
+            <ellipse cx="70" cy="87" rx="4.5" ry="3" fill="#FFA6B8" />
           </g>
         ) : (
-          // Sweet :3 Mouth Curve
+          // Sweet :3 Kitten Smile
           <path
-            d="M 57 76 Q 61 79 65 76 Q 69 79 73 76"
+            d="M 61 80 Q 65.5 84 70 80 Q 74.5 84 79 80"
             stroke="#2B2A33"
-            strokeWidth="1.9"
+            strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="none"
           />
         )}
 
-        {/* 7. Whiskers */}
-        <g stroke="#C4B09F" strokeWidth="1.2" strokeLinecap="round" opacity="0.9">
-          <path d="M 30 73 Q 16 71 8 67" fill="none" />
-          <path d="M 30 78 Q 14 78 6 78" fill="none" />
-          <path d="M 30 83 Q 16 85 8 89" fill="none" />
+        {/* 9. Soft Organic Curved Whiskers */}
+        <g stroke="#BFA895" strokeWidth="1.3" strokeLinecap="round" opacity="0.92">
+          {/* Left Whiskers */}
+          <path d="M 36 78 Q 20 76 10 72" fill="none" />
+          <path d="M 36 84 Q 18 84 8 84" fill="none" />
+          <path d="M 36 90 Q 20 92 12 96" fill="none" />
 
-          <path d="M 100 73 Q 114 71 122 67" fill="none" />
-          <path d="M 100 78 Q 116 78 124 78" fill="none" />
-          <path d="M 100 83 Q 114 85 122 89" fill="none" />
+          {/* Right Whiskers */}
+          <path d="M 104 78 Q 120 76 130 72" fill="none" />
+          <path d="M 104 84 Q 122 84 132 84" fill="none" />
+          <path d="M 104 90 Q 120 92 128 96" fill="none" />
         </g>
 
-        {/* 8. Glowing Magical Lantern Pendant */}
-        <g style={{ transformOrigin: '65px 98px' }}>
+        {/* 10. The Iconic Lumora Golden Lantern Necklace */}
+        <g style={{ transformOrigin: '70px 105px' }}>
           {/* Braided Cord */}
-          <path d="M 46 95 Q 65 104 84 95" stroke="#C96442" strokeWidth="1.8" fill="none" />
-          {/* Glowing Aura */}
-          <circle cx="65" cy="102" r="12" fill="url(#lantern-glow)" />
-          {/* Golden Lantern Frame */}
+          <path d="M 48 100 Q 70 110 92 100" stroke="#C96442" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+
+          {/* Warm Amber Glowing Halo */}
+          <circle cx="70" cy="108" r="16" fill="url(#lantern-aura)" />
+
+          {/* Golden Lantern Pendant Frame */}
           <rect
-            x="59"
-            y="96"
-            width="12"
-            height="13"
-            rx="3"
-            fill="#FFD152"
+            x="63"
+            y="100"
+            width="14"
+            height="16"
+            rx="3.5"
+            fill="#FFD24D"
             stroke="#C96442"
-            strokeWidth="1.4"
+            strokeWidth="1.6"
           />
-          {/* Glass Candle Core */}
-          <ellipse cx="65" cy="102.5" rx="3.5" ry="4.5" fill="#FFFDF9" />
-          <circle cx="65" cy="102" r="2" fill="#E8A33D" />
+          {/* Top Ring */}
+          <circle cx="70" cy="99" r="2.5" fill="none" stroke="#C96442" strokeWidth="1.4" />
+
+          {/* Candle Light Core */}
+          <ellipse cx="70" cy="108" rx="4" ry="5.5" fill="#FFFFFF" />
+          <circle cx="70" cy="108" r="2.5" fill="#E8A33D" />
         </g>
       </motion.svg>
     </div>
