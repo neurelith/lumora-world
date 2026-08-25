@@ -89,6 +89,20 @@ Re-structured repository into 9 clean, human conventional commits:
   - Added exponential backoff (1s, 2s, 4s... max 30s) and max 5 retry dead-letter policy in `lib/storage.ts`.
   - Wrapped app in React `ErrorBoundary` in `app/layout.tsx`.
 
+### 9. Immersive Child UI/UX & Gamified Haven Upgrade
+- **Magic Air Wand & Camera Hardware Fix**:
+  - Fixed dangling `getUserMedia` stream in `CameraPermissionModal.tsx` that previously locked camera hardware on mobile/laptop.
+  - Rendered active video feed inside PiP box with overlaid teal hand skeleton joints and glowing wand tip — zero black screens on laptop/mobile.
+  - Removed developer debug switches (`1-Euro locked`, `Continuous/Pinch`) from child screen.
+- **Vision Valley Smooth Star Pursuit**:
+  - Upgraded calibration from manual button taps to **Constellation Star Glide**: celestial glowing star glides along smooth curves while tracking gaze fixation and pursuit smoothness automatically.
+- **My Haven Gamified 5-World Quest Hub**:
+  - Transformed into a 5-world daily adventure camp (Sound Forest, Rune Realm, Vision Valley, Story Castle, Memory Mountains).
+  - Added 🔥 Duolingo-style daily streak counter and weekly Mon–Sun streak tracker.
+  - Added **Sensory Calm Mode**: single-tap header toggle providing soothing pastels, 50% slower motion, and peaceful chimes.
+  - Added **"That's Enough for Today" Fatigue Guard**: displays cozy bedtime scene with sleepy Lumi mascot rewarding the child after completing daily goals.
+  - Added **1-Click Printable Developmental Report Card** (`components/ui/PrintableReportCard.tsx`): print-optimized PDF certificate for parents, teachers, and specialists.
+
 ---
 
 ## 📂 Key File Map
@@ -97,15 +111,13 @@ Re-structured repository into 9 clean, human conventional commits:
 | :--- | :--- |
 | `app/page.tsx` | Main Homepage (Hero, 5 Worlds Explorer, 3 Tiers, Live Telemetry) |
 | `app/screening/page.tsx` | 15-Minute Gamified Battery Intake Flow |
-| `app/haven/page.tsx` | My Haven Daily Practice Companion with Sensory Calm Mode |
+| `app/haven/page.tsx` | My Haven Gamified 5-World Daily Quest Camp |
 | `app/doctor/page.tsx` | Specialist Command Center, RTI Curves, DALI PDF Export & IASQ |
-| `app/api/v1/*` | Clean Architecture API endpoints (health, scoring, sessions) |
-| `lib/services/*` | Domain services for scoring & session management |
-| `lib/schemas/*` | Zod validation schemas |
-| `lib/camera-service.ts` | Centralized hardware camera singleton service |
-| `components/ui/HarmonicFlowCanvas.tsx` | Camera Air-Wand Tracking Canvas with zero-leak teardown |
-| `components/ui/ErrorBoundary.tsx` | Global React Error Boundary with kid-friendly recovery |
-| `firestore.rules` | Declarative Firestore role-based security rules |
+| `components/ui/HarmonicFlowCanvas.tsx` | Camera Air-Wand Tracking Canvas with live PiP video & skeleton |
+| `components/ui/PrintableReportCard.tsx` | 1-Click Printable PDF Developmental Report Card & Certificate |
+| `components/screening/VisionValley.tsx` | Vision Valley with Smooth Constellation Star Pursuit |
+| `components/screening/RuneRealm.tsx` | Child-optimized Rune Realm drawing arena |
+| `components/ui/LanternMascot.tsx` | Animated SVG mascot with `sleepy`, `celebrating`, `encouraging` moods |
 
 ---
 

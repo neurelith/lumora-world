@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-type MascotMood = 'neutral' | 'encouraging' | 'celebrating' | 'thinking' | 'calm' | 'confused';
+type MascotMood = 'neutral' | 'encouraging' | 'celebrating' | 'thinking' | 'calm' | 'confused' | 'sleepy';
 
 interface LanternMascotProps {
   mood?: MascotMood;
@@ -23,6 +23,7 @@ const MOOD: Record<MascotMood, {
   thinking:     { eyeH: 10, eyeW: 14, pupilScale: 0.9, lidY: 3, brow: 5,  mouth: 'M -4 5 Q 0 3 4 5',   blush: 0.1,  ear: 10, bounce: 0, tail: false },
   calm:         { eyeH: 3,  eyeW: 15, pupilScale: 0.8, lidY: 7, brow: 2,  mouth: 'M -6 3 Q 0 6 6 3',   blush: 0.14, ear: 0,  bounce: 0, tail: false },
   confused:     { eyeH: 14, eyeW: 18, pupilScale: 1,   lidY: 1, brow: 7,  mouth: 'M -5 6 Q 0 2 5 6',   blush: 0.12, ear: -9, bounce: 1, tail: false },
+  sleepy:       { eyeH: 2,  eyeW: 16, pupilScale: 0.7, lidY: 9, brow: 1,  mouth: 'M -5 2 Q 0 5 5 2',   blush: 0.25, ear: 4,  bounce: 0, tail: false },
 };
 
 export const LanternMascot: React.FC<LanternMascotProps> = ({

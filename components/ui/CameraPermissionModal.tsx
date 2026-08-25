@@ -26,17 +26,9 @@ export const CameraPermissionModal: React.FC<CameraPermissionModalProps> = ({
 
   if (!open) return null;
 
-  const handleAllow = async () => {
-    setRequesting(true);
-    try {
-      // Warm up the permission so the native prompt appears in user-gesture context
-      await navigator.mediaDevices?.getUserMedia({ video: { facingMode: 'user' } });
-    } catch {
-      /* denial handled by parent via cameraError state */
-    } finally {
-      setRequesting(false);
-      onAllow();
-    }
+  const handleAllow = () => {
+    setRequesting(false);
+    onAllow();
   };
 
   return (

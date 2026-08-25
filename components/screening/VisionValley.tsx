@@ -131,33 +131,34 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
     }
   };
 
-  // Handle calibration point capture
-  const handleCalibrationNext = () => {
-    if (!gazeTrackerRef.current) {
-      // Simulated fallback path
-      if (calibrationPointIdx < calibrationTargets.length - 1) {
-        setCalibrationPointIdx((prev) => prev + 1);
-      } else {
-        setStep('reading');
-        gazeAnalyzerRef.current.reset();
-        startSimulatedGazeLoop();
-      }
-      return;
-    }
+  // Handle smooth star pursuit progression
+  useEffect(() => {
+    if (step !== 'calibrating') return;
 
-    // Real gaze: capture iris position at this screen target
-    const target = calibrationTargets[calibrationPointIdx];
-    const success = gazeTrackerRef.current.addCalibrationPoint(target.x / 100, target.y / 100);
+    const interval = setInterval(() => {
+      setCalibrationPointIdx((prev) => {
+        const nextIdx = prev + 1;
+        if (nextIdx < calibrationTargets.length) {
+          // Capture calibration point for current target
+          if (gazeTrackerRef.current) {
+            const target = calibrationTargets[nextIdx];
+            gazeTrackerRef.current.addCalibrationPoint(target.x / 100, target.y / 100);
+          }
+          return nextIdx;
+        } else {
+          clearInterval(interval);
+          setStep('reading');
+          gazeAnalyzerRef.current.reset();
+          if (showSimulatedFallback || !gazeTrackerRef.current) {
+            startSimulatedGazeLoop();
+          }
+          return prev;
+        }
+      });
+    }, 1400);
 
-    if (success) {
-      if (calibrationPointIdx < calibrationTargets.length - 1) {
-        setCalibrationPointIdx((prev) => prev + 1);
-      } else {
-        setStep('reading');
-        gazeAnalyzerRef.current.reset();
-      }
-    }
-  };
+    return () => clearInterval(interval);
+  }, [step, showSimulatedFallback]);
 
   // Simulated gaze loop for fallback with rAF cancel ref
   const startSimulatedGazeLoop = () => {
@@ -314,38 +315,47 @@ export const VisionValley: React.FC<VisionValleyProps> = ({
           </div>
         )}
 
-        {/* Step 2: 5-Point Calibration Target */}
+        {/* Step 2: Smooth Constellation Star Pursuit */}
         {step === 'calibrating' && (
-          <div className="relative w-full h-[360px] bg-white border-2 border-hairline rounded-3xl overflow-hidden flex flex-col items-center justify-center">
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between">
-              <p className="text-xs font-display font-bold uppercase tracking-widest text-valley animate-pulse">
-                {showSimulatedFallback ? 'Demo: Look at the star and tap it!' : 'Look at the glowing star and tap it!'}
-                <span className="ml-2">({calibrationPointIdx + 1}/5)</span>
+          <div className="relative w-full h-[360px] bg-gradient-to-b from-valley-light/10 via-white to-paper border-2 border-hairline rounded-3xl overflow-hidden flex flex-col items-center justify-center">
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+              <p className="text-xs sm:text-sm font-display font-extrabold tracking-wide text-valley flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber animate-spin-slow" />
+                <span>Follow the glowing guide star with your eyes!</span>
+                <span className="ml-1 px-2 py-0.5 bg-valley/10 rounded-full text-xs font-bold">({calibrationPointIdx + 1}/5)</span>
               </p>
-              <div className="w-32 h-4 bg-paper rounded-full overflow-hidden">
+              <div className="w-28 sm:w-36 h-3.5 bg-paper border border-hairline rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-valley rounded-full transition-all duration-300"
+                  className="h-full bg-gradient-to-r from-valley to-amber rounded-full transition-all duration-700 ease-out"
                   style={{ width: `${calibrationProgress}%` }}
                 />
               </div>
             </div>
 
-            {/* Moving target dot */}
+            {/* Constellation Path Guide Lines */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-20">
+              <polyline
+                points={calibrationTargets.map(t => `${t.x}%,${t.y}%`).join(' ')}
+                fill="none"
+                stroke="#3E8FB0"
+                strokeWidth="3"
+                strokeDasharray="6 8"
+              />
+            </svg>
+
+            {/* Gliding Celestial Star Target */}
             <div
-              onClick={handleCalibrationNext}
               style={{
                 position: 'absolute',
                 left: `${calibrationTargets[calibrationPointIdx].x}%`,
                 top: `${calibrationTargets[calibrationPointIdx].y}%`,
                 transform: 'translate(-50%, -50%)',
+                transition: 'left 1.2s cubic-bezier(0.34, 1.56, 0.64, 1), top 1.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
               }}
-              className="w-14 h-14 bg-amber text-ink rounded-full flex items-center justify-center cursor-pointer shadow-amber-glow animate-bounce-gentle border-2 border-amber-600 select-none"
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCalibrationNext(); } }}
-              aria-label={`Calibration point ${calibrationPointIdx + 1} of 5`}
+              className="w-16 h-16 bg-gradient-to-tr from-amber to-amber-300 text-ink rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(232,163,61,0.6)] animate-pulse border-2 border-white select-none z-20"
+              aria-label={`Constellation guide star at checkpoint ${calibrationPointIdx + 1} of 5`}
             >
-              <Sparkles className="w-7 h-7 fill-white text-ink" />
+              <Sparkles className="w-8 h-8 fill-white text-ink animate-spin-slow" />
             </div>
 
             {/* Live gaze indicator (real only) */}
