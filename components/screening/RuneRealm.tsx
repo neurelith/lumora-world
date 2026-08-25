@@ -46,7 +46,7 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
   };
 
   const handleAutoStrokeFinish = (points: HarmonicPoint[]) => {
-    if (showAnalysis || points.length < 5) return;
+    if (showAnalysis || points.length < 3) return;
     const rawStrokePoints = points.map((p) => ({ x: p.x, y: p.y, t: p.t, pressure: p.pressure ?? 0.8 }));
     const trial = analyzeStroke(rawStrokePoints, currentLetter, language);
     setLastTrial(trial);
@@ -58,6 +58,8 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
     setTimeout(() => {
       if (currentIdx < lettersList.length - 1) {
         setCurrentIdx((prev) => prev + 1);
+        setCurrentPoints([]);
+        setMascotMood('neutral');
       } else {
         const meanNvi = Number((nextTrials.reduce((a, tt) => a + tt.nvi, 0) / nextTrials.length).toFixed(1));
         const meanJerk = Number((nextTrials.reduce((a, tt) => a + tt.jerkIndex, 0) / nextTrials.length).toFixed(1));
@@ -74,7 +76,7 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
         });
       }
       setShowAnalysis(false);
-    }, 1200);
+    }, 850);
   };
 
   const handleNextRune = () => {

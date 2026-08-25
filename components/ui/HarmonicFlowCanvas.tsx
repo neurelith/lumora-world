@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Camera, RefreshCw, Wand2, Sparkles, Check, Flame, Hand } from 'lucide-react';
+import { RefreshCw, Wand2, Sparkles, Flame, Hand } from 'lucide-react';
 import { cameraService } from '@/lib/camera-service';
 
 export interface HarmonicPoint {
@@ -109,8 +109,8 @@ function softMap(v: number, lo: number, hi: number, max: number): number {
 }
 
 export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
-  width = 440,
-  height = 440,
+  width = 380,
+  height = 380,
   targetLetter,
   onStrokeUpdate,
   onStrokeFinish,
@@ -133,18 +133,27 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   const [handDetected, setHandDetected] = useState(false);
   const [isPinching, setIsPinching] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [calibrating, setCalibrating] = useState(false);
+  const [isStartingCamera, setIsStartingCamera] = useState(false);
 
   // References for live 60fps tracking & particles
   const strokeHistoryRef = useRef<HarmonicPoint[]>([]);
+  const strokeOpacityRef = useRef(1.0);
   const isInteractingRef = useRef(false);
   const wasPinchingRef = useRef(false);
-  const handPosRef = useRef({ x: 220, y: 220, present: false, pinching: false });
+  const handPosRef = useRef({ x: 190, y: 190, present: false, pinching: false });
   const particlesRef = useRef<Particle[]>([]);
   const cosmicMotesRef = useRef<CosmicMote[]>([]);
   const oneEuroRef = useRef(new OneEuroFilter(1.2, 0.009, 1.0));
   const rafRef = useRef<number | null>(null);
   const bloomRef = useRef(0);
+
+  // Automatically reset canvas and stroke history when targetLetter changes
+  useEffect(() => {
+    strokeHistoryRef.current = [];
+    strokeOpacityRef.current = 1.0;
+    particlesRef.current = [];
+    oneEuroRef.current.reset();
+  }, [targetLetter]);
 
   // Pentatonic Resonator (Audio Synthesis)
   const playTone = useCallback((normY: number) => {
@@ -185,16 +194,16 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   // Initialize Cosmic Ambient Motes
   useEffect(() => {
     const motes: CosmicMote[] = [];
-    const count = 28;
+    const count = 24;
     for (let i = 0; i < count; i++) {
       motes.push({
         x: Math.random() * width,
         y: Math.random() * height,
         vx: (Math.random() - 0.5) * 0.4,
         vy: (Math.random() - 0.5) * 0.4,
-        size: Math.random() * 2.5 + 1.2,
+        size: Math.random() * 2.2 + 1.2,
         alpha: Math.random() * 0.45 + 0.2,
-        baseHue: worldAccent === 'realm' ? 172 : worldAccent === 'forest' ? 142 : 38,
+        baseHue: worldAccent === 'realm' ? 172 : 38,
       });
     }
     cosmicMotesRef.current = motes;
@@ -256,7 +265,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       ctx.fillStyle = `rgba(252, 250, 246, ${0.28 + bloom * 0.04})`;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // 2. Cosmic Ambient Motes (Generative Harmonic Flow)
+      // 2. Cosmic Ambient Motes
       const motes = cosmicMotesRef.current;
       for (const m of motes) {
         m.x += m.vx + Math.sin(animTime + m.y * 0.01) * 0.2;
@@ -266,7 +275,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         if (m.y < 0) m.y = canvas.height;
         if (m.y > canvas.height) m.y = 0;
 
-        ctx.fillStyle = `hsla(${m.baseHue}, 80%, 65%, ${m.alpha * 0.4})`;
+        ctx.fillStyle = `hsla(${m.baseHue}, 80%, 65%, ${m.alpha * 0.35})`;
         ctx.beginPath();
         ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
         ctx.fill();
@@ -275,7 +284,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       // 3. Target Letter Silhouette
       if (targetLetter) {
         ctx.save();
-        ctx.font = 'bold 230px "Baloo 2", "Lexend", sans-serif';
+        ctx.font = 'bold 210px "Baloo 2", "Lexend", sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = 'rgba(201, 100, 66, 0.12)';
@@ -287,9 +296,11 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         ctx.restore();
       }
 
-      // 4. Multi-Segment Neon Spline Strokes
+      // 4. Multi-Segment Neon Spline Strokes (with Opacity Fading)
       const pts = strokeHistoryRef.current;
-      if (pts.length > 1) {
+      const opacity = strokeOpacityRef.current;
+
+      if (pts.length > 1 && opacity > 0.01) {
         const segments: HarmonicPoint[][] = [];
         let cur: HarmonicPoint[] = [];
 
@@ -306,8 +317,8 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
           if (seg.length < 2) return;
 
           const hue = worldAccent === 'realm' ? 172 : 28;
-          const outerColor = `hsla(${hue}, 85%, 60%, 0.4)`;
-          const coreColor = `hsl(${hue}, 95%, 62%)`;
+          const outerColor = `hsla(${hue}, 85%, 60%, ${0.4 * opacity})`;
+          const coreColor = `hsla(${hue}, 95%, 62%, ${opacity})`;
 
           // Outer Glow
           ctx.save();
@@ -332,8 +343,8 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
           ctx.shadowBlur = 4;
           ctx.stroke();
 
-          // White Hot Centerline
-          ctx.strokeStyle = '#FFFFFF';
+          // White Centerline
+          ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
           ctx.lineWidth = 2;
           ctx.shadowBlur = 0;
           ctx.stroke();
@@ -498,6 +509,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       setCameraActive(false);
       setHandDetected(false);
       setIsPinching(false);
+      setIsStartingCamera(false);
       handPosRef.current.present = false;
       handPosRef.current.pinching = false;
     }
@@ -512,7 +524,9 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
 
   const startCameraAirTracking = async () => {
     setCameraError(null);
+    setIsStartingCamera(true);
     oneEuroRef.current.reset();
+
     try {
       const stream = await cameraService.acquireStream({ width: 480, height: 360, facingMode: 'user' });
       streamRef.current = stream;
@@ -521,12 +535,12 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         await cameraService.attachToVideo(videoRef.current, stream);
         setCameraActive(true);
         setInputMode('camera');
-        setCalibrating(true);
-        setTimeout(() => setCalibrating(false), 1200);
+        setIsStartingCamera(false);
         void initHandTracking();
       }
     } catch (err: any) {
       console.warn('[HarmonicFlowCanvas] Camera start error:', err);
+      setIsStartingCamera(false);
       setCameraError('Camera access needed for Magic Air Wand. You can also draw with Touch!');
     }
   };
@@ -673,6 +687,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
 
   const handleClear = () => {
     strokeHistoryRef.current = [];
+    strokeOpacityRef.current = 1.0;
     particlesRef.current = [];
     oneEuroRef.current.reset();
     onStrokeUpdate?.([]);
@@ -680,8 +695,17 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
 
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
+      {/* Hidden Master Video Element (Always Mounted for Camera Hardware) */}
+      <video
+        ref={videoRef}
+        playsInline
+        muted
+        autoPlay
+        className="hidden"
+      />
+
       {/* Mode Selector & Controls Bar */}
-      <div className="flex items-center justify-between gap-3 w-full max-w-[440px] pb-3">
+      <div className="flex items-center justify-between gap-3 w-full max-w-[380px] pb-2">
         <div className="flex items-center gap-1.5 p-1 bg-sand/60 border border-hairline rounded-2xl shadow-soft-xs">
           <button
             type="button"
@@ -689,30 +713,31 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
               stopCamera();
               setInputMode('touch');
             }}
-            className={`min-h-[42px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
+            className={`min-h-[40px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
               inputMode === 'touch'
                 ? 'bg-ink text-white shadow-soft-sm'
                 : 'text-muted hover:text-ink'
             }`}
           >
-            <Hand className="w-4 h-4" />
+            <Hand className="w-3.5 h-3.5" />
             <span>Touch</span>
           </button>
 
           {enableCameraAirControl && (
             <button
               type="button"
+              disabled={isStartingCamera}
               onClick={() => {
                 if (inputMode !== 'camera') void startCameraAirTracking();
               }}
-              className={`min-h-[42px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
+              className={`min-h-[40px] px-3.5 rounded-xl font-display font-bold text-xs flex items-center gap-1.5 transition-all ${
                 inputMode === 'camera'
                   ? 'bg-amber text-ink shadow-soft-sm'
                   : 'text-muted hover:text-ink'
               }`}
             >
-              <Wand2 className="w-4 h-4" />
-              <span>Magic Air Wand</span>
+              <Wand2 className={`w-3.5 h-3.5 ${isStartingCamera ? 'animate-spin' : ''}`} />
+              <span>{isStartingCamera ? 'Starting...' : 'Magic Air Wand'}</span>
             </button>
           )}
         </div>
@@ -721,15 +746,15 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
           type="button"
           onClick={handleClear}
           title="Clear canvas"
-          className="p-2.5 text-muted hover:text-ink rounded-xl hover:bg-sand/60 border border-transparent hover:border-hairline transition-all"
+          className="p-2 text-muted hover:text-ink rounded-xl hover:bg-sand/60 border border-transparent hover:border-hairline transition-all"
         >
-          <RefreshCw className="w-4 h-4" />
+          <RefreshCw className="w-3.5 h-3.5" />
         </button>
       </div>
 
       {/* Main Drawing Canvas Arena */}
       <div
-        className="relative rounded-3xl overflow-hidden border-4 border-realm/30 bg-[#FCFAF6] shadow-soft-lg"
+        className="relative rounded-3xl overflow-hidden border-2 border-realm/30 bg-[#FCFAF6] shadow-soft-md"
         style={{ width, height }}
       >
         <canvas
@@ -744,23 +769,16 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
 
         {/* Live PiP Hardware Camera Preview (Top Right) */}
         {inputMode === 'camera' && cameraActive && (
-          <div className="absolute top-3 right-3 w-28 h-20 rounded-2xl overflow-hidden border-2 border-white/90 shadow-soft-md bg-black/60 z-20">
-            <video
-              ref={videoRef}
-              playsInline
-              muted
-              autoPlay
-              className="w-full h-full object-cover -scale-x-100"
-            />
+          <div className="absolute top-2.5 right-2.5 w-24 h-18 rounded-xl overflow-hidden border-2 border-white/90 shadow-soft-md bg-black/60 z-20">
             <canvas
               ref={pipCanvasRef}
-              width={112}
-              height={80}
+              width={96}
+              height={72}
               className="absolute inset-0 w-full h-full pointer-events-none -scale-x-100"
             />
 
             {/* Hand Status Pill in PiP */}
-            <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full bg-black/75 backdrop-blur-xs flex items-center gap-1 text-[9px] font-display font-bold text-white whitespace-nowrap">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-black/75 backdrop-blur-xs flex items-center gap-1 text-[8px] font-display font-bold text-white whitespace-nowrap">
               <span className={`w-1.5 h-1.5 rounded-full ${handDetected ? (isPinching ? 'bg-amber animate-ping' : 'bg-emerald-400') : 'bg-amber-400 animate-pulse'}`} />
               <span>{handDetected ? (isPinching ? '✍️ Drawing' : '🪄 Hovering') : 'Show hand'}</span>
             </div>
@@ -768,21 +786,21 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         )}
 
         {/* Dynamic Instructional Banner at Canvas Bottom */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none z-10">
-          <div className="px-4 py-2 rounded-full bg-white/90 backdrop-blur-md border border-hairline shadow-soft-xs flex items-center gap-2 text-xs font-display font-bold text-ink">
+        <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 pointer-events-none z-10">
+          <div className="px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-hairline shadow-soft-xs flex items-center gap-1.5 text-[11px] font-display font-bold text-ink">
             {inputMode === 'touch' ? (
               <>
-                <Sparkles className="w-3.5 h-3.5 text-realm fill-realm" />
+                <Sparkles className="w-3 h-3 text-realm fill-realm" />
                 <span>Touch and trace with your finger</span>
               </>
             ) : isPinching ? (
               <>
-                <Flame className="w-3.5 h-3.5 text-amber fill-amber animate-bounce-gentle" />
+                <Flame className="w-3 h-3 text-amber fill-amber animate-bounce-gentle" />
                 <span className="text-amber-800">✨ Drawing magic ink!</span>
               </>
             ) : (
               <>
-                <Wand2 className="w-3.5 h-3.5 text-realm" />
+                <Wand2 className="w-3 h-3 text-realm" />
                 <span>Pinch thumb & index to draw &middot; Release to hover</span>
               </>
             )}
@@ -791,7 +809,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       </div>
 
       {cameraError && (
-        <p className="text-xs font-body text-terracotta mt-2 text-center max-w-sm">
+        <p className="text-xs font-body text-terracotta mt-1.5 text-center max-w-sm">
           {cameraError}
         </p>
       )}
