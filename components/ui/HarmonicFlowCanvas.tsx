@@ -49,16 +49,18 @@ interface HarmonicFlowCanvasProps {
   className?: string;
 }
 
-// 1-Euro Adaptive Low-Pass Filter
+// 1-Euro Adaptive Low-Pass Filter for Jitter-Free Air Writing
 class OneEuroFilter {
   private minCutoff: number;
   private beta: number;
   private dCutoff: number;
   private xPrev: number | null = null;
   private dxPrev: number | null = null;
+  private yPrev: number | null = null;
+  private dyPrev: number | null = null;
   private tPrev: number | null = null;
 
-  constructor(minCutoff = 1.0, beta = 0.007, dCutoff = 1.0) {
+  constructor(minCutoff = 0.8, beta = 0.015, dCutoff = 1.0) {
     this.minCutoff = minCutoff;
     this.beta = beta;
     this.dCutoff = dCutoff;
@@ -74,38 +76,56 @@ class OneEuroFilter {
   }
 
   filter(x: number, y: number, t: number): { x: number; y: number } {
-    if (this.xPrev === null || this.tPrev === null) {
+    if (this.xPrev === null || this.yPrev === null || this.tPrev === null) {
       this.xPrev = x;
       this.dxPrev = 0;
+      this.yPrev = y;
+      this.dyPrev = 0;
       this.tPrev = t;
       return { x, y };
     }
     const tDiff = Math.max((t - this.tPrev) / 1000.0, 0.001);
+
+    // X axis filtering
     const dx = (x - this.xPrev) / tDiff;
-    const aD = this.smoothingFactor(tDiff, this.dCutoff);
-    const dxHat = this.exponentialSmoothing(aD, dx, this.dxPrev ?? 0);
-    const cutoff = this.minCutoff + this.beta * Math.abs(dxHat);
-    const a = this.smoothingFactor(tDiff, cutoff);
-    const xHat = this.exponentialSmoothing(a, x, this.xPrev);
+    const aDx = this.smoothingFactor(tDiff, this.dCutoff);
+    const dxHat = this.exponentialSmoothing(aDx, dx, this.dxPrev ?? 0);
+    const cutoffX = this.minCutoff + this.beta * Math.abs(dxHat);
+    const ax = this.smoothingFactor(tDiff, cutoffX);
+    const xHat = this.exponentialSmoothing(ax, x, this.xPrev);
+
+    // Y axis filtering
+    const dy = (y - this.yPrev) / tDiff;
+    const aDy = this.smoothingFactor(tDiff, this.dCutoff);
+    const dyHat = this.exponentialSmoothing(aDy, dy, this.dyPrev ?? 0);
+    const cutoffY = this.minCutoff + this.beta * Math.abs(dyHat);
+    const ay = this.smoothingFactor(tDiff, cutoffY);
+    const yHat = this.exponentialSmoothing(ay, y, this.yPrev);
 
     this.xPrev = xHat;
     this.dxPrev = dxHat;
+    this.yPrev = yHat;
+    this.dyPrev = dyHat;
     this.tPrev = t;
-    return { x: xHat, y };
+    return { x: xHat, y: yHat };
   }
 
   reset() {
     this.xPrev = null;
     this.dxPrev = null;
+    this.yPrev = null;
+    this.dyPrev = null;
     this.tPrev = null;
   }
 }
 
-// Map camera frame to canvas coordinate
+// Smooth Sigmoid Coordinate Mapping with Outer Deadzone
 function softMap(v: number, lo: number, hi: number, max: number): number {
   const norm = (v - lo) / (hi - lo);
   const clamped = Math.max(0, Math.min(1, norm));
-  return clamped * max;
+  // Smooth cubic ease for natural arm ergonomics
+  const eased = clamped < 0.5 ? 2 * clamped * clamped : 1 - Math.pow(-2 * clamped + 2, 2) / 2;
+  return eased * max;
 }
 
 export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
@@ -143,7 +163,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
   const handPosRef = useRef({ x: 190, y: 190, present: false, pinching: false });
   const particlesRef = useRef<Particle[]>([]);
   const cosmicMotesRef = useRef<CosmicMote[]>([]);
-  const oneEuroRef = useRef(new OneEuroFilter(1.2, 0.009, 1.0));
+  const oneEuroRef = useRef(new OneEuroFilter(0.8, 0.015, 1.0));
   const rafRef = useRef<number | null>(null);
   const bloomRef = useRef(0);
 
@@ -317,10 +337,10 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
           if (seg.length < 2) return;
 
           const hue = worldAccent === 'realm' ? 172 : 28;
-          const outerColor = `hsla(${hue}, 85%, 60%, ${0.4 * opacity})`;
+          const outerColor = `hsla(${hue}, 85%, 60%, ${0.45 * opacity})`;
           const coreColor = `hsla(${hue}, 95%, 62%, ${opacity})`;
 
-          // Outer Glow
+          // Outer Neon Glow
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(seg[0].x, seg[0].y);
@@ -530,14 +550,17 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     try {
       const stream = await cameraService.acquireStream({ width: 480, height: 360, facingMode: 'user' });
       streamRef.current = stream;
+      setCameraActive(true);
+      setInputMode('camera');
 
-      if (videoRef.current) {
-        await cameraService.attachToVideo(videoRef.current, stream);
-        setCameraActive(true);
-        setInputMode('camera');
-        setIsStartingCamera(false);
-        void initHandTracking();
-      }
+      // Allow DOM to render video element then attach
+      setTimeout(async () => {
+        if (videoRef.current) {
+          await cameraService.attachToVideo(videoRef.current, stream);
+          setIsStartingCamera(false);
+          void initHandTracking();
+        }
+      }, 100);
     } catch (err: any) {
       console.warn('[HarmonicFlowCanvas] Camera start error:', err);
       setIsStartingCamera(false);
@@ -545,7 +568,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
     }
   };
 
-  // MediaPipe Hand Landmark & Pinch Tracking
+  // MediaPipe Hand Landmark & Pinch Tracking with Hysteresis & Sub-Pixel Smoothing
   const initHandTracking = async () => {
     if (typeof window === 'undefined') return;
     try {
@@ -559,10 +582,14 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
       hands.setOptions({
         maxNumHands: 1,
         modelComplexity: 0, // Lite 60fps model
-        minDetectionConfidence: 0.5,
-        minTrackingConfidence: 0.5,
+        minDetectionConfidence: 0.55,
+        minTrackingConfidence: 0.55,
       });
       handsRef.current = hands;
+
+      // Hysteresis thresholds for jitter-free pinch stability
+      const PINCH_ENGAGE = 0.32;
+      const PINCH_RELEASE = 0.44;
 
       hands.onResults((results) => {
         const pipCanvas = pipCanvasRef.current;
@@ -590,8 +617,8 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
             const thumb = lm[4];
             pipCtx.fillStyle = '#E8A33D';
             pipCtx.beginPath();
-            pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 5.5, 0, Math.PI * 2);
-            pipCtx.arc(thumb.x * pipCanvas.width, thumb.y * pipCanvas.height, 4.5, 0, Math.PI * 2);
+            pipCtx.arc(tip.x * pipCanvas.width, tip.y * pipCanvas.height, 5, 0, Math.PI * 2);
+            pipCtx.arc(thumb.x * pipCanvas.width, thumb.y * pipCanvas.height, 4, 0, Math.PI * 2);
             pipCtx.fill();
           }
         }
@@ -614,7 +641,7 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        // Pinch Detection: Euclidean distance normalized by palm scale
+        // 3D Euclidean distance between thumb and index
         const dx = thumbTip.x - indexTip.x;
         const dy = thumbTip.y - indexTip.y;
         const dz = (thumbTip.z || 0) - (indexTip.z || 0);
@@ -622,16 +649,19 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         const handScale = Math.hypot(wrist.x - middleMcp.x, wrist.y - middleMcp.y);
         const pinchRatio = pinchDist / Math.max(handScale, 0.08);
 
-        // Active pinch threshold
-        const pinching = pinchRatio < 0.38;
+        // Hysteresis state machine (eliminates stutter & disjointed lines)
+        const pinching = wasPinchingRef.current
+          ? pinchRatio < PINCH_RELEASE
+          : pinchRatio < PINCH_ENGAGE;
+
         setIsPinching(pinching);
         handPosRef.current.pinching = pinching;
 
-        // Mirrored coordinate mapping
+        // Mirrored coordinate mapping with deadzone
         const rawX = 1 - indexTip.x;
         const rawY = indexTip.y;
-        const tx = softMap(rawX, 0.15, 0.85, canvas.width);
-        const ty = softMap(rawY, 0.15, 0.85, canvas.height);
+        const tx = softMap(rawX, 0.18, 0.82, canvas.width);
+        const ty = softMap(rawY, 0.18, 0.82, canvas.height);
 
         const filtered = oneEuroRef.current.filter(tx, ty, performance.now());
         handPosRef.current.x = filtered.x;
@@ -642,21 +672,26 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
         if (pinching) {
           // PEN IS DOWN — DRAWING INK
           const isNewStroke = !wasPinchingRef.current;
-          strokeHistoryRef.current.push({
-            x: filtered.x,
-            y: filtered.y,
-            t,
-            pressure: 0.85,
-            isAirDrawing: true,
-            isNewStroke,
-          });
-          spawnBurst(filtered.x, filtered.y, 172, 3);
-          if (Math.random() < 0.22) playTone(filtered.y / canvas.height);
-          onStrokeUpdate?.(strokeHistoryRef.current);
+          const lastPoint = strokeHistoryRef.current[strokeHistoryRef.current.length - 1];
+
+          // Sub-pixel threshold: only push if moved >= 2.5px or new stroke
+          if (isNewStroke || !lastPoint || Math.hypot(filtered.x - lastPoint.x, filtered.y - lastPoint.y) >= 2.5) {
+            strokeHistoryRef.current.push({
+              x: filtered.x,
+              y: filtered.y,
+              t,
+              pressure: 0.85,
+              isAirDrawing: true,
+              isNewStroke,
+            });
+            spawnBurst(filtered.x, filtered.y, 172, 2);
+            if (Math.random() < 0.2) playTone(filtered.y / canvas.height);
+            onStrokeUpdate?.(strokeHistoryRef.current);
+          }
         } else {
           // PEN IS UP — HOVERING ONLY (Zero ink drawn!)
           if (wasPinchingRef.current && strokeHistoryRef.current.length > 5) {
-            spawnBurst(filtered.x, filtered.y, 38, 6);
+            spawnBurst(filtered.x, filtered.y, 38, 5);
           }
         }
         wasPinchingRef.current = pinching;
@@ -695,15 +730,6 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
 
   return (
     <div className={`relative flex flex-col items-center select-none ${className}`}>
-      {/* Hidden Master Video Element (Always Mounted for Camera Hardware) */}
-      <video
-        ref={videoRef}
-        playsInline
-        muted
-        autoPlay
-        className="hidden"
-      />
-
       {/* Mode Selector & Controls Bar */}
       <div className="flex items-center justify-between gap-3 w-full max-w-[380px] pb-2">
         <div className="flex items-center gap-1.5 p-1 bg-sand/60 border border-hairline rounded-2xl shadow-soft-xs">
@@ -767,18 +793,25 @@ export const HarmonicFlowCanvas: React.FC<HarmonicFlowCanvasProps> = ({
           className="block w-full h-full cursor-crosshair touch-none"
         />
 
-        {/* Live PiP Hardware Camera Preview (Top Right) */}
+        {/* Live PiP Webcam Feed of Child's Face & Hand (Top Right) */}
         {inputMode === 'camera' && cameraActive && (
-          <div className="absolute top-2.5 right-2.5 w-24 h-18 rounded-xl overflow-hidden border-2 border-white/90 shadow-soft-md bg-black/60 z-20">
+          <div className="absolute top-2.5 right-2.5 w-28 h-20 rounded-2xl overflow-hidden border-2 border-white/95 shadow-soft-md bg-black/80 z-20">
+            <video
+              ref={videoRef}
+              playsInline
+              muted
+              autoPlay
+              className="w-full h-full object-cover -scale-x-100 block"
+            />
             <canvas
               ref={pipCanvasRef}
-              width={96}
-              height={72}
+              width={112}
+              height={80}
               className="absolute inset-0 w-full h-full pointer-events-none -scale-x-100"
             />
 
             {/* Hand Status Pill in PiP */}
-            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-black/75 backdrop-blur-xs flex items-center gap-1 text-[8px] font-display font-bold text-white whitespace-nowrap">
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full bg-black/80 backdrop-blur-xs flex items-center gap-1 text-[8px] font-display font-bold text-white whitespace-nowrap shadow-xs">
               <span className={`w-1.5 h-1.5 rounded-full ${handDetected ? (isPinching ? 'bg-amber animate-ping' : 'bg-emerald-400') : 'bg-amber-400 animate-pulse'}`} />
               <span>{handDetected ? (isPinching ? '✍️ Drawing' : '🪄 Hovering') : 'Show hand'}</span>
             </div>
