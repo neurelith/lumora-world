@@ -8,7 +8,7 @@ import { LanternMascot } from '@/components/ui/LanternMascot';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { HarmonicFlowCanvas, HarmonicPoint } from '@/components/ui/HarmonicFlowCanvas';
 import { PenTool, Check, Sparkles, RotateCcw } from 'lucide-react';
-import { RUNE_LETTERS_EN, RUNE_LETTERS_HI } from '@/lib/speech';
+import { generateRuneChallenges } from '@/lib/challenge-generator';
 import { RuneTrial, RuneRealmResult, Language } from '@/lib/types';
 import { analyzeStroke } from '@/lib/tracing';
 import { classifyRuneRealm } from '@/lib/scoring';
@@ -22,7 +22,7 @@ interface RuneRealmProps {
 
 export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplete }) => {
   const { t } = useTranslation();
-  const lettersList = language === 'hi' ? RUNE_LETTERS_HI : RUNE_LETTERS_EN;
+  const [lettersList] = useState<string[]>(() => generateRuneChallenges(language, grade, 6));
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [completedTrials, setCompletedTrials] = useState<RuneTrial[]>([]);
@@ -31,7 +31,7 @@ export const RuneRealm: React.FC<RuneRealmProps> = ({ grade, language, onComplet
   const [showAnalysis, setShowAnalysis] = useState(false);
   const [lastTrial, setLastTrial] = useState<RuneTrial | null>(null);
 
-  const currentLetter = lettersList[currentIdx] || lettersList[0];
+  const currentLetter = lettersList[currentIdx] || lettersList[0] || 'b';
   const progress = ((currentIdx + 1) / lettersList.length) * 100;
 
   useEffect(() => {

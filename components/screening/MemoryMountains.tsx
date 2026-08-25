@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { Grid, Brain, Play, Square, CheckCircle2 } from 'lucide-react';
+import { generateMemoryMountainsGrid, RANItem } from '@/lib/challenge-generator';
+import { UniversalAirWand } from '@/components/ui/UniversalAirWand';
 import { MemoryMountainsResult, Language } from '@/lib/types';
 import { classifyMemoryMountains } from '@/lib/scoring';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -16,40 +18,35 @@ interface MemoryMountainsProps {
   onComplete: (result: MemoryMountainsResult) => void;
 }
 
-interface GridItem {
-  id: number;
-  shape: 'circle' | 'square' | 'triangle' | 'star' | 'diamond';
-  color: 'red' | 'blue' | 'green' | 'yellow' | 'purple';
-  isFlaggedError?: boolean;
-}
-
-function ShapeIcon({ shape, color }: { shape: GridItem['shape']; color: GridItem['color'] }) {
-  const bg: Record<GridItem['color'], string> = {
-    red: 'bg-terracotta',
-    blue: 'bg-castle',
-    green: 'bg-forest',
-    yellow: 'bg-amber',
-    purple: 'bg-purple-600',
+function ShapeIcon({ shape, color }: { shape: RANItem['shape']; color: RANItem['color'] }) {
+  const bg: Record<RANItem['color'], string> = {
+    amber: 'bg-amber',
+    sage: 'bg-forest',
+    terracotta: 'bg-terracotta',
+    indigo: 'bg-castle',
+    rose: 'bg-pink-500',
+    ink: 'bg-ink',
   };
-  const fill: Record<GridItem['color'], string> = {
-    red: 'text-terracotta fill-terracotta',
-    blue: 'text-castle fill-castle',
-    green: 'text-forest fill-forest',
-    yellow: 'text-amber fill-amber',
-    purple: 'text-purple-600 fill-purple-600',
+  const fill: Record<RANItem['color'], string> = {
+    amber: 'text-amber fill-amber',
+    sage: 'text-forest fill-forest',
+    terracotta: 'text-terracotta fill-terracotta',
+    indigo: 'text-castle fill-castle',
+    rose: 'text-pink-500 fill-pink-500',
+    ink: 'text-ink fill-ink',
   };
-  if (shape === 'circle') return <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full ${bg[color]}`} />;
-  if (shape === 'square') return <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg ${bg[color]}`} />;
-  if (shape === 'triangle') return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color]}`} viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22" /></svg>;
-  if (shape === 'star') return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color]}`} viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /></svg>;
-  return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color]}`} viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" /></svg>;
+  if (shape === 'circle') return <div className={`w-7 h-7 md:w-8 md:h-8 rounded-full ${bg[color] || 'bg-amber'}`} />;
+  if (shape === 'square') return <div className={`w-7 h-7 md:w-8 md:h-8 rounded-lg ${bg[color] || 'bg-forest'}`} />;
+  if (shape === 'triangle') return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color] || 'text-terracotta'}`} viewBox="0 0 24 24"><polygon points="12,2 22,22 2,22" /></svg>;
+  if (shape === 'star') return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color] || 'text-amber'}`} viewBox="0 0 24 24"><polygon points="12,2 15,9 22,9 17,14 19,21 12,17 5,21 7,14 2,9 9,9" /></svg>;
+  return <svg className={`w-7 h-7 md:w-8 md:h-8 ${fill[color] || 'text-castle'}`} viewBox="0 0 24 24"><polygon points="12,2 22,12 12,22 2,12" /></svg>;
 }
 
 export const MemoryMountains: React.FC<MemoryMountainsProps> = ({ grade, language, onComplete }) => {
   const { t } = useTranslation();
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedSec, setElapsedSec] = useState(0);
-  const [gridItems, setGridItems] = useState<GridItem[]>([]);
+  const [gridItems, setGridItems] = useState<RANItem[]>(() => generateMemoryMountainsGrid(25));
   const [hasStarted, setHasStarted] = useState(false);
   const [hasFinished, setHasFinished] = useState(false);
   const [itemsNamed, setItemsNamed] = useState(0);
@@ -58,12 +55,7 @@ export const MemoryMountains: React.FC<MemoryMountainsProps> = ({ grade, languag
   const startRef = useRef<number>(0);
 
   useEffect(() => {
-    const shapes: GridItem['shape'][] = ['circle', 'square', 'triangle', 'star', 'diamond'];
-    const colors: GridItem['color'][] = ['red', 'blue', 'green', 'yellow', 'purple'];
-    const items: GridItem[] = [];
-    let c = 0;
-    for (let r = 0; r < 5; r++) for (let col = 0; col < 5; col++) items.push({ id: c++, shape: shapes[(r + col) % 5], color: colors[(r * 2 + col) % 5], isFlaggedError: false });
-    setGridItems(items);
+    setGridItems(generateMemoryMountainsGrid(25));
   }, []);
 
   const handleStart = () => {
@@ -179,6 +171,9 @@ export const MemoryMountains: React.FC<MemoryMountainsProps> = ({ grade, languag
           )}
         </div>
       </div>
+
+      {/* Universal Camera Air Gesture Wand */}
+      <UniversalAirWand accentColor="#C96442" />
     </div>
   );
 };

@@ -10,6 +10,7 @@ import { VisualSchedule } from '@/components/ui/VisualSchedule';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { PrintableReportCard } from '@/components/ui/PrintableReportCard';
 import { HarmonicFlowCanvas } from '@/components/ui/HarmonicFlowCanvas';
+import { UniversalAirWand } from '@/components/ui/UniversalAirWand';
 import {
   ArrowLeft,
   Sparkles,
@@ -511,6 +512,9 @@ export default function HavenPage() {
       <footer className="max-w-4xl mx-auto w-full pt-4 text-center text-xs text-muted font-body">
         My Haven &middot; 5-World Adaptive Daily Companion &middot; 100% In-Memory Privacy
       </footer>
+
+      {/* Universal Camera Air Gesture Wand for Daily Quests */}
+      <UniversalAirWand accentColor="#E8A33D" />
     </div>
   );
 }

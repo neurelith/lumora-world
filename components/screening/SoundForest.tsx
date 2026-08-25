@@ -7,8 +7,9 @@ import { Card } from '@/components/ui/Card';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { Volume2, Sparkles, ArrowRight, Play, RotateCcw } from 'lucide-react';
-import { SOUND_FOREST_TRIALS_EN, SOUND_FOREST_TRIALS_HI } from '@/lib/speech';
+import { generateSoundForestChallenges } from '@/lib/challenge-generator';
 import { playPhonemeSequence } from '@/lib/speech-real';
+import { UniversalAirWand } from '@/components/ui/UniversalAirWand';
 import { SoundForestTrial, SoundForestResult, Language } from '@/lib/types';
 import { classifySoundForest } from '@/lib/scoring';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,7 +26,7 @@ export const SoundForest: React.FC<SoundForestProps> = ({
   onComplete,
 }) => {
   const { t } = useTranslation();
-  const trialsList = language === 'hi' ? SOUND_FOREST_TRIALS_HI : SOUND_FOREST_TRIALS_EN;
+  const [trialsList] = useState<SoundForestTrial[]>(() => generateSoundForestChallenges(language, 6));
 
   const [currentTrialIdx, setCurrentTrialIdx] = useState(0);
   const [activePhonemeIdx, setActivePhonemeIdx] = useState<number | null>(null);
@@ -363,6 +364,9 @@ export const SoundForest: React.FC<SoundForestProps> = ({
           </Card>
         </div>
       </div>
+
+      {/* Universal Camera Air Gesture Wand */}
+      <UniversalAirWand accentColor="#4A7C5E" />
     </div>
   );
 };

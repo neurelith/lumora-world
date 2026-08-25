@@ -7,7 +7,8 @@ import { Card } from '@/components/ui/Card';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { BookOpen, ThumbsUp, ThumbsDown, Mic, MicOff, Volume2 } from 'lucide-react';
-import { STORY_CASTLE_NONWORDS_EN, STORY_CASTLE_NONWORDS_HI } from '@/lib/speech';
+import { generateStoryCastleChallenges } from '@/lib/challenge-generator';
+import { UniversalAirWand } from '@/components/ui/UniversalAirWand';
 import { StoryCastleResult, Language } from '@/lib/types';
 import { classifyStoryCastle } from '@/lib/scoring';
 import { useSpeechRecognition } from '@/lib/speech-real';
@@ -24,7 +25,7 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
   onComplete,
 }) => {
   const { t } = useTranslation();
-  const wordsList = language === 'hi' ? STORY_CASTLE_NONWORDS_HI : STORY_CASTLE_NONWORDS_EN;
+  const [wordsList] = useState<string[]>(() => generateStoryCastleChallenges(language, 6));
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [trialStartTime, setTrialStartTime] = useState(performance.now());
@@ -208,6 +209,9 @@ export const StoryCastle: React.FC<StoryCastleProps> = ({
           </div>
         </div>
       </Card>
+
+      {/* Universal Camera Air Gesture Wand */}
+      <UniversalAirWand accentColor="#5E527F" />
     </div>
   );
 };
