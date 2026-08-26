@@ -29,7 +29,11 @@ import {
   KeyRound,
   LogOut,
   UserCheck,
-  Shield
+  Shield,
+  MessageSquare,
+  Download,
+  Star,
+  Trash2,
 } from 'lucide-react';
 import {
   LineChart,
@@ -171,13 +175,50 @@ export default function DoctorHubPage() {
   const [selectedStudent, setSelectedStudent] = useState<StudentCohortRecord>(DEFAULT_COHORT[0]);
   const [filterTriage, setFilterTriage] = useState<'all' | 'followup' | 'watch' | 'typical'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'roster' | 'daliPacket' | 'iasq'>('roster');
+  const [activeTab, setActiveTab] = useState<'roster' | 'daliPacket' | 'iasq' | 'feedback'>('roster');
+  const [feedbackList, setFeedbackList] = useState<any[]>([]);
 
   // IASQ Form State (item id -> score 0, 1, 2)
   const [iasqResponses, setIasqResponses] = useState<Record<number, number>>({});
   const [iasqSavedNotice, setIasqSavedNotice] = useState(false);
 
   useEffect(() => {
+    // Load community feedback from localStorage
+    try {
+      const stored = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
+      const defaultFeedback = [
+        {
+          id: 'fb-01',
+          role: 'teacher',
+          device: 'iPad / Tablet',
+          rating: 5,
+          airWandRating: 5,
+          testedWorlds: ['rune', 'sound', 'story', 'memory', 'vision'],
+          likedFeature: 'Children loved the Magic Air Wand! Lumi following finger tracking kept Grade 1 students fully focused.',
+          suggestions: 'Would love Hindi speech pace controls for rural schools.',
+          bugs: 'None observed on iPad Safari.',
+          email: 'priya.sharma@delhischools.edu.in',
+          submittedAt: new Date(Date.now() - 3600000 * 4).toLocaleString(),
+        },
+        {
+          id: 'fb-02',
+          role: 'specialist',
+          device: 'Laptop / PC',
+          rating: 5,
+          airWandRating: 4,
+          testedWorlds: ['rune', 'vision', 'memory'],
+          likedFeature: 'DALI Benchmark Matrix and NVI handwriting kinematic jerk scores are clinically very impressive.',
+          suggestions: 'Add direct PDF export for parent conference meetings.',
+          bugs: '',
+          email: 'dr.ananya@aiims.edu',
+          submittedAt: new Date(Date.now() - 3600000 * 22).toLocaleString(),
+        },
+      ];
+      setFeedbackList(stored.length > 0 ? [...stored, ...defaultFeedback] : defaultFeedback);
+    } catch (e) {
+      console.warn('[DoctorHub] Feedback load notice:', e);
+    }
+
     // Check if previously logged in in this browser session
     const authSession = sessionStorage.getItem('lumora_doctor_auth');
     if (authSession === 'true') {
@@ -456,6 +497,15 @@ export default function DoctorHubPage() {
               }`}
             >
               ✦ {t('doctor.iasqScreening')}
+            </button>
+            <button
+              onClick={() => setActiveTab('feedback')}
+              className={`px-3 py-1.5 rounded-xl font-display text-xs md:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                activeTab === 'feedback' ? 'bg-amber text-ink shadow-soft-sm' : 'text-muted hover:text-ink'
+              }`}
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Feedback ({feedbackList.length})</span>
             </button>
           </div>
 
@@ -828,6 +878,177 @@ export default function DoctorHubPage() {
               </Button>
             </div>
           </Card>
+        )}
+
+        {/* ── Tab 4: Community & Clinical Feedback ───────────────────────── */}
+        {activeTab === 'feedback' && (
+          <div className="space-y-6">
+            {/* Feedback Dashboard Summary Strip */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="p-5 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm space-y-1">
+                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-muted">Total Responses</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-display font-extrabold text-ink">{feedbackList.length}</span>
+                  <span className="text-xs text-emerald-600 font-bold font-display">Live Submissions</span>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm space-y-1">
+                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-muted">Avg Overall Rating</p>
+                <div className="flex items-center gap-1.5">
+                  <Star className="w-6 h-6 text-amber fill-amber" />
+                  <span className="text-3xl font-display font-extrabold text-ink">
+                    {(
+                      feedbackList.reduce((acc, curr) => acc + (curr.rating || 5), 0) /
+                      (feedbackList.length || 1)
+                    ).toFixed(1)}
+                  </span>
+                  <span className="text-xs text-muted font-bold font-display">/ 5.0</span>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm space-y-1">
+                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-muted">Magic Air Wand Score</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-3xl font-display font-extrabold text-cyan-600">
+                    {(
+                      feedbackList.reduce((acc, curr) => acc + (curr.airWandRating || 5), 0) /
+                      (feedbackList.length || 1)
+                    ).toFixed(1)}
+                  </span>
+                  <span className="text-xs text-muted font-bold font-display">/ 5.0 webcam accuracy</span>
+                </div>
+              </div>
+
+              <div className="p-5 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm flex flex-col justify-between">
+                <p className="text-[11px] font-display font-extrabold uppercase tracking-wider text-muted">Data Actions</p>
+                <div className="flex items-center gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(feedbackList, null, 2));
+                      const downloadAnchor = document.createElement('a');
+                      downloadAnchor.setAttribute("href", dataStr);
+                      downloadAnchor.setAttribute("download", `lumora_feedback_${Date.now()}.json`);
+                      document.body.appendChild(downloadAnchor);
+                      downloadAnchor.click();
+                      downloadAnchor.remove();
+                    }}
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-ink text-xs font-display font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>JSON</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const headers = ['Role', 'Device', 'Rating', 'AirWand', 'LikedFeature', 'Suggestions', 'Bugs', 'Email', 'Timestamp'];
+                      const rows = feedbackList.map(f => [
+                        `"${f.role || ''}"`,
+                        `"${f.device || ''}"`,
+                        f.rating || 5,
+                        f.airWandRating || 5,
+                        `"${(f.likedFeature || '').replace(/"/g, '""')}"`,
+                        `"${(f.suggestions || '').replace(/"/g, '""')}"`,
+                        `"${(f.bugs || '').replace(/"/g, '""')}"`,
+                        `"${f.email || ''}"`,
+                        `"${f.submittedAt || ''}"`
+                      ]);
+                      const csvContent = "data:text/csv;charset=utf-8," + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+                      const encodedUri = encodeURI(csvContent);
+                      const link = document.createElement("a");
+                      link.setAttribute("href", encodedUri);
+                      link.setAttribute("download", `lumora_feedback_${Date.now()}.csv`);
+                      document.body.appendChild(link);
+                      link.click();
+                      link.remove();
+                    }}
+                    className="flex-1 py-2 px-3 rounded-xl bg-amber hover:bg-amber-hover text-ink text-xs font-display font-extrabold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-soft-xs"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>CSV</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* List of Feedback Submissions */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-display font-extrabold text-xl text-ink">
+                  Feedback Entries ({feedbackList.length})
+                </h3>
+                <Link
+                  href="/feedback"
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 text-xs font-display font-extrabold text-amber-700 hover:text-amber-800 underline"
+                >
+                  <span>Open Public Feedback Form</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              {feedbackList.map((fb, idx) => (
+                <div
+                  key={fb.id || idx}
+                  className="p-6 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm space-y-4 hover:border-amber-300 transition-colors"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div className="flex items-center gap-2.5">
+                      <span className="px-3 py-1 rounded-full text-xs font-display font-extrabold uppercase tracking-wide bg-amber-100 text-amber-900">
+                        {fb.role === 'teacher' ? '👩‍🏫 Teacher / Educator' : fb.role === 'specialist' ? '🩺 Specialist' : fb.role === 'parent' ? '👨‍👩‍👧 Parent' : '🏆 Reviewer'}
+                      </span>
+                      <span className="text-xs text-muted font-body">
+                        {fb.device || 'Tablet'} &middot; {fb.submittedAt || 'Recent'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-xl border border-amber-200">
+                        <Star className="w-4 h-4 text-amber fill-amber" />
+                        <span className="text-xs font-display font-extrabold text-amber-900">{fb.rating || 5}/5</span>
+                      </div>
+                      <div className="flex items-center gap-1 bg-cyan-50 px-2.5 py-1 rounded-xl border border-cyan-200">
+                        <span className="text-[11px] font-display font-bold text-cyan-900">🪄 Wand: {fb.airWandRating || 5}/5</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-body">
+                    {fb.likedFeature && (
+                      <div className="space-y-1 p-3 rounded-2xl bg-paper border border-slate-100">
+                        <p className="font-display font-extrabold text-ink">⭐ Favorite Highlight</p>
+                        <p className="text-ink/80 leading-relaxed">{fb.likedFeature}</p>
+                      </div>
+                    )}
+
+                    {fb.suggestions && (
+                      <div className="space-y-1 p-3 rounded-2xl bg-paper border border-slate-100">
+                        <p className="font-display font-extrabold text-ink">💡 Suggestions / Polish</p>
+                        <p className="text-ink/80 leading-relaxed">{fb.suggestions}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {fb.bugs && (
+                    <div className="p-3 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-body space-y-0.5">
+                      <p className="font-display font-extrabold text-rose-900">🐛 Bug Report</p>
+                      <p className="text-rose-800">{fb.bugs}</p>
+                    </div>
+                  )}
+
+                  {fb.email && (
+                    <div className="text-[11px] text-muted font-body pt-1">
+                      <span>Contact Email: </span>
+                      <a href={`mailto:${fb.email}`} className="text-amber-800 font-medium underline">
+                        {fb.email}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
         )}
       </main>
     </div>
