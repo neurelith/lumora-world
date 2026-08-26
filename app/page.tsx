@@ -147,6 +147,9 @@ export default function HomePage() {
             <Link href="#privacy" className="transition-colors hover:text-ink">
               Privacy
             </Link>
+            <Link href="/feedback" className="transition-colors hover:text-amber-700 text-amber-900 font-bold">
+              Feedback
+            </Link>
           </nav>
 
           {/* Desktop Actions */}
@@ -245,6 +248,14 @@ export default function HomePage() {
               >
                 <span>Specialist Hub</span>
                 <ArrowRight className="h-4 w-4 text-ink-tertiary" />
+              </Link>
+              <Link
+                href="/feedback"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-2.5 rounded-2xl hover:bg-amber-50 text-amber-900 flex items-center justify-between font-bold"
+              >
+                <span>Community Feedback</span>
+                <ArrowRight className="h-4 w-4 text-amber-700" />
               </Link>
               <div className="pt-2 border-t border-slate-200">
                 <Link
@@ -658,6 +669,7 @@ export default function HomePage() {
             <Link href="/screening" className="hover:text-ink">Screening</Link>
             <Link href="/haven" className="hover:text-ink">Haven</Link>
             <Link href="/doctor" className="hover:text-ink">Specialist Hub</Link>
+            <Link href="/feedback" className="text-amber-700 hover:text-amber-800 font-extrabold">Feedback</Link>
           </div>
         </div>
       </footer>
