@@ -65,38 +65,48 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
 
   return (
     <div className="relative w-full max-w-[420px] flex flex-col items-center select-none py-2 transition-all">
-      {/* 1. Organic Ambient Aura Glow (No Card/Box Border) */}
+      {/* 1. Organic Ambient Aura Glow (Cardless Background) */}
       <div className="absolute inset-0 -top-6 bg-gradient-to-b from-amber-200/35 via-orange-100/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* 2. Top Minimal Quick Badges */}
+      {/* 2. Top Quick Badges (Smooth Hovering & Floating Animation) */}
       <div className="w-full flex items-center justify-between gap-3 px-2 mb-2">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/80 text-[11px] font-display font-extrabold text-amber-900 shadow-soft-xs">
-          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
-          <span>15 Min Check</span>
-        </div>
+        <motion.div
+          animate={{ y: [0, -3.5, 0] }}
+          transition={{ duration: 4.0, repeat: Infinity, ease: 'easeInOut' }}
+        >
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/80 text-[11px] font-display font-extrabold text-amber-900 shadow-soft-xs hover:scale-105 transition-transform">
+            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+            <span>15 Min Check</span>
+          </div>
+        </motion.div>
 
-        {onToggleAirWand ? (
-          <button
-            type="button"
-            onClick={onToggleAirWand}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-display font-extrabold transition-all cursor-pointer shadow-soft-xs active:scale-95 ${
-              isAirWandActive
-                ? 'bg-cyan-500 text-white ring-2 ring-cyan-300 shadow-candy-cyan'
-                : 'bg-white/90 backdrop-blur-md border border-cyan-200 text-cyan-900 hover:bg-cyan-50'
-            }`}
-          >
-            <Wand2 className={`w-3.5 h-3.5 ${isAirWandActive ? 'text-white animate-spin' : 'text-cyan-600'}`} />
-            <span>{isAirWandActive ? 'Air Wand Active ✨' : 'Magic Air Wand'}</span>
-          </button>
-        ) : (
-          <Link
-            href="/screening/rune-realm"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-cyan-200 text-[11px] font-display font-extrabold text-cyan-900 shadow-soft-xs hover:bg-cyan-50 transition-colors"
-          >
-            <Wand2 className="w-3.5 h-3.5 text-cyan-600" />
-            <span>Magic Air Wand</span>
-          </Link>
-        )}
+        <motion.div
+          animate={{ y: [0, 3.5, 0] }}
+          transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+        >
+          {onToggleAirWand ? (
+            <button
+              type="button"
+              onClick={onToggleAirWand}
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[11px] font-display font-extrabold transition-all cursor-pointer shadow-soft-xs active:scale-95 hover:scale-105 ${
+                isAirWandActive
+                  ? 'bg-cyan-500 text-white ring-2 ring-cyan-300 shadow-candy-cyan'
+                  : 'bg-white/90 backdrop-blur-md border border-cyan-200 text-cyan-900 hover:bg-cyan-50'
+              }`}
+            >
+              <Wand2 className={`w-3.5 h-3.5 ${isAirWandActive ? 'text-white animate-spin' : 'text-cyan-600'}`} />
+              <span>{isAirWandActive ? 'Air Wand Active ✨' : 'Magic Air Wand'}</span>
+            </button>
+          ) : (
+            <Link
+              href="/screening/rune-realm"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-cyan-200 text-[11px] font-display font-extrabold text-cyan-900 shadow-soft-xs hover:bg-cyan-50 hover:scale-105 transition-all"
+            >
+              <Wand2 className="w-3.5 h-3.5 text-cyan-600" />
+              <span>Magic Air Wand</span>
+            </Link>
+          )}
+        </motion.div>
       </div>
 
       {/* 3. Mascot Centerpiece (Living & Cardless) */}
@@ -108,7 +118,7 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         {/* Soft Grounding Pedestal Shadow */}
         <div className="absolute bottom-2 w-48 h-7 bg-amber-900/10 rounded-full blur-md" />
 
-        {/* Living Mascot Character (Bigger & Expressive) */}
+        {/* Living Mascot Character (Bigger & Expressive with subtle hover spring) */}
         <motion.div
           whileHover={{ scale: 1.06 }}
           whileTap={{ scale: 0.94 }}
@@ -122,45 +132,55 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
           />
         </motion.div>
 
-        {/* Micro-Hint Pill with gentle 50% breathing pulse */}
+        {/* Micro-Hint Pill with gentle 50% breathing pulse & subtle floating bob */}
         <motion.div
-          animate={{ opacity: [1, 0.5, 1] }}
-          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-black/[0.06] text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-950 group-hover:border-amber-300 group-hover:bg-amber-50/90 transition-all shadow-soft-xs"
+          animate={{ y: [0, -2.5, 0], opacity: [1, 0.55, 1] }}
+          transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+          className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/95 backdrop-blur-md border border-black/[0.06] text-[11px] font-display font-semibold text-ink/75 hover:text-amber-950 hover:border-amber-300 hover:bg-amber-50/90 transition-all shadow-soft-xs"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
           <span>Wave hand or tap Dyuti &middot; Eyes follow your cursor</span>
         </motion.div>
       </div>
 
-      {/* 4. Lightweight Activities Strip (Free Floating, No Box Enclosure) */}
+      {/* 4. Lightweight Activities Strip (Smooth Complementary Float) */}
       <div className="w-full grid grid-cols-2 gap-2.5 mt-3 px-1">
-        <Link
-          href="/screening/sound-forest"
-          onMouseEnter={() => handleWorldHover('encouraging', 'Sound Forest checks voice blending! 🌲')}
-          onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-emerald-200/80 hover:bg-emerald-50 text-emerald-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
+        <motion.div
+          animate={{ y: [0, 2.5, 0] }}
+          transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
         >
-          <Volume2 className="w-4 h-4 text-emerald-600 shrink-0" />
-          <span className="truncate">Sound Forest</span>
-        </Link>
+          <Link
+            href="/screening/sound-forest"
+            onMouseEnter={() => handleWorldHover('encouraging', 'Sound Forest checks voice blending! 🌲')}
+            onMouseLeave={handleWorldLeave}
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/85 backdrop-blur-md border border-emerald-200/80 hover:bg-emerald-50 text-emerald-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.03] hover:shadow-soft-sm"
+          >
+            <Volume2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="truncate">Sound Forest</span>
+          </Link>
+        </motion.div>
 
-        <Link
-          href="/screening/memory-mountains"
-          onMouseEnter={() => handleWorldHover('thinking', 'Memory Mountains tests rapid naming! 🏔️')}
-          onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-orange-200/80 hover:bg-orange-50 text-orange-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
+        <motion.div
+          animate={{ y: [0, -2.5, 0] }}
+          transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut', delay: 1.4 }}
         >
-          <Brain className="w-4 h-4 text-orange-600 shrink-0" />
-          <span className="truncate">Memory Jewels</span>
-        </Link>
+          <Link
+            href="/screening/memory-mountains"
+            onMouseEnter={() => handleWorldHover('thinking', 'Memory Mountains tests rapid naming! 🏔️')}
+            onMouseLeave={handleWorldLeave}
+            className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/85 backdrop-blur-md border border-orange-200/80 hover:bg-orange-50 text-orange-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.03] hover:shadow-soft-sm"
+          >
+            <Brain className="w-4 h-4 text-orange-600 shrink-0" />
+            <span className="truncate">Memory Jewels</span>
+          </Link>
+        </motion.div>
       </div>
 
       {/* 5. Clean Launch Action Button */}
       <div className="w-full mt-3 px-1">
         <Link
           href="/screening"
-          className="w-full py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-sm text-xs font-display font-bold flex items-center justify-between transition-all group"
+          className="w-full py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-sm text-xs font-display font-bold flex items-center justify-between transition-all group hover:shadow-soft-md"
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />

@@ -101,8 +101,8 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
             style={{ bottom: 'calc(100% + 14px)', width: 'max-content', maxWidth: 280 }}
           >
             <motion.div
-              animate={{ opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              animate={{ opacity: [1, 0.55, 1], y: [0, -3.5, 0] }}
+              transition={{ duration: 3.0, repeat: Infinity, ease: 'easeInOut' }}
               className="relative bg-white/95 backdrop-blur-xl border border-hairline shadow-soft-md px-4 py-2 text-xs sm:text-sm font-display font-bold leading-snug text-ink text-center rounded-2xl ring-1 ring-black/[0.04]"
             >
               {speechBubble}
