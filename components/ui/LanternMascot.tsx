@@ -98,7 +98,7 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
             exit={{ opacity: 0, scale: 0.88, y: -6 }}
             transition={{ type: 'spring', stiffness: 420, damping: 28 }}
             className="absolute z-30 left-1/2 -translate-x-1/2 pointer-events-none"
-            style={{ bottom: 'calc(100% + 14px)', width: 'max-content', maxWidth: 280 }}
+            style={{ bottom: 'calc(100% + 8px)', width: 'max-content', maxWidth: 280 }}
           >
             <motion.div
               animate={{ opacity: [1, 0.55, 1], y: [0, -3.5, 0] }}

@@ -68,8 +68,8 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
       {/* 1. Organic Ambient Aura Glow (Cardless Background) */}
       <div className="absolute inset-0 -top-6 bg-gradient-to-b from-amber-200/35 via-orange-100/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* 2. Top Quick Badges (Smooth Hovering & Floating Animation) */}
-      <div className="w-full flex items-center justify-between gap-3 px-2 mb-2">
+      {/* 2. Top Quick Badges (Positioned cleanly higher up with ample clearance) */}
+      <div className="w-full flex items-center justify-between gap-3 px-2 mb-8 sm:mb-10">
         <motion.div
           animate={{ y: [0, -3.5, 0] }}
           transition={{ duration: 4.0, repeat: Infinity, ease: 'easeInOut' }}
@@ -81,7 +81,7 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         </motion.div>
 
         <motion.div
-          animate={{ y: [0, 3.5, 0] }}
+          animate={{ y: [0, -3.5, 0] }}
           transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
         >
           {onToggleAirWand ? (
@@ -109,10 +109,10 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         </motion.div>
       </div>
 
-      {/* 3. Mascot Centerpiece (Living & Cardless) */}
+      {/* 3. Mascot Centerpiece (Living & Cardless with Dedicated Speech Zone) */}
       <div
         onClick={handleDyutiClick}
-        className="relative cursor-pointer group flex flex-col items-center pt-8 pb-2 w-full"
+        className="relative cursor-pointer group flex flex-col items-center pt-10 sm:pt-12 pb-2 w-full"
         title="Tap Dyuti to interact!"
       >
         {/* Soft Grounding Pedestal Shadow */}
