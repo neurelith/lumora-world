@@ -1,0 +1,49 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isSpecialist() {
+      return isAuthenticated() && (request.auth.token.role == 'specialist' || request.auth.token.email != null);
+    }
+    
+    // Screening Sessions
+    // Children write/update pseudonymous session; Specialists read cohort
+    match /sessions/{sessionId} {
+      allow create: if true;
+      allow update: if true;
+      allow read: if isSpecialist() || isAuthenticated();
+      allow delete: if isSpecialist();
+    }
+    
+    // Haven Daily Practice Sessions
+    match /haven_sessions/{dayId} {
+      allow create: if true;
+      allow update: if true;
+      allow read: if true;
+      allow delete: if isSpecialist();
+    }
+    
+    // IASQ Autism Screener — Restricted to Authenticated Specialists
+    match /iasq_results/{resultId} {
+      allow read, write: if isSpecialist();
+      allow delete: if isSpecialist();
+    }
+    
+    // Specialist Cohort Telemetry Cache
+    match /cohortCache/{recordId} {
+      allow read: if isSpecialist();
+      allow write: if isSpecialist();
+    }
+    
+    // Specialist User Profiles
+    match /specialists/{userId} {
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
+    }
+  }
+}
