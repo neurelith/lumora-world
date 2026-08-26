@@ -1,0 +1,44 @@
+{
+  "name": "Lumora World — Five Worlds of Learning in Your Classroom",
+  "short_name": "Lumora",
+  "description": "Tablet-first bilingual screening & adaptive practice platform for dyslexia, dysgraphia, and neurodevelopmental triage in primary schoolchildren.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F4F2F6",
+  "theme_color": "#E8A33D",
+  "orientation": "any",
+  "categories": ["education", "medical", "kids"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "/lumora_logo_transparent.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/lumora_logo_transparent.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Start Screening",
+      "url": "/screening",
+      "description": "Begin the 5-world classroom screening battery"
+    },
+    {
+      "name": "My Haven Practice",
+      "url": "/haven",
+      "description": "3-minute calm daily practice quest"
+    },
+    {
+      "name": "Specialist Portal",
+      "url": "/doctor",
+      "description": "Clinical psychologist telemetry hub"
+    }
+  ]
+}

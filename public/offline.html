@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lumora World — Offline</title>
+  <link rel="icon" href="/lumora_logo_transparent.png" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Lexend', system-ui, sans-serif;
+      background: #F4F2F6;
+      color: #2B2A33;
+      text-align: center;
+      padding: 2rem;
+    }
+    .glow {
+      width: 120px; height: 120px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(232,163,61,0.35), transparent 70%);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    h1 { font-size: 1.75rem; margin: 0 0 0.5rem; }
+    p { color: #6B6875; max-width: 28rem; line-height: 1.6; margin: 0 0 1.5rem; }
+    a {
+      display: inline-block; padding: 0.9rem 2rem; border-radius: 1rem;
+      background: #E8A33D; color: #2B2A33; text-decoration: none;
+      font-weight: 700; box-shadow: 0 8px 24px -4px rgba(232,163,61,0.35);
+    }
+  </style>
+</head>
+<body>
+  <div class="glow">🏮</div>
+  <h1>You're offline — but the lantern still glows!</h1>
+  <p>Lumora World works offline for screening and practice. Cached pages are available, and any sessions you complete will be saved locally on this device until you reconnect.</p>
+  <a href="/">Try Home Page</a>
+</body>
+</html>
