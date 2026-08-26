@@ -51,7 +51,7 @@ export default function SoundForestDemoPage() {
 
       <footer className="max-w-4xl mx-auto w-full pt-8 text-center">
         <p className="text-[11px] text-muted font-body leading-relaxed">
-          <strong>Clinical Disclaimer:</strong> Lumora World is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument. For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
+          <strong>Clinical Disclaimer:</strong> DyutiPath is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument. For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
         </p>
       </footer>
     </div>

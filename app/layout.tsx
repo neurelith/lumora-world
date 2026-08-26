@@ -11,10 +11,10 @@ const jetMono = JetBrains_Mono({ subsets: ["latin"], weight: ["400", "500"], var
 const notoDeva = Noto_Sans_Devanagari({ subsets: ["devanagari"], weight: ["400", "500", "600", "700"], variable: "--font-devanagari", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://lumora-world.vercel.app"),
+  metadataBase: new URL("https://dyutipath.vercel.app"),
   title: {
-    default: "Lumora World — Five Worlds of Learning in Your Classroom",
-    template: "%s · Lumora World",
+    default: "DyutiPath — Five Worlds of Learning in Your Classroom",
+    template: "%s · DyutiPath",
   },
   description:
     "Tablet-first bilingual screening & adaptive practice platform for dyslexia, dysgraphia, and neurodevelopmental triage in primary schoolchildren. DALI-aligned, 100% client-side privacy.",
@@ -29,11 +29,11 @@ export const metadata: Metadata = {
     "special education technology",
   ],
   manifest: "/manifest.json",
-  applicationName: "Lumora World",
+  applicationName: "DyutiPath",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Lumora World",
+    title: "DyutiPath",
   },
   formatDetection: { telephone: false },
   icons: {
@@ -42,8 +42,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "Lumora World",
-    title: "Lumora World — Five Worlds of Learning in Your Classroom",
+    siteName: "DyutiPath",
+    title: "DyutiPath — Five Worlds of Learning in Your Classroom",
     description:
       "Camera air-tracing + gamified screening for dyslexia & dysgraphia triage, aligned with DALI (NBRC). Works on any classroom tablet, offline-ready.",
     images: [{ url: "/lumora_logo_transparent.png", width: 512, height: 512 }],
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Lumora World — Five Worlds of Learning in Your Classroom",
+    title: "DyutiPath — Five Worlds of Learning in Your Classroom",
     description:
       "Tablet-first bilingual dyslexia screening & adaptive practice. DALI-aligned. Zero biometric transmission.",
     images: ["/lumora_logo_transparent.png"],
@@ -69,8 +69,8 @@ export const viewport: Viewport = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
-  name: "Lumora World",
-  alternateName: "Lumora",
+  name: "DyutiPath",
+  alternateName: "Dyuti",
   applicationCategory: "EducationalApplication",
   operatingSystem: "Web (iOS, Android, Windows, ChromeOS tablets)",
   description:

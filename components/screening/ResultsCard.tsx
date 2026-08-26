@@ -185,7 +185,7 @@ export const ResultsCard: React.FC<ResultsCardProps> = ({ session }) => {
 
       {/* Mandatory Clinical Disclaimer */}
       <div className="p-4 bg-white border-2 border-hairline rounded-2xl text-xs text-muted leading-relaxed">
-        <strong className="text-ink">Mandatory Clinical Disclaimer:</strong> Lumora World is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument. For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
+        <strong className="text-ink">Mandatory Clinical Disclaimer:</strong> DyutiPath is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument. For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
       </div>
     </div>
   );

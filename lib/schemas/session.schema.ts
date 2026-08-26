@@ -1,4 +1,4 @@
-// lib/schemas/session.schema.ts — Zod validation schemas for Lumora World
+// lib/schemas/session.schema.ts — Zod validation schemas for DyutiPath
 import { z } from 'zod';
 
 export const LanguageSchema = z.enum(['en', 'hi']);

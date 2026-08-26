@@ -7,7 +7,7 @@ export async function GET() {
   return NextResponse.json(
     {
       status: 'ok',
-      service: 'lumora-world',
+      service: 'dyutipath',
       timestamp: new Date().toISOString(),
     },
     { status: 200 }

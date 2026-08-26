@@ -1,9 +1,9 @@
-// lib/storage.ts — IndexedDB persistence layer for Lumora World
+// lib/storage.ts — IndexedDB persistence layer for DyutiPath
 // Offline-first, client-side storage with automatic sync when online
 
 import { ScreeningSession, HavenDaySession, IASQResult, StudentCohortRecord } from './types';
 
-const DB_NAME = 'LumoraWorldDB';
+const DB_NAME = 'DyutiPathDB';
 const DB_VERSION = 2;
 
 const STORES = {

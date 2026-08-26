@@ -1,4 +1,4 @@
-# Lumora World ✦
+# DyutiPath ✦
 
 > **A tablet-first, bilingual (English + Hindi) developmental screening triage & practice platform for primary schoolchildren (ages 5–8), aligned with DALI (Dyslexia Assessment for Languages of India by NBRC).**
 
@@ -14,11 +14,11 @@
 
 In India, an estimated **~8% of primary schoolchildren** experience Specific Learning Disabilities (SLD) such as dyslexia and dysgraphia. With only **3,890 registered clinical psychologists** nationwide (RCI, 2024), specialized clinical evaluations face severe bottleneck delays.
 
-**Lumora World** bridges the early identification gap by transforming standard classroom tablets into non-stigmatizing, gamified triage environments. Children complete 15-minute multi-sensory activities across five exploratory worlds while the platform captures granular motor, phonemic, and naming practice indicators directly on-device.
+**DyutiPath** bridges the early identification gap by transforming standard classroom tablets into non-stigmatizing, gamified triage environments. Children complete 15-minute multi-sensory activities across five exploratory worlds while the platform captures granular motor, phonemic, and naming practice indicators directly on-device.
 
 ```
                     ┌───────────────────────────────┐
-                    │       Lumora World v2.0       │
+                    │        DyutiPath v2.0         │
                     └───────────────┬───────────────┘
                                     │
         ┌───────────────────────────┼───────────────────────────┐
@@ -72,7 +72,7 @@ Looking to drop the custom **webcam hand tracking**, **star-to-fire morphing cur
 - Generates an immediate 3-tier triage recommendation: **Typical Range**, **Worth a Closer Look (Watch)**, or **Recommend Follow-Up Soon**.
 
 ### 2. Tier 2 · My Haven Practice Companion (`/haven`)
-- 3-minute self-guided daily practice quests with the **Lumora Lantern mascot**.
+- 3-minute self-guided daily practice quests with the **Dyuti the Lantern mascot**.
 - Predictable **TEACCH visual schedule** structure with fading prompts based on Vygotsky's Zone of Proximal Development (ZPD).
 - Includes **Sensory Calm Mode** (reduced motion, muted pastels, ambient brown-noise frequencies) for neurodiverse comfort.
 
@@ -117,8 +117,8 @@ Looking to drop the custom **webcam hand tracking**, **star-to-fire morphing cur
 
 ```bash
 # Clone the repository
-git clone https://github.com/neurelith/lumora-world.git
-cd lumora-world
+git clone https://github.com/<your-username>/dyutipath.git
+cd dyutipath
 
 # Install dependencies
 npm install
@@ -184,7 +184,7 @@ npm run start
 
 ## ⚖️ Clinical Disclaimer
 
-> **Lumora World is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument.** For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized diagnostic batteries such as **DALI** (*Dyslexia Assessment for Languages of India* by National Brain Research Centre, NBRC).
+> **DyutiPath is a first-pass screening triage tool and developmental practice companion, not a clinical diagnostic instrument.** For formal evaluation, children must be assessed by a certified clinical psychologist or special educator using standardized diagnostic batteries such as **DALI** (*Dyslexia Assessment for Languages of India* by National Brain Research Centre, NBRC).
 
 ---
 

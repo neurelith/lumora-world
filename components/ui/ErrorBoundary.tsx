@@ -56,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Oops! A Minor Magic Hiccup
               </h2>
               <p className="text-sm font-body text-muted leading-relaxed">
-                The Lumora Lantern stumbled on a tricky path. Your progress is saved locally.
+                Dyuti the Lantern stumbled on a tricky path. Your progress is saved locally.
               </p>
             </div>
 

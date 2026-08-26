@@ -1,5 +1,5 @@
-/* Lumora World Service Worker — offline-first for classroom resilience */
-const CACHE_NAME = 'lumora-v1';
+/* DyutiPath Service Worker — offline-first for classroom resilience */
+const CACHE_NAME = 'dyutipath-v1';
 const OFFLINE_URL = '/offline.html';
 
 // Precache critical shell + assets

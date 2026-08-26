@@ -23,7 +23,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
-    const saved = localStorage.getItem('lumora_lang') as Language;
+    const saved = (localStorage.getItem('dyutipath_lang') || localStorage.getItem('lumora_lang')) as Language;
     if (saved === 'en' || saved === 'hi') {
       setLanguageState(saved);
     }
@@ -32,7 +32,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('lumora_lang', lang);
+      localStorage.setItem('dyutipath_lang', lang);
     }
   };
 

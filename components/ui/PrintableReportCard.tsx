@@ -67,7 +67,7 @@ export const PrintableReportCard: React.FC<ReportCardProps> = ({
         {/* Certificate Header Banner */}
         <div className="text-center space-y-2 border-b-2 border-amber/30 pb-6">
           <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 bg-amber-50 text-amber-800 rounded-full text-xs font-display font-extrabold tracking-wider uppercase border border-amber/30">
-            <Sparkles className="w-3.5 h-3.5 fill-amber" /> Official Lumora World Certificate of Practice
+            <Sparkles className="w-3.5 h-3.5 fill-amber" /> Official DyutiPath Certificate of Practice
           </div>
           <h1 className="font-display font-extrabold text-3xl sm:text-4xl text-ink tracking-tight">
             {childName || 'Young Explorer'}
@@ -129,7 +129,7 @@ export const PrintableReportCard: React.FC<ReportCardProps> = ({
         <div className="p-4 bg-paper border border-hairline rounded-2xl text-[11px] font-body text-muted leading-relaxed flex items-start gap-2.5">
           <Shield className="w-5 h-5 text-amber shrink-0 mt-0.5" />
           <p>
-            <strong>Note for Parents, Teachers & Specialists:</strong> Lumora World is an early developmental screening triage tool and practice companion, not a formal medical diagnosis. Standardized clinical evaluations in India should be conducted by certified psychologists using batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
+            <strong>Note for Parents, Teachers & Specialists:</strong> DyutiPath is an early developmental screening triage tool and practice companion, not a formal medical diagnosis. Standardized clinical evaluations in India should be conducted by certified psychologists using batteries such as DALI (Dyslexia Assessment for Languages of India by NBRC).
           </p>
         </div>
       </div>

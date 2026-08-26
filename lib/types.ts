@@ -1,4 +1,4 @@
-// Lumora World Core TypeScript Types
+// DyutiPath Core TypeScript Types
 
 export type Language = 'en' | 'hi';
 

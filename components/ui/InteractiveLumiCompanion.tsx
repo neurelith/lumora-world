@@ -6,12 +6,14 @@ import { LanternMascot, MascotMood } from '@/components/ui/LanternMascot';
 import { Sparkles, Wand2, Volume2, Brain, ArrowRight, Star, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-interface InteractiveLumiCompanionProps {
+interface InteractiveDyutiCompanionProps {
   isAirWandActive?: boolean;
   onToggleAirWand?: () => void;
 }
 
-export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> = ({
+export type InteractiveLumiCompanionProps = InteractiveDyutiCompanionProps;
+
+export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps> = ({
   isAirWandActive = false,
   onToggleAirWand,
 }) => {
@@ -37,7 +39,7 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
     'Listen closely to the forest sounds! 🌲',
   ];
 
-  const handleLumiClick = () => {
+  const handleDyutiClick = () => {
     const nextCount = interactCount + 1;
     setInteractCount(nextCount);
     setMood('celebrating');
@@ -66,7 +68,7 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
       {/* Ambient Glowing Aura */}
       <div className="absolute inset-0 bg-gradient-to-b from-amber-200/40 via-orange-100/30 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* Floating Orbital Badges that interact with Lumi */}
+      {/* Floating Orbital Badges that interact with Dyuti */}
       
       {/* Top Left Float: Quick Time Badge */}
       <motion.div
@@ -147,9 +149,9 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
 
       {/* Mascot Centerpiece (Living & Clickable) */}
       <div
-        onClick={handleLumiClick}
+        onClick={handleDyutiClick}
         className="relative cursor-pointer group flex flex-col items-center pt-8 pb-4"
-        title="Tap Lumi!"
+        title="Tap Dyuti!"
       >
         {/* Soft Pedestal Shadow */}
         <div className="absolute bottom-4 w-40 h-8 bg-amber-900/10 rounded-full blur-md" />
@@ -168,10 +170,10 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
           />
         </motion.div>
 
-        {/* Tap Prompt Badge below Lumi */}
+        {/* Tap Prompt Badge below Dyuti */}
         <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-slate-200 shadow-xs text-[11px] font-display font-extrabold text-ink/70 group-hover:text-amber-800 group-hover:border-amber-300 transition-colors">
           <Sparkles className="w-3 h-3 text-amber-500" />
-          <span>Tap Lumi to play &middot; Eyes follow your cursor &amp; air wand</span>
+          <span>Tap Dyuti to play &middot; Eyes follow your cursor &amp; air wand</span>
         </div>
       </div>
 
@@ -183,7 +185,7 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
         >
           <div className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Explore all 5 activities with Lumi</span>
+            <span>Explore all 5 activities with Dyuti</span>
           </div>
           <ArrowRight className="w-4 h-4 text-emerald-600 transition-transform group-hover:translate-x-1" />
         </Link>
@@ -191,3 +193,6 @@ export const InteractiveLumiCompanion: React.FC<InteractiveLumiCompanionProps> =
     </div>
   );
 };
+
+export const InteractiveLumiCompanion = InteractiveDyutiCompanion;
+

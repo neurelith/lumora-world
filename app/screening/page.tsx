@@ -164,8 +164,8 @@ export default function ScreeningPage() {
           </Link>
 
           <div className="flex items-center gap-2.5">
-            <div className="relative w-7 h-7"><Image src="/lumora_logo_transparent.png" alt="Lumora" fill className="object-contain" /></div>
-            <span className="font-display font-semibold tracking-[-0.03em] text-[17px] text-ink">Lumora Screening</span>
+            <div className="relative w-7 h-7"><Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" /></div>
+            <span className="font-display font-semibold tracking-[-0.03em] text-[17px] text-ink">DyutiPath Screening</span>
           </div>
 
           <div className="flex items-center gap-3">
@@ -206,7 +206,7 @@ export default function ScreeningPage() {
 
               <div className="space-y-4 text-sm leading-relaxed text-ink/80 font-body">
                 <p>
-                  Lumora World tracks how a child interacts across five short activities and summarizes patterns for a teacher, parent, or specialist to review. It is an early screening check and does not replace a clinical diagnosis.
+                  DyutiPath tracks how a child interacts across five short activities and summarizes patterns for a teacher, parent, or specialist to review. It is an early screening check and does not replace a clinical diagnosis.
                 </p>
                 <p>
                   If an activity suggests extra attention is helpful, the recommended next step is an in-person conversation with a certified psychologist or educator.
@@ -428,7 +428,7 @@ export default function ScreeningPage() {
 
       {/* Footer */}
       <footer className="max-w-5xl mx-auto w-full pt-6 text-center text-xs text-muted font-body">
-        Lumora World Classroom Screening Battery · Pseudonymous & Zero Biometric Transmission
+        DyutiPath Classroom Screening Battery · Pseudonymous & Zero Biometric Transmission
       </footer>
     </div>
   );

@@ -18,8 +18,8 @@ export interface DALIBenchmarkProps {
 interface DALIComparisonRow {
   domain: string;
   subtestName: string;
-  lumoraMetric: string;
-  lumoraValue: number;
+  dyutiPathMetric: string;
+  dyutiPathValue: number;
   daliNormMean: number;
   daliNormStd: number;
   unit: string;
@@ -39,8 +39,8 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
     {
       domain: 'Phonological Processing',
       subtestName: 'DALI-PA (Phoneme Blending)',
-      lumoraMetric: 'Sound Forest Blending Accuracy',
-      lumoraValue: soundForestAccuracy,
+      dyutiPathMetric: 'Sound Forest Blending Accuracy',
+      dyutiPathValue: soundForestAccuracy,
       daliNormMean: 82.0,
       daliNormStd: 9.5,
       unit: '%',
@@ -49,8 +49,8 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
     {
       domain: 'Rapid Automatized Naming',
       subtestName: 'DALI-RAN (Matrix Naming Speed)',
-      lumoraMetric: 'Memory Mountains Speed',
-      lumoraValue: ranSpeed,
+      dyutiPathMetric: 'Memory Mountains Speed',
+      dyutiPathValue: ranSpeed,
       daliNormMean: 1.65,
       daliNormStd: 0.35,
       unit: ' items/s',
@@ -59,8 +59,8 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
     {
       domain: 'Motor Kinematics & Dysgraphia',
       subtestName: 'DALI-HW (Motor Planning Index)',
-      lumoraMetric: 'Rune Realm Number of Velocity Inversions (NVI)',
-      lumoraValue: runeNvi,
+      dyutiPathMetric: 'Rune Realm Number of Velocity Inversions (NVI)',
+      dyutiPathValue: runeNvi,
       daliNormMean: 1.5,
       daliNormStd: 0.45,
       unit: '',
@@ -69,8 +69,8 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
     {
       domain: 'Nonword Orthographic Decoding',
       subtestName: 'DALI-NWD (Fluency & Nonwords)',
-      lumoraMetric: 'Story Castle Stone Reading',
-      lumoraValue: storyCastleAccuracy,
+      dyutiPathMetric: 'Story Castle Stone Reading',
+      dyutiPathValue: storyCastleAccuracy,
       daliNormMean: 75.0,
       daliNormStd: 10.5,
       unit: '%',
@@ -107,7 +107,7 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
       <div className="space-y-4">
         {rows.map((row, idx) => {
           // Calculate z-score
-          const diff = row.lumoraValue - row.daliNormMean;
+          const diff = row.dyutiPathValue - row.daliNormMean;
           const zScore = Number((diff / row.daliNormStd).toFixed(2));
           const adjustedZ = row.higherIsBetter ? zScore : -zScore;
 
@@ -131,11 +131,11 @@ export const DALIBenchmarkMatrix: React.FC<DALIBenchmarkProps> = ({
                   <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-indigo-700">
                     {row.domain} &middot; {row.subtestName}
                   </span>
-                  <p className="font-display font-extrabold text-sm text-ink">{row.lumoraMetric}</p>
+                  <p className="font-display font-extrabold text-sm text-ink">{row.dyutiPathMetric}</p>
                 </div>
                 <div className="flex items-center gap-2 font-mono text-xs">
                   <span className="bg-white px-2.5 py-1 rounded-lg border border-slate-200 text-ink font-bold shadow-xs">
-                    Child: <strong>{row.lumoraValue}{row.unit}</strong>
+                    Child: <strong>{row.dyutiPathValue}{row.unit}</strong>
                   </span>
                   <span className="text-ink/60">
                     DALI Norm: {row.daliNormMean}{row.unit} (&plusmn;{row.daliNormStd})

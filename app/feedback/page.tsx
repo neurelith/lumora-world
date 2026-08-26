@@ -52,7 +52,7 @@ export default function FeedbackPage() {
     }
     const currentRating = hoverRating || rating;
     if (currentRating === 5) {
-      return { mood: 'celebrating', speech: '5 Stars! Woohoo! We love having you in Lumora World! ✨' };
+      return { mood: 'celebrating', speech: '5 Stars! Woohoo! We love having you in DyutiPath! ✨' };
     }
     if (currentRating === 4) {
       return { mood: 'encouraging', speech: 'Thank you! What can we polish to make it 5 stars? 🪄' };
@@ -95,9 +95,13 @@ export default function FeedbackPage() {
     try {
       // 1. Save to local storage for instant offline access
       if (typeof window !== 'undefined') {
-        const stored = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
+        const stored = JSON.parse(
+          localStorage.getItem('dyutipath_community_feedback') ||
+          localStorage.getItem('lumora_community_feedback') ||
+          '[]'
+        );
         stored.unshift(feedbackData);
-        localStorage.setItem('lumora_community_feedback', JSON.stringify(stored));
+        localStorage.setItem('dyutipath_community_feedback', JSON.stringify(stored));
       }
 
       // 2. Dispatch real API POST request to server
@@ -136,10 +140,10 @@ export default function FeedbackPage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-8 h-16">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative h-9 w-9 flex-shrink-0 transition-transform group-hover:scale-105">
-              <Image src="/lumora_logo_transparent.png" alt="Lumora World" fill className="object-contain" priority />
+              <Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" priority />
             </div>
             <span className="font-display text-xl font-extrabold tracking-tight text-ink">
-              Lumora<span className="text-amber-600"> World</span>
+              Dyuti<span className="text-amber-600">Path</span>
             </span>
           </Link>
 
@@ -160,7 +164,7 @@ export default function FeedbackPage() {
                   language === 'en' ? 'bg-white text-ink shadow-xs' : 'text-ink/60 hover:text-ink'
                 }`}
               >
-                English
+                EN
               </button>
               <button
                 type="button"
@@ -176,7 +180,7 @@ export default function FeedbackPage() {
         </div>
       </header>
 
-      {/* ── Main Container ────────────────────────────────────────────── */}
+      {/* ── Main Feedback Body ────────────────────────────────────────── */}
       <main className="relative max-w-4xl mx-auto px-4 py-8 md:py-12">
         {/* Soft Ambient Background Auras */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
@@ -188,11 +192,11 @@ export default function FeedbackPage() {
         <div className="mb-8 md:mb-10 text-center space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full border-2 border-amber-200 bg-amber-50/90 px-3.5 py-1 text-xs font-display font-extrabold text-amber-900 shadow-soft-xs">
             <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Community &amp; Clinical Feedback &middot; Shaping Lumora</span>
+            <span>Community &amp; Clinical Feedback &middot; Shaping DyutiPath</span>
           </div>
 
           <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-ink leading-tight">
-            Help us make Lumora{' '}
+            Help us make DyutiPath{' '}
             <span className="relative inline-flex items-center gap-1.5 px-3 py-0.5 rounded-2xl bg-amber-100 border-2 border-b-4 border-amber-300 text-amber-950 shadow-soft-xs -rotate-1 align-middle">
               <span>delightful</span>
               <Sparkles className="w-4 h-4 text-amber-600 fill-amber-500 animate-pulse" />
@@ -445,7 +449,7 @@ export default function FeedbackPage() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. Lumi following finger in air, voice blending sounds, clean report card..."
+                    placeholder="e.g. Dyuti following finger in air, voice blending sounds, clean report card..."
                     value={likedFeature}
                     onChange={(e) => setLikedFeature(e.target.value)}
                     className="w-full min-h-[44px] px-4 rounded-2xl border-2 border-slate-200 font-body text-xs text-ink focus:outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100 shadow-soft-xs"

@@ -1,5 +1,5 @@
 // lib/challenge-generator.ts
-// Dynamic Procedural Challenge Generator for Lumora World
+// Dynamic Procedural Challenge Generator for DyutiPath
 // Generates fresh, clinically aligned trials on every session login
 
 import { Language, SoundForestTrial } from './types';

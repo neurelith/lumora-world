@@ -154,13 +154,13 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
         </div>
       )}
 
-      {/* Master Studio-Quality Hand-Crafted Lumi Character */}
+      {/* Master Studio-Quality Hand-Crafted Dyuti Character */}
       <motion.svg
         viewBox="0 0 140 156"
         className="w-full h-full block overflow-visible"
         preserveAspectRatio="xMidYMid meet"
         role="img"
-        aria-label={`Lumi the mascot, feeling ${mood}`}
+        aria-label={`Dyuti the mascot, feeling ${mood}`}
         animate={
           isCelebrate
             ? { y: [0, -8, 0], rotate: [0, -3, 3, 0] }

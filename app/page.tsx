@@ -126,10 +126,10 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-8 h-16">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="relative h-9 w-9 flex-shrink-0 transition-transform group-hover:scale-105">
-              <Image src="/lumora_logo_transparent.png" alt="Lumora World" fill className="object-contain" priority />
+              <Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" priority />
             </div>
             <span className="font-display text-xl font-extrabold tracking-tight text-ink">
-              Lumora<span className="text-amber-600"> World</span>
+              Dyuti<span className="text-amber-600">Path</span>
             </span>
           </Link>
 
@@ -370,7 +370,7 @@ export default function HomePage() {
               Three Simple Steps
             </span>
             <h2 className="font-display text-2xl sm:text-4xl font-extrabold text-ink">
-              How Lumora Works in the Classroom
+              How DyutiPath Works in the Classroom
             </h2>
             <p className="text-sm sm:text-base text-ink/70 font-body">
               A quick way for teachers to check an entire class without extra paperwork.
@@ -659,10 +659,10 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 md:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-ink/60">
           <div className="max-w-2xl space-y-1 text-center md:text-left">
             <p className="font-medium">
-              <strong>Clinical Disclaimer:</strong> Lumora World is an early screening triage and practice tool, not a clinical diagnostic instrument. Formal diagnoses must be conducted by certified clinical psychologists or special educators.
+              <strong>Clinical Disclaimer:</strong> DyutiPath is an early screening triage and practice tool, not a clinical diagnostic instrument. Formal diagnoses must be conducted by certified clinical psychologists or special educators.
             </p>
             <p className="text-[11px] text-ink/40">
-              &copy; 2026 Lumora World. Bilingual Developmental Screening Platform.
+              &copy; 2026 DyutiPath. Bilingual Developmental Screening Platform.
             </p>
           </div>
           <div className="flex items-center gap-4 font-bold text-ink/70 flex-shrink-0">

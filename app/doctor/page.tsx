@@ -167,7 +167,7 @@ export default function DoctorHubPage() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [doctorLicense, setDoctorLicense] = useState<string>('dr.ananya@aiims.edu');
-  const [doctorPassword, setDoctorPassword] = useState<string>('lumora2026');
+  const [doctorPassword, setDoctorPassword] = useState<string>('dyutipath2026');
   const [authError, setAuthError] = useState<string | null>(null);
 
   // Specialist App State
@@ -186,7 +186,11 @@ export default function DoctorHubPage() {
     // Fetch real community feedback from API and localStorage
     async function loadRealFeedback() {
       try {
-        const local = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
+        const local = JSON.parse(
+          localStorage.getItem('dyutipath_community_feedback') ||
+          localStorage.getItem('lumora_community_feedback') ||
+          '[]'
+        );
         let apiData: any[] = [];
         try {
           const res = await fetch('/api/v1/feedback');
@@ -217,7 +221,9 @@ export default function DoctorHubPage() {
     loadRealFeedback();
 
     // Check if previously logged in in this browser session
-    const authSession = sessionStorage.getItem('lumora_doctor_auth');
+    const authSession =
+      sessionStorage.getItem('dyutipath_doctor_auth') ||
+      sessionStorage.getItem('lumora_doctor_auth');
     if (authSession === 'true') {
       setIsAuthenticated(true);
     }
@@ -226,7 +232,7 @@ export default function DoctorHubPage() {
     const unsubscribe = onAuthChange((user) => {
       if (user) {
         setIsAuthenticated(true);
-        sessionStorage.setItem('lumora_doctor_auth', 'true');
+        sessionStorage.setItem('dyutipath_doctor_auth', 'true');
         if (user.email) setDoctorLicense(user.email);
       }
     });
@@ -273,12 +279,12 @@ export default function DoctorHubPage() {
       try {
         await signInSpecialist(doctorLicense, doctorPassword);
         setIsAuthenticated(true);
-        sessionStorage.setItem('lumora_doctor_auth', 'true');
+        sessionStorage.setItem('dyutipath_doctor_auth', 'true');
       } catch (err: any) {
         console.warn('[DoctorHub] Firebase Auth error, trying local sandbox:', err);
         if (doctorPassword.trim().length >= 4) {
           setIsAuthenticated(true);
-          sessionStorage.setItem('lumora_doctor_auth', 'true');
+          sessionStorage.setItem('dyutipath_doctor_auth', 'true');
         } else {
           setAuthError(err.message || 'Invalid specialist credentials.');
         }
@@ -287,7 +293,7 @@ export default function DoctorHubPage() {
       // Local clinical sandbox mode
       if (doctorPassword.trim().length >= 4) {
         setIsAuthenticated(true);
-        sessionStorage.setItem('lumora_doctor_auth', 'true');
+        sessionStorage.setItem('dyutipath_doctor_auth', 'true');
       } else {
         setAuthError('Please enter a valid specialist password or PIN.');
       }
@@ -297,6 +303,7 @@ export default function DoctorHubPage() {
   const handleLogout = async () => {
     await signOutSpecialist();
     setIsAuthenticated(false);
+    sessionStorage.removeItem('dyutipath_doctor_auth');
     sessionStorage.removeItem('lumora_doctor_auth');
   };
 
@@ -341,7 +348,7 @@ export default function DoctorHubPage() {
         <header className="max-w-5xl mx-auto w-full flex items-center justify-between pb-7 border-b border-black/8">
           <Link href="/" className="flex items-center gap-2 text-sm font-medium text-muted hover:text-amber">
             <ArrowLeft className="w-4 h-4" />
-            <span>Return to Lumora World</span>
+            <span>Return to DyutiPath</span>
           </Link>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-full bg-[#e8f1fd] px-3 py-1.5 text-[12px] font-medium text-[#0066cc]">
@@ -357,7 +364,7 @@ export default function DoctorHubPage() {
               <div className="w-11 h-11 bg-[#1d1d1f] dark:bg-slate-800 text-white rounded-xl flex items-center justify-center">
                 <Lock className="w-5 h-5" />
               </div>
-              <p className="text-[13px] font-semibold tracking-[0.08em] text-amber dark:text-amber-400">LUMORA CLINICAL VIEW</p>
+              <p className="text-[13px] font-semibold tracking-[0.08em] text-amber dark:text-amber-400">DYUTIPATH CLINICAL VIEW</p>
               <h1 className="text-[30px] leading-none tracking-[-0.05em] font-display font-semibold text-ink dark:text-white">Specialist Hub</h1>
               <p className="text-sm text-muted dark:text-slate-400 font-body leading-6">A focused workspace for reviewing pseudonymous learning signals and planning next steps.</p>
             </div>
@@ -431,7 +438,7 @@ export default function DoctorHubPage() {
         </main>
 
         <footer className="max-w-5xl mx-auto w-full text-center text-xs text-muted dark:text-slate-500 font-body py-4">
-          Lumora World Specialist Command Center · DALI Aligned
+          DyutiPath Specialist Command Center · DALI Aligned
         </footer>
       </div>
     );
@@ -726,7 +733,7 @@ export default function DoctorHubPage() {
           <Card className="max-w-4xl mx-auto p-8 md:p-12 bg-white border-2 border-hairline shadow-soft-md space-y-8 print:shadow-none print:border-none">
             <div className="flex items-center justify-between pb-6 border-b-2 border-hairline">
               <div className="flex items-center gap-3">
-                <Image src="/lumora_logo_transparent.png" alt="Lumora" width={48} height={48} />
+                <Image src="/lumora_logo_transparent.png" alt="DyutiPath" width={48} height={48} />
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-ink">
                     DALI Intake & Screening Summary Packet
@@ -926,7 +933,7 @@ export default function DoctorHubPage() {
                       const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(feedbackList, null, 2));
                       const downloadAnchor = document.createElement('a');
                       downloadAnchor.setAttribute("href", dataStr);
-                      downloadAnchor.setAttribute("download", `lumora_feedback_${Date.now()}.json`);
+                      downloadAnchor.setAttribute("download", `dyutipath_feedback_${Date.now()}.json`);
                       document.body.appendChild(downloadAnchor);
                       downloadAnchor.click();
                       downloadAnchor.remove();
@@ -955,7 +962,7 @@ export default function DoctorHubPage() {
                       const encodedUri = encodeURI(csvContent);
                       const link = document.createElement("a");
                       link.setAttribute("href", encodedUri);
-                      link.setAttribute("download", `lumora_feedback_${Date.now()}.csv`);
+                      link.setAttribute("download", `dyutipath_feedback_${Date.now()}.csv`);
                       document.body.appendChild(link);
                       link.click();
                       link.remove();

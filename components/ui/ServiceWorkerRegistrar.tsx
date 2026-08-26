@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 /**
- * Registers the Lumora service worker for offline classroom resilience.
+ * Registers the DyutiPath service worker for offline classroom resilience.
  * No-ops gracefully in development and on unsupported browsers.
  */
 export const ServiceWorkerRegistrar: React.FC = () => {

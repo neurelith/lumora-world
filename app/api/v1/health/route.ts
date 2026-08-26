@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   return apiSuccess({
     status: 'healthy',
-    service: 'lumora-world-backend',
+    service: 'dyutipath-backend',
     uptimeSec: process.uptime(),
     nodeEnv: process.env.NODE_ENV || 'production',
   });
