@@ -1,5 +1,5 @@
 /* DyutiPath Service Worker — offline-first for classroom resilience */
-const CACHE_NAME = 'dyutipath-v1';
+const CACHE_NAME = 'dyutipath-v2';
 const OFFLINE_URL = '/offline.html';
 
 // Precache critical shell + assets
