@@ -183,41 +183,38 @@ export default function DoctorHubPage() {
   const [iasqSavedNotice, setIasqSavedNotice] = useState(false);
 
   useEffect(() => {
-    // Load community feedback from localStorage
-    try {
-      const stored = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
-      const defaultFeedback = [
-        {
-          id: 'fb-01',
-          role: 'teacher',
-          device: 'iPad / Tablet',
-          rating: 5,
-          airWandRating: 5,
-          testedWorlds: ['rune', 'sound', 'story', 'memory', 'vision'],
-          likedFeature: 'Children loved the Magic Air Wand! Lumi following finger tracking kept Grade 1 students fully focused.',
-          suggestions: 'Would love Hindi speech pace controls for rural schools.',
-          bugs: 'None observed on iPad Safari.',
-          email: 'priya.sharma@delhischools.edu.in',
-          submittedAt: new Date(Date.now() - 3600000 * 4).toLocaleString(),
-        },
-        {
-          id: 'fb-02',
-          role: 'specialist',
-          device: 'Laptop / PC',
-          rating: 5,
-          airWandRating: 4,
-          testedWorlds: ['rune', 'vision', 'memory'],
-          likedFeature: 'DALI Benchmark Matrix and NVI handwriting kinematic jerk scores are clinically very impressive.',
-          suggestions: 'Add direct PDF export for parent conference meetings.',
-          bugs: '',
-          email: 'dr.ananya@aiims.edu',
-          submittedAt: new Date(Date.now() - 3600000 * 22).toLocaleString(),
-        },
-      ];
-      setFeedbackList(stored.length > 0 ? [...stored, ...defaultFeedback] : defaultFeedback);
-    } catch (e) {
-      console.warn('[DoctorHub] Feedback load notice:', e);
+    // Fetch real community feedback from API and localStorage
+    async function loadRealFeedback() {
+      try {
+        const local = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
+        let apiData: any[] = [];
+        try {
+          const res = await fetch('/api/v1/feedback');
+          if (res.ok) {
+            const json = await res.json();
+            apiData = json.data || [];
+          }
+        } catch (e) {
+          // offline fallback
+        }
+
+        // Deduplicate by ID or timestamp
+        const combined = [...local, ...apiData];
+        const seen = new Set<string>();
+        const unique: any[] = [];
+        for (const item of combined) {
+          const key = item.id || `${item.timestamp}-${item.email || ''}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            unique.push(item);
+          }
+        }
+        setFeedbackList(unique);
+      } catch (e) {
+        console.warn('[DoctorHub] Feedback load notice:', e);
+      }
     }
+    loadRealFeedback();
 
     // Check if previously logged in in this browser session
     const authSession = sessionStorage.getItem('lumora_doctor_auth');
@@ -988,7 +985,30 @@ export default function DoctorHubPage() {
                 </Link>
               </div>
 
-              {feedbackList.map((fb, idx) => (
+              {feedbackList.length === 0 ? (
+                <div className="p-12 rounded-3xl bg-white border-2 border-dashed border-slate-200 text-center space-y-4 shadow-soft-xs">
+                  <div className="w-14 h-14 mx-auto rounded-full bg-amber-100 text-amber-900 flex items-center justify-center">
+                    <MessageSquare className="w-7 h-7" />
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-display font-extrabold text-lg text-ink">No Real Submissions Yet</h4>
+                    <p className="text-xs text-muted font-body max-w-sm mx-auto leading-relaxed">
+                      Real feedback submitted by educators, parents, or hackathon judges via <span className="font-bold text-amber-800">/feedback</span> will appear here in real time.
+                    </p>
+                  </div>
+                  <div className="pt-2">
+                    <Link
+                      href="/feedback"
+                      target="_blank"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white font-display font-extrabold text-xs shadow-md border-b-4 border-amber-700 active:translate-y-0.5 active:border-b-2 transition-all cursor-pointer"
+                    >
+                      <span>Submit First Real Feedback</span>
+                      <Sparkles className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                feedbackList.map((fb, idx) => (
                 <div
                   key={fb.id || idx}
                   className="p-6 rounded-3xl bg-white border-2 border-hairline shadow-soft-sm space-y-4 hover:border-amber-300 transition-colors"
@@ -1046,7 +1066,8 @@ export default function DoctorHubPage() {
                     </div>
                   )}
                 </div>
-              ))}
+              ))
+            )}
             </div>
           </div>
         )}

@@ -93,19 +93,28 @@ export default function FeedbackPage() {
     };
 
     try {
-      // 1. Save to local storage cache for demonstration
+      // 1. Save to local storage for instant offline access
       if (typeof window !== 'undefined') {
         const stored = JSON.parse(localStorage.getItem('lumora_community_feedback') || '[]');
-        stored.push(feedbackData);
+        stored.unshift(feedbackData);
         localStorage.setItem('lumora_community_feedback', JSON.stringify(stored));
       }
 
-      // 2. Network simulation delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // 2. Dispatch real API POST request to server
+      try {
+        await fetch('/api/v1/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(feedbackData),
+        });
+      } catch (netErr) {
+        console.warn('[Feedback] Network dispatch notice:', netErr);
+      }
+
       setIsSubmitted(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
-      console.warn('[Feedback] Submission note:', err);
+      console.warn('[Feedback] Submission error:', err);
       setIsSubmitted(true);
     } finally {
       setIsSubmitting(false);
