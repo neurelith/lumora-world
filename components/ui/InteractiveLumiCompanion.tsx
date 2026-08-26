@@ -3,8 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { LanternMascot, MascotMood } from '@/components/ui/LanternMascot';
-import { Sparkles, Wand2, Volume2, Brain, ArrowRight, Star, Heart } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Sparkles, Wand2, Volume2, Brain, ArrowRight, Star, Eye, BookOpen } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface InteractiveDyutiCompanionProps {
   isAirWandActive?: boolean;
@@ -51,12 +51,12 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
     }, 2200);
   };
 
-  const handleBadgeHover = (hoverMood: MascotMood, text: string) => {
+  const handleWorldHover = (hoverMood: MascotMood, text: string) => {
     setMood(hoverMood);
     setSpeechText(text);
   };
 
-  const handleBadgeLeave = () => {
+  const handleWorldLeave = () => {
     setMood(isAirWandActive ? 'celebrating' : 'encouraging');
     setSpeechText(
       isAirWandActive ? 'Magic wand active! Wave your finger in the air! 🪄' : 'Wave your hand or tap me!'
@@ -64,130 +64,105 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
   };
 
   return (
-    <div className="relative w-full max-w-[420px] flex flex-col items-center select-none py-4">
-      {/* Ambient Glowing Aura */}
-      <div className="absolute inset-0 bg-gradient-to-b from-amber-200/40 via-orange-100/30 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
+    <div className="relative w-full max-w-[440px] rounded-3xl bg-white/80 backdrop-blur-xl border border-black/[0.07] shadow-soft-lg p-5 sm:p-6 flex flex-col items-center select-none transition-all">
+      {/* Soft Ambient Radial Glow Behind Mascot */}
+      <div className="absolute inset-0 bg-gradient-to-b from-amber-100/50 via-orange-50/30 to-transparent rounded-3xl pointer-events-none -z-10" />
 
-      {/* Floating Orbital Badges that interact with Dyuti */}
-      
-      {/* Top Left Float: Quick Time Badge */}
-      <motion.div
-        animate={{ y: [0, -6, 0] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut' }}
-        onMouseEnter={() => handleBadgeHover('thinking', 'Just 15 minutes of gentle play!')}
-        onMouseLeave={handleBadgeLeave}
-        className="absolute -top-2 -left-2 sm:-left-4 z-20"
-      >
-        <div className="px-3 py-1.5 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-b-4 border-amber-200 shadow-md flex items-center gap-1.5 text-xs font-display font-extrabold text-amber-950 cursor-pointer hover:scale-105 transition-transform">
+      {/* ── 1. Top Feature Bar (Clear, Non-overlapping Header Row) ────────── */}
+      <div className="w-full flex items-center justify-between gap-2 mb-3">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-[11px] font-display font-extrabold text-amber-900 shadow-soft-xs">
           <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
           <span>15 Min Check</span>
         </div>
-      </motion.div>
 
-      {/* Top Right Float: Wand Realm (Interactive live wand trigger!) */}
-      <motion.div
-        animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 4.0, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-        onMouseEnter={() => handleBadgeHover('celebrating', 'Click to test Magic Air Wand finger tracking!')}
-        onMouseLeave={handleBadgeLeave}
-        className="absolute -top-1 -right-2 sm:-right-4 z-20"
-      >
         {onToggleAirWand ? (
           <button
             type="button"
             onClick={onToggleAirWand}
-            className={`px-3.5 py-1.5 rounded-2xl backdrop-blur-md border-2 border-b-4 shadow-md flex items-center gap-1.5 text-xs font-display font-extrabold cursor-pointer transition-all hover:scale-105 ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-display font-extrabold transition-all cursor-pointer shadow-soft-xs active:scale-95 ${
               isAirWandActive
-                ? 'bg-cyan-500 text-white border-cyan-300 ring-2 ring-cyan-400 shadow-candy-cyan'
-                : 'bg-white/95 border-cyan-200 text-cyan-950 hover:border-cyan-400'
+                ? 'bg-cyan-500 text-white ring-2 ring-cyan-300 shadow-candy-cyan'
+                : 'bg-cyan-50 border border-cyan-200 text-cyan-900 hover:bg-cyan-100'
             }`}
           >
             <Wand2 className={`w-3.5 h-3.5 ${isAirWandActive ? 'text-white animate-spin' : 'text-cyan-600'}`} />
             <span>{isAirWandActive ? 'Air Wand Active ✨' : 'Magic Air Wand'}</span>
           </button>
         ) : (
-          <Link href="/screening/rune-realm">
-            <div className="px-3.5 py-1.5 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-b-4 border-cyan-200 shadow-md flex items-center gap-1.5 text-xs font-display font-extrabold text-cyan-950 cursor-pointer hover:border-cyan-400 hover:scale-105 transition-all">
-              <Wand2 className="w-3.5 h-3.5 text-cyan-600" />
-              <span>Magic Air Wand</span>
-            </div>
+          <Link
+            href="/screening/rune-realm"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-[11px] font-display font-extrabold text-cyan-900 shadow-soft-xs hover:bg-cyan-100 transition-colors"
+          >
+            <Wand2 className="w-3.5 h-3.5 text-cyan-600" />
+            <span>Magic Air Wand</span>
           </Link>
         )}
-      </motion.div>
+      </div>
 
-      {/* Bottom Left Float: Sound Forest */}
-      <motion.div
-        animate={{ y: [0, 6, 0] }}
-        transition={{ duration: 3.8, repeat: Infinity, ease: 'easeInOut', delay: 1.0 }}
-        onMouseEnter={() => handleBadgeHover('encouraging', 'Sound Forest checks voice blending!')}
-        onMouseLeave={handleBadgeLeave}
-        className="absolute bottom-16 -left-2 sm:-left-6 z-20"
-      >
-        <Link href="/screening/sound-forest">
-          <div className="px-3.5 py-1.5 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-b-4 border-emerald-200 shadow-md flex items-center gap-1.5 text-xs font-display font-extrabold text-emerald-950 cursor-pointer hover:border-emerald-400 hover:scale-105 transition-all">
-            <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Sound Forest</span>
-          </div>
-        </Link>
-      </motion.div>
-
-      {/* Bottom Right Float: Memory Mountains */}
-      <motion.div
-        animate={{ y: [0, -7, 0] }}
-        transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-        onMouseEnter={() => handleBadgeHover('thinking', 'Memory Mountains tests rapid naming!')}
-        onMouseLeave={handleBadgeLeave}
-        className="absolute bottom-14 -right-2 sm:-right-6 z-20"
-      >
-        <Link href="/screening/memory-mountains">
-          <div className="px-3.5 py-1.5 rounded-2xl bg-white/95 backdrop-blur-md border-2 border-b-4 border-orange-200 shadow-md flex items-center gap-1.5 text-xs font-display font-extrabold text-orange-950 cursor-pointer hover:border-orange-400 hover:scale-105 transition-all">
-            <Brain className="w-3.5 h-3.5 text-orange-600" />
-            <span>Memory Jewels</span>
-          </div>
-        </Link>
-      </motion.div>
-
-      {/* Mascot Centerpiece (Living & Clickable) */}
+      {/* ── 2. Mascot Centerpiece (With Guaranteed Speech Bubble Clearance) ─ */}
       <div
         onClick={handleDyutiClick}
-        className="relative cursor-pointer group flex flex-col items-center pt-8 pb-4"
-        title="Tap Dyuti!"
+        className="relative cursor-pointer group flex flex-col items-center pt-9 pb-3 w-full"
+        title="Tap Dyuti to interact!"
       >
-        {/* Soft Pedestal Shadow */}
-        <div className="absolute bottom-4 w-40 h-8 bg-amber-900/10 rounded-full blur-md" />
+        {/* Soft Grounding Pedestal Shadow */}
+        <div className="absolute bottom-2 w-36 h-6 bg-amber-900/10 rounded-full blur-md" />
 
-        {/* Mascot Character */}
+        {/* Dynamic Living Mascot Character */}
         <motion.div
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.94 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
           className="relative z-10"
         >
           <LanternMascot
             mood={mood}
-            size={140}
+            size={135}
             speechBubble={speechText}
           />
         </motion.div>
 
-        {/* Tap Prompt Badge below Dyuti */}
-        <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 border border-slate-200 shadow-xs text-[11px] font-display font-extrabold text-ink/70 group-hover:text-amber-800 group-hover:border-amber-300 transition-colors">
+        {/* Micro-Hint Pill */}
+        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100/90 border border-slate-200/80 text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-900 group-hover:border-amber-300 group-hover:bg-amber-50/80 transition-all">
           <Sparkles className="w-3 h-3 text-amber-500" />
-          <span>Tap Dyuti to play &middot; Eyes follow your cursor &amp; air wand</span>
+          <span>Tap Dyuti to play &middot; Eyes follow your cursor</span>
         </div>
       </div>
 
-      {/* Seamless Hero Launch Strip */}
-      <div className="w-full pt-2 flex items-center justify-center">
+      {/* ── 3. Structured Activities Pill Strip (Grid, Never Overlapping) ─── */}
+      <div className="w-full grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-200/60">
+        <Link
+          href="/screening/sound-forest"
+          onMouseEnter={() => handleWorldHover('encouraging', 'Sound Forest checks voice blending! 🌲')}
+          onMouseLeave={handleWorldLeave}
+          className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50/70 border border-emerald-200/70 hover:bg-emerald-100/70 text-emerald-950 text-xs font-display font-bold transition-all"
+        >
+          <Volume2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <span className="truncate">Sound Forest</span>
+        </Link>
+
+        <Link
+          href="/screening/memory-mountains"
+          onMouseEnter={() => handleWorldHover('thinking', 'Memory Mountains tests rapid naming! 🏔️')}
+          onMouseLeave={handleWorldLeave}
+          className="flex items-center gap-2 p-2 rounded-xl bg-orange-50/70 border border-orange-200/70 hover:bg-orange-100/70 text-orange-950 text-xs font-display font-bold transition-all"
+        >
+          <Brain className="w-3.5 h-3.5 text-orange-600 shrink-0" />
+          <span className="truncate">Memory Jewels</span>
+        </Link>
+      </div>
+
+      {/* ── 4. Full Action Launch Button ─────────────────────────────────── */}
+      <div className="w-full mt-3">
         <Link
           href="/screening"
-          className="w-full py-3 px-5 rounded-2xl bg-white border-2 border-b-4 border-slate-200 hover:border-emerald-400 hover:bg-emerald-50/50 shadow-soft-xs text-xs font-display font-extrabold text-ink flex items-center justify-between transition-all group"
+          className="w-full py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-xs text-xs font-display font-bold flex items-center justify-between transition-all group"
         >
           <div className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
             <span>Explore all 5 activities with Dyuti</span>
           </div>
-          <ArrowRight className="w-4 h-4 text-emerald-600 transition-transform group-hover:translate-x-1" />
+          <ArrowRight className="w-4 h-4 text-white/90 transition-transform group-hover:translate-x-1" />
         </Link>
       </div>
     </div>
@@ -195,4 +170,3 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
 };
 
 export const InteractiveLumiCompanion = InteractiveDyutiCompanion;
-
