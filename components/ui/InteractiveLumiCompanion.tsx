@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { LanternMascot, MascotMood } from '@/components/ui/LanternMascot';
-import { Sparkles, Wand2, Volume2, Brain, ArrowRight, Star, Eye, BookOpen } from 'lucide-react';
+import { Sparkles, Wand2, Volume2, Brain, ArrowRight, Star } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface InteractiveDyutiCompanionProps {
@@ -64,13 +64,13 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
   };
 
   return (
-    <div className="relative w-full max-w-[440px] rounded-3xl bg-white/80 backdrop-blur-xl border border-black/[0.07] shadow-soft-lg p-5 sm:p-6 flex flex-col items-center select-none transition-all">
-      {/* Soft Ambient Radial Glow Behind Mascot */}
-      <div className="absolute inset-0 bg-gradient-to-b from-amber-100/50 via-orange-50/30 to-transparent rounded-3xl pointer-events-none -z-10" />
+    <div className="relative w-full max-w-[420px] flex flex-col items-center select-none py-2 transition-all">
+      {/* 1. Organic Ambient Aura Glow (No Card/Box Border) */}
+      <div className="absolute inset-0 -top-6 bg-gradient-to-b from-amber-200/35 via-orange-100/20 to-transparent rounded-full blur-3xl pointer-events-none -z-10" />
 
-      {/* ── 1. Top Feature Bar (Clear, Non-overlapping Header Row) ────────── */}
-      <div className="w-full flex items-center justify-between gap-2 mb-3">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-[11px] font-display font-extrabold text-amber-900 shadow-soft-xs">
+      {/* 2. Top Minimal Quick Badges */}
+      <div className="w-full flex items-center justify-between gap-3 px-2 mb-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-amber-200/80 text-[11px] font-display font-extrabold text-amber-900 shadow-soft-xs">
           <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
           <span>15 Min Check</span>
         </div>
@@ -82,7 +82,7 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-display font-extrabold transition-all cursor-pointer shadow-soft-xs active:scale-95 ${
               isAirWandActive
                 ? 'bg-cyan-500 text-white ring-2 ring-cyan-300 shadow-candy-cyan'
-                : 'bg-cyan-50 border border-cyan-200 text-cyan-900 hover:bg-cyan-100'
+                : 'bg-white/90 backdrop-blur-md border border-cyan-200 text-cyan-900 hover:bg-cyan-50'
             }`}
           >
             <Wand2 className={`w-3.5 h-3.5 ${isAirWandActive ? 'text-white animate-spin' : 'text-cyan-600'}`} />
@@ -91,7 +91,7 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         ) : (
           <Link
             href="/screening/rune-realm"
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-50 border border-cyan-200 text-[11px] font-display font-extrabold text-cyan-900 shadow-soft-xs hover:bg-cyan-100 transition-colors"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/90 backdrop-blur-md border border-cyan-200 text-[11px] font-display font-extrabold text-cyan-900 shadow-soft-xs hover:bg-cyan-50 transition-colors"
           >
             <Wand2 className="w-3.5 h-3.5 text-cyan-600" />
             <span>Magic Air Wand</span>
@@ -99,25 +99,25 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         )}
       </div>
 
-      {/* ── 2. Mascot Centerpiece (With Guaranteed Speech Bubble Clearance) ─ */}
+      {/* 3. Mascot Centerpiece (Living & Cardless) */}
       <div
         onClick={handleDyutiClick}
-        className="relative cursor-pointer group flex flex-col items-center pt-10 pb-2 w-full"
+        className="relative cursor-pointer group flex flex-col items-center pt-8 pb-2 w-full"
         title="Tap Dyuti to interact!"
       >
         {/* Soft Grounding Pedestal Shadow */}
-        <div className="absolute bottom-2 w-44 h-7 bg-amber-900/10 rounded-full blur-md" />
+        <div className="absolute bottom-2 w-48 h-7 bg-amber-900/10 rounded-full blur-md" />
 
-        {/* Dynamic Living Mascot Character (Bigger & Expressive) */}
+        {/* Living Mascot Character (Bigger & Expressive) */}
         <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: 'spring', stiffness: 400, damping: 22 }}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           className="relative z-10"
         >
           <LanternMascot
             mood={mood}
-            size={175}
+            size={185}
             speechBubble={speechText}
           />
         </motion.div>
@@ -126,20 +126,20 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         <motion.div
           animate={{ opacity: [1, 0.5, 1] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
-          className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-900 group-hover:border-amber-300 group-hover:bg-amber-50/80 transition-all shadow-xs"
+          className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-black/[0.06] text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-950 group-hover:border-amber-300 group-hover:bg-amber-50/90 transition-all shadow-soft-xs"
         >
           <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
           <span>Wave hand or tap Dyuti &middot; Eyes follow your cursor</span>
         </motion.div>
       </div>
 
-      {/* ── 3. Structured Activities Pill Strip (Grid, Never Overlapping) ─── */}
-      <div className="w-full grid grid-cols-2 gap-2.5 mt-3 pt-3.5 border-t border-slate-200/60">
+      {/* 4. Lightweight Activities Strip (Free Floating, No Box Enclosure) */}
+      <div className="w-full grid grid-cols-2 gap-2.5 mt-3 px-1">
         <Link
           href="/screening/sound-forest"
           onMouseEnter={() => handleWorldHover('encouraging', 'Sound Forest checks voice blending! 🌲')}
           onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80 hover:bg-emerald-100 text-emerald-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
+          className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-emerald-200/80 hover:bg-emerald-50 text-emerald-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
         >
           <Volume2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span className="truncate">Sound Forest</span>
@@ -149,15 +149,15 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
           href="/screening/memory-mountains"
           onMouseEnter={() => handleWorldHover('thinking', 'Memory Mountains tests rapid naming! 🏔️')}
           onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2.5 rounded-xl bg-orange-50/80 border border-orange-200/80 hover:bg-orange-100 text-orange-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
+          className="flex items-center gap-2 p-2.5 rounded-2xl bg-white/80 backdrop-blur-md border border-orange-200/80 hover:bg-orange-50 text-orange-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
         >
           <Brain className="w-4 h-4 text-orange-600 shrink-0" />
           <span className="truncate">Memory Jewels</span>
         </Link>
       </div>
 
-      {/* ── 4. Full Action Launch Button ─────────────────────────────────── */}
-      <div className="w-full mt-3">
+      {/* 5. Clean Launch Action Button */}
+      <div className="w-full mt-3 px-1">
         <Link
           href="/screening"
           className="w-full py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-sm text-xs font-display font-bold flex items-center justify-between transition-all group"
