@@ -100,7 +100,11 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
             className="absolute z-30 left-1/2 -translate-x-1/2 pointer-events-none"
             style={{ bottom: 'calc(100% + 14px)', width: 'max-content', maxWidth: 280 }}
           >
-            <div className="relative bg-white/95 backdrop-blur-xl border border-hairline shadow-soft-md px-4 py-2 text-xs sm:text-sm font-display font-bold leading-snug text-ink text-center rounded-2xl">
+            <motion.div
+              animate={{ opacity: [1, 0.5, 1] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+              className="relative bg-white/95 backdrop-blur-xl border border-hairline shadow-soft-md px-4 py-2 text-xs sm:text-sm font-display font-bold leading-snug text-ink text-center rounded-2xl ring-1 ring-black/[0.04]"
+            >
               {speechBubble}
               {/* Downward triangle pointer to Lumi's head */}
               <svg
@@ -112,7 +116,7 @@ export const LanternMascot: React.FC<LanternMascotProps> = ({
                 <path d="M0 0 L8 8 L16 0 Z" fill="white" />
                 <path d="M0 0 L8 8 L16 0 Z" fill="none" stroke="rgba(43,42,51,0.12)" strokeWidth="1" />
               </svg>
-            </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

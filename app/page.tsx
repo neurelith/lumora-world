@@ -286,7 +286,7 @@ export default function HomePage() {
       </header>
 
       {/* ── Main Hero Cockpit ─────────────────────────────────────────── */}
-      <section className="relative overflow-hidden pt-8 pb-14 sm:pt-12 sm:pb-20 md:pt-16 md:pb-24 border-b border-slate-200/80">
+      <section className="relative overflow-hidden pt-6 pb-12 sm:pt-8 sm:pb-16 md:pt-10 md:pb-20 border-b border-slate-200/80">
         <div aria-hidden="true" className="pointer-events-none absolute inset-0">
           <div className="absolute -top-24 -right-24 h-[420px] w-[420px] sm:h-[540px] sm:w-[540px] rounded-full bg-amber-200/35 blur-[90px]" />
           <div className="absolute top-48 -left-20 h-[360px] w-[360px] rounded-full bg-emerald-100/45 blur-[90px]" />
@@ -363,8 +363,8 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Right Column: Living Interactive Lumi Mascot Companion */}
-            <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            {/* Right Column: Living Interactive Dyuti Mascot Companion (Shifted Up ~10%) */}
+            <div className="lg:col-span-5 flex justify-center lg:justify-end -translate-y-2 sm:-translate-y-4 lg:-translate-y-7">
               <InteractiveLumiCompanion
                 isAirWandActive={airWandActive}
                 onToggleAirWand={() => setAirWandActive((prev) => !prev)}

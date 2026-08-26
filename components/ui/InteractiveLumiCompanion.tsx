@@ -102,13 +102,13 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
       {/* ── 2. Mascot Centerpiece (With Guaranteed Speech Bubble Clearance) ─ */}
       <div
         onClick={handleDyutiClick}
-        className="relative cursor-pointer group flex flex-col items-center pt-9 pb-3 w-full"
+        className="relative cursor-pointer group flex flex-col items-center pt-10 pb-2 w-full"
         title="Tap Dyuti to interact!"
       >
         {/* Soft Grounding Pedestal Shadow */}
-        <div className="absolute bottom-2 w-36 h-6 bg-amber-900/10 rounded-full blur-md" />
+        <div className="absolute bottom-2 w-44 h-7 bg-amber-900/10 rounded-full blur-md" />
 
-        {/* Dynamic Living Mascot Character */}
+        {/* Dynamic Living Mascot Character (Bigger & Expressive) */}
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -117,27 +117,31 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
         >
           <LanternMascot
             mood={mood}
-            size={135}
+            size={175}
             speechBubble={speechText}
           />
         </motion.div>
 
-        {/* Micro-Hint Pill */}
-        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-slate-100/90 border border-slate-200/80 text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-900 group-hover:border-amber-300 group-hover:bg-amber-50/80 transition-all">
-          <Sparkles className="w-3 h-3 text-amber-500" />
-          <span>Tap Dyuti to play &middot; Eyes follow your cursor</span>
-        </div>
+        {/* Micro-Hint Pill with gentle 50% breathing pulse */}
+        <motion.div
+          animate={{ opacity: [1, 0.5, 1] }}
+          transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
+          className="mt-4 inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-[11px] font-display font-semibold text-ink/75 group-hover:text-amber-900 group-hover:border-amber-300 group-hover:bg-amber-50/80 transition-all shadow-xs"
+        >
+          <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+          <span>Wave hand or tap Dyuti &middot; Eyes follow your cursor</span>
+        </motion.div>
       </div>
 
       {/* ── 3. Structured Activities Pill Strip (Grid, Never Overlapping) ─── */}
-      <div className="w-full grid grid-cols-2 gap-2 mt-2 pt-3 border-t border-slate-200/60">
+      <div className="w-full grid grid-cols-2 gap-2.5 mt-3 pt-3.5 border-t border-slate-200/60">
         <Link
           href="/screening/sound-forest"
           onMouseEnter={() => handleWorldHover('encouraging', 'Sound Forest checks voice blending! 🌲')}
           onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2 rounded-xl bg-emerald-50/70 border border-emerald-200/70 hover:bg-emerald-100/70 text-emerald-950 text-xs font-display font-bold transition-all"
+          className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/80 hover:bg-emerald-100 text-emerald-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
         >
-          <Volume2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <Volume2 className="w-4 h-4 text-emerald-600 shrink-0" />
           <span className="truncate">Sound Forest</span>
         </Link>
 
@@ -145,9 +149,9 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
           href="/screening/memory-mountains"
           onMouseEnter={() => handleWorldHover('thinking', 'Memory Mountains tests rapid naming! 🏔️')}
           onMouseLeave={handleWorldLeave}
-          className="flex items-center gap-2 p-2 rounded-xl bg-orange-50/70 border border-orange-200/70 hover:bg-orange-100/70 text-orange-950 text-xs font-display font-bold transition-all"
+          className="flex items-center gap-2 p-2.5 rounded-xl bg-orange-50/80 border border-orange-200/80 hover:bg-orange-100 text-orange-950 text-xs font-display font-bold transition-all shadow-soft-xs hover:scale-[1.02]"
         >
-          <Brain className="w-3.5 h-3.5 text-orange-600 shrink-0" />
+          <Brain className="w-4 h-4 text-orange-600 shrink-0" />
           <span className="truncate">Memory Jewels</span>
         </Link>
       </div>
@@ -156,7 +160,7 @@ export const InteractiveDyutiCompanion: React.FC<InteractiveDyutiCompanionProps>
       <div className="w-full mt-3">
         <Link
           href="/screening"
-          className="w-full py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-xs text-xs font-display font-bold flex items-center justify-between transition-all group"
+          className="w-full py-3 px-5 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white shadow-soft-sm text-xs font-display font-bold flex items-center justify-between transition-all group"
         >
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
