@@ -37,8 +37,8 @@ export const metadata: Metadata = {
   },
   formatDetection: { telephone: false },
   icons: {
-    icon: [{ url: "/lumora_logo_transparent.png", type: "image/png" }],
-    apple: [{ url: "/lumora_logo_transparent.png", sizes: "180x180" }],
+    icon: [{ url: "/dyutipath_logo.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/dyutipath_logo.svg" }],
   },
   openGraph: {
     type: "website",
@@ -46,7 +46,7 @@ export const metadata: Metadata = {
     title: "DyutiPath — Five Worlds of Learning in Your Classroom",
     description:
       "Camera air-tracing + gamified screening for dyslexia & dysgraphia triage, aligned with DALI (NBRC). Works on any classroom tablet, offline-ready.",
-    images: [{ url: "/lumora_logo_transparent.png", width: 512, height: 512 }],
+    images: [{ url: "/dyutipath_logo.svg", width: 512, height: 512 }],
     locale: "en_IN",
     alternateLocale: "hi_IN",
   },
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "DyutiPath — Five Worlds of Learning in Your Classroom",
     description:
       "Tablet-first bilingual dyslexia screening & adaptive practice. DALI-aligned. Zero biometric transmission.",
-    images: ["/lumora_logo_transparent.png"],
+    images: ["/dyutipath_logo.svg"],
   },
 };
 

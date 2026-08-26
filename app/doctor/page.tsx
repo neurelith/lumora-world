@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { TriageIndicator } from '@/components/ui/TriageIndicator';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { DALIBenchmarkMatrix } from '@/components/doctor/DALIBenchmarkMatrix';
+import { DyutiLogoMark } from '@/components/ui/DyutiLogoMark';
 import { StudentCohortRecord, Language, IASQItem, IASQResult } from '@/lib/types';
 import { getLocalScreeningSessions, saveIASQResult, signInSpecialist, signOutSpecialist, onAuthChange, isConfigured } from '@/lib/firebase';
 import {
@@ -733,7 +734,7 @@ export default function DoctorHubPage() {
           <Card className="max-w-4xl mx-auto p-8 md:p-12 bg-white border-2 border-hairline shadow-soft-md space-y-8 print:shadow-none print:border-none">
             <div className="flex items-center justify-between pb-6 border-b-2 border-hairline">
               <div className="flex items-center gap-3">
-                <Image src="/lumora_logo_transparent.png" alt="DyutiPath" width={48} height={48} />
+                <DyutiLogoMark size={44} />
                 <div>
                   <h2 className="font-display font-extrabold text-2xl text-ink">
                     DALI Intake & Screening Summary Packet

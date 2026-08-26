@@ -9,7 +9,7 @@ const PRECACHE_URLS = [
   '/haven',
   '/offline.html',
   '/manifest.json',
-  '/lumora_logo_transparent.png',
+  '/dyutipath_logo.svg',
 ];
 
 self.addEventListener('install', (event) => {

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LanternMascot, MascotMood } from '@/components/ui/LanternMascot';
+import { DyutiLogoMark } from '@/components/ui/DyutiLogoMark';
 import {
   ArrowLeft,
   Star,
@@ -135,14 +136,12 @@ export default function FeedbackPage() {
 
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-ink selection:bg-amber-200">
-      {/* ── Navigation Bar ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-8 h-16">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative h-9 w-9 flex-shrink-0 transition-transform group-hover:scale-105">
-              <Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" priority />
-            </div>
-            <span className="font-display text-xl font-extrabold tracking-tight text-ink">
+      {/* ── Navigation Bar (Apple HIG Clean Layout) ────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/80 backdrop-blur-xl backdrop-saturate-150 transition-all">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 md:px-8 h-16">
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <DyutiLogoMark size={34} className="transition-transform group-hover:scale-105 duration-200" />
+            <span className="font-display text-[20px] font-extrabold tracking-tight text-ink">
               Dyuti<span className="text-amber-600">Path</span>
             </span>
           </Link>
@@ -150,18 +149,18 @@ export default function FeedbackPage() {
           <div className="flex items-center gap-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-slate-200 bg-white text-xs font-display font-bold text-ink hover:bg-slate-50 transition-colors shadow-soft-xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-black/[0.08] bg-white text-xs font-display font-bold text-ink hover:bg-slate-50 transition-colors shadow-soft-xs"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Back to Home</span>
             </Link>
 
-            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-full p-0.5 text-xs font-bold">
+            <div className="flex items-center bg-black/[0.04] p-1 rounded-full border border-black/[0.06] text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  language === 'en' ? 'bg-white text-ink shadow-xs' : 'text-ink/60 hover:text-ink'
+                className={`px-3 py-1 rounded-full transition-all text-xs ${
+                  language === 'en' ? 'bg-white text-ink shadow-xs font-bold' : 'text-ink/60 hover:text-ink'
                 }`}
               >
                 EN
@@ -169,8 +168,8 @@ export default function FeedbackPage() {
               <button
                 type="button"
                 onClick={() => setLanguage('hi')}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  language === 'hi' ? 'bg-white text-ink shadow-xs' : 'text-ink/60 hover:text-ink'
+                className={`px-3 py-1 rounded-full transition-all text-xs ${
+                  language === 'hi' ? 'bg-white text-ink shadow-xs font-bold' : 'text-ink/60 hover:text-ink'
                 }`}
               >
                 हिन्दी

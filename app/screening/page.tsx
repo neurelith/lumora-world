@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/i18n';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { LanternMascot } from '@/components/ui/LanternMascot';
+import { DyutiLogoMark } from '@/components/ui/DyutiLogoMark';
 import { SoundForest } from '@/components/screening/SoundForest';
 import { StoryCastle } from '@/components/screening/StoryCastle';
 import { RuneRealm } from '@/components/screening/RuneRealm';
@@ -164,8 +165,10 @@ export default function ScreeningPage() {
           </Link>
 
           <div className="flex items-center gap-2.5">
-            <div className="relative w-7 h-7"><Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" /></div>
-            <span className="font-display font-semibold tracking-[-0.03em] text-[17px] text-ink">DyutiPath Screening</span>
+            <DyutiLogoMark size={28} />
+            <span className="font-display font-bold tracking-tight text-[17px] text-ink">
+              Dyuti<span className="text-amber-600">Path</span> Screening
+            </span>
           </div>
 
           <div className="flex items-center gap-3">

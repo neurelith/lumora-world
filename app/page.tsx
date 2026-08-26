@@ -7,6 +7,7 @@ import { useTranslation } from '@/lib/i18n';
 import { LanternMascot } from '@/components/ui/LanternMascot';
 import { InteractiveLumiCompanion } from '@/components/ui/InteractiveLumiCompanion';
 import { UniversalAirWand } from '@/components/ui/UniversalAirWand';
+import { DyutiLogoMark } from '@/components/ui/DyutiLogoMark';
 import {
   ArrowRight,
   Stethoscope,
@@ -121,100 +122,108 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FAF9FC] text-ink selection:bg-amber-200">
-      {/* ── Navigation Bar ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 md:px-8 h-16">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="relative h-9 w-9 flex-shrink-0 transition-transform group-hover:scale-105">
-              <Image src="/lumora_logo_transparent.png" alt="DyutiPath" fill className="object-contain" priority />
-            </div>
-            <span className="font-display text-xl font-extrabold tracking-tight text-ink">
+      {/* ── Navigation Bar (Apple HIG Clean Layout) ────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-black/[0.06] bg-white/80 backdrop-blur-xl backdrop-saturate-150 transition-all">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 md:px-8 h-16">
+          {/* 1. Left: Brand Mark & Wordmark */}
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <DyutiLogoMark size={34} className="transition-transform group-hover:scale-105 duration-200" />
+            <span className="font-display text-[20px] font-extrabold tracking-tight text-ink">
               Dyuti<span className="text-amber-600">Path</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-ink-secondary">
+          {/* 2. Center: Clean, Airy Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-8 text-[13px] font-medium text-ink/75">
+            <Link href="#worlds" className="transition-colors hover:text-ink">
+              The 5 Worlds
+            </Link>
             <Link href="#how-it-works" className="transition-colors hover:text-ink">
               How It Works
             </Link>
-            <Link href="#worlds" className="transition-colors hover:text-ink">
-              The 5 Activities
+            <Link href="/doctor" className="transition-colors hover:text-ink">
+              Specialist Hub
             </Link>
-            <Link href="#approach" className="transition-colors hover:text-ink">
-              For Schools
-            </Link>
-            <Link href="#privacy" className="transition-colors hover:text-ink">
-              Privacy
-            </Link>
-            <Link href="/feedback" className="transition-colors hover:text-amber-700 text-amber-900 font-bold">
+            <Link href="/feedback" className="transition-colors hover:text-amber-700 text-amber-900 font-semibold">
               Feedback
             </Link>
           </nav>
 
-          {/* Desktop Actions */}
+          {/* 3. Right: Functional Actions (Language + Single CTA) */}
           <div className="hidden sm:flex items-center gap-3">
-            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-full p-0.5 text-xs font-bold">
+            {/* Apple-style Segmented Language Switcher */}
+            <div className="flex items-center bg-black/[0.04] p-1 rounded-full border border-black/[0.06] text-xs font-semibold">
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  language === 'en' ? 'bg-white text-ink shadow-xs' : 'text-ink-secondary hover:text-ink'
+                className={`px-3 py-1 rounded-full transition-all text-xs ${
+                  language === 'en'
+                    ? 'bg-white text-ink shadow-xs font-bold'
+                    : 'text-ink/60 hover:text-ink'
                 }`}
-              >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage('hi')}
-                className={`px-3 py-1 rounded-full transition-all ${
-                  language === 'hi' ? 'bg-white text-ink shadow-xs' : 'text-ink-secondary hover:text-ink'
-                }`}
-              >
-                हिन्दी
-              </button>
-            </div>
-
-            <Link
-              href="/doctor"
-              className="inline-flex items-center gap-1.5 rounded-full border-2 border-slate-200 bg-white px-3.5 py-1.5 text-xs font-extrabold text-ink transition-colors hover:border-slate-400 hover:bg-slate-50 shadow-xs"
-            >
-              <Stethoscope className="h-4 w-4 text-purple-600" />
-              <span>Specialist Hub</span>
-            </Link>
-
-            <Link
-              href="/screening"
-              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-b from-[#22C55E] to-[#16A34A] border-b-2 border-[#15803D] px-4 py-1.5 text-xs font-extrabold text-white shadow-candy-emerald hover:brightness-105 active:translate-y-0.5"
-            >
-              <Sparkles className="h-3.5 w-3.5 fill-white" />
-              <span>Start Screening</span>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex items-center gap-2 sm:hidden">
-            <div className="flex items-center bg-slate-100 border border-slate-200 rounded-full p-0.5 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setLanguage('en')}
-                className={`px-2.5 py-0.5 rounded-full ${language === 'en' ? 'bg-white text-ink shadow-xs' : 'text-ink-secondary'}`}
               >
                 EN
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('hi')}
-                className={`px-2.5 py-0.5 rounded-full ${language === 'hi' ? 'bg-white text-ink shadow-xs' : 'text-ink-secondary'}`}
+                className={`px-3 py-1 rounded-full transition-all text-xs ${
+                  language === 'hi'
+                    ? 'bg-white text-ink shadow-xs font-bold'
+                    : 'text-ink/60 hover:text-ink'
+                }`}
+              >
+                हिन्दी
+              </button>
+            </div>
+
+            {/* Specialist Quick Link */}
+            <Link
+              href="/doctor"
+              className="hidden md:inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold text-ink/80 hover:text-ink hover:bg-black/[0.04] transition-colors"
+            >
+              <Stethoscope className="w-3.5 h-3.5 text-purple-600" />
+              <span>Specialist</span>
+            </Link>
+
+            {/* Single Bold Primary CTA */}
+            <Link
+              href="/screening"
+              className="inline-flex items-center gap-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] px-4 py-2 text-xs font-extrabold font-display text-white shadow-soft-xs hover:shadow-soft-sm transition-all"
+            >
+              <Sparkles className="w-3.5 h-3.5 fill-white/80" />
+              <span>Start Screening</span>
+            </Link>
+          </div>
+
+          {/* Mobile Actions & Menu Trigger */}
+          <div className="flex items-center gap-2 sm:hidden">
+            <div className="flex items-center bg-black/[0.04] p-0.5 rounded-full border border-black/[0.06] text-xs font-bold">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`px-2.5 py-0.5 rounded-full text-[11px] ${
+                  language === 'en' ? 'bg-white text-ink shadow-xs font-bold' : 'text-ink/60'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('hi')}
+                className={`px-2.5 py-0.5 rounded-full text-[11px] ${
+                  language === 'hi' ? 'bg-white text-ink shadow-xs font-bold' : 'text-ink/60'
+                }`}
               >
                 हि
               </button>
             </div>
+
             <button
               type="button"
               onClick={() => setMobileMenuOpen((prev) => !prev)}
               aria-label="Toggle menu"
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-ink"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-black/[0.08] bg-white text-ink shadow-soft-xs"
             >
               {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
             </button>
@@ -223,50 +232,55 @@ export default function HomePage() {
 
         {/* Mobile Dropdown Drawer */}
         {mobileMenuOpen && (
-          <div className="border-t border-slate-200 bg-white/95 backdrop-blur-xl px-4 py-4 sm:hidden animate-fade-in shadow-xl">
-            <nav className="flex flex-col gap-2.5 text-sm font-bold text-ink">
+          <div className="border-t border-black/[0.06] bg-white/95 backdrop-blur-xl px-4 py-5 sm:hidden animate-fade-in shadow-xl space-y-3">
+            <nav className="flex flex-col gap-1 text-sm font-semibold text-ink">
+              <Link
+                href="#worlds"
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2.5 rounded-xl hover:bg-slate-50 flex items-center justify-between"
+              >
+                <span>The 5 Worlds</span>
+                <ArrowRight className="h-4 w-4 text-ink-tertiary" />
+              </Link>
               <Link
                 href="#how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-2xl hover:bg-slate-100 flex items-center justify-between"
+                className="px-3 py-2.5 rounded-xl hover:bg-slate-50 flex items-center justify-between"
               >
                 <span>How It Works</span>
                 <ArrowRight className="h-4 w-4 text-ink-tertiary" />
               </Link>
               <Link
-                href="#worlds"
-                onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-2xl hover:bg-slate-100 flex items-center justify-between"
-              >
-                <span>The 5 Activities</span>
-                <ArrowRight className="h-4 w-4 text-ink-tertiary" />
-              </Link>
-              <Link
                 href="/doctor"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-2xl hover:bg-slate-100 flex items-center justify-between"
+                className="px-3 py-2.5 rounded-xl hover:bg-slate-50 flex items-center justify-between"
               >
-                <span>Specialist Hub</span>
+                <div className="flex items-center gap-2">
+                  <Stethoscope className="w-4 h-4 text-purple-600" />
+                  <span>Specialist Hub</span>
+                </div>
                 <ArrowRight className="h-4 w-4 text-ink-tertiary" />
               </Link>
               <Link
                 href="/feedback"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2.5 rounded-2xl hover:bg-amber-50 text-amber-900 flex items-center justify-between font-bold"
+                className="px-3 py-2.5 rounded-xl hover:bg-amber-50 text-amber-900 font-bold flex items-center justify-between"
               >
                 <span>Community Feedback</span>
-                <ArrowRight className="h-4 w-4 text-amber-700" />
+                <ArrowRight className="h-4 w-4 text-amber-600" />
               </Link>
-              <div className="pt-2 border-t border-slate-200">
-                <Link
-                  href="/screening"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 text-sm font-extrabold text-white shadow-md"
-                >
-                  <Sparkles className="h-4 w-4" /> Start Screening Free
-                </Link>
-              </div>
             </nav>
+
+            <div className="pt-2 border-t border-slate-100">
+              <Link
+                href="/screening"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-600 hover:bg-emerald-700 py-3 text-sm font-bold text-white shadow-soft-xs"
+              >
+                <Sparkles className="w-4 h-4 fill-white/80" />
+                <span>Start Screening</span>
+              </Link>
+            </div>
           </div>
         )}
       </header>
